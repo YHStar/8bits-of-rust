@@ -15,7 +15,7 @@
 export default { name: 'MyInput' }
 </script>
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 const props = defineProps({
   modelValue: String,
   placeholder: {
@@ -27,6 +27,10 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'input', 'change'])
 
 const inputValue = ref(props.modelValue)
+
+watch(() => props.modelValue, (newVal) => {
+  inputValue.value = newVal
+})
 
 const handleInput = (val) => {
   emit('update:modelValue', val)
@@ -45,9 +49,11 @@ const handleChange = (val) => {
 
   :deep(.el-input__wrapper) {
     background: var(--bg-color);
+    box-sizing: border-box;
     border: 2px solid var(--pixel-border);
     border-radius: 0;
     max-width: 200px;
+    height: 50px;
     padding: 4px 8px;
     font-family: 'Zpix', monospace;
     font-size: 14px;

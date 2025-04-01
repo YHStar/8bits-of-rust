@@ -5,7 +5,10 @@
       Your browser does not support the audio element.
     </audio> -->
     <router-link v-if="StartRoute" to="/compose">
-      <my-button text="创作你的8bit音乐" />
+      <my-test />
+      <div class="start-button">
+        <my-button text="创作你的8bit音乐" size="large" />
+      </div>
     </router-link>
     <!-- <my-test></my-test> -->
     <div v-show="!StartRoute">
@@ -28,11 +31,11 @@
 </template>
 
 <script>
-import Compose from '@/views/Compose.vue'
-import Songs from '@/views/Songs.vue'
-import Developers from '@/views/Developers.vue'
+import Compose from "@/views/Compose.vue";
+import Songs from "@/views/Songs.vue";
+import Developers from "@/views/Developers.vue";
 
-console.log('begin')
+console.log("begin");
 export default {
   components: {
     Compose,
@@ -41,49 +44,54 @@ export default {
   },
   computed: {
     StartRoute() {
-      console.log(this.$route.path === '/')
-      return this.$route.path === '/'
+      console.log(this.$route.path === "/");
+      return this.$route.path === "/";
     },
   },
   mounted() {
-    this.$el.addEventListener('selectstart', this.handleSelectStart)
-    this.$el.addEventListener('contextmenu', this.handleContextMenu)
+    this.$el.addEventListener("selectstart", this.handleSelectStart);
+    this.$el.addEventListener("contextmenu", this.handleContextMenu);
   },
   beforeDestroy() {
-    this.$el.removeEventListener('selectstart', this.handleSelectStart)
-    this.$el.removeEventListener('contextmenu', this.handleContextMenu)
+    this.$el.removeEventListener("selectstart", this.handleSelectStart);
+    this.$el.removeEventListener("contextmenu", this.handleContextMenu);
   },
   methods: {
     handleSelectStart(e) {
       if (!e.target.matches('input, textarea, [contenteditable="true"]')) {
-        e.preventDefault()
+        e.preventDefault();
       }
     },
     handleContextMenu(e) {
       if (!e.target.matches('input, textarea, [contenteditable="true"]')) {
-        e.preventDefault()
+        e.preventDefault();
       }
     },
   },
-}
+};
 </script>
 
 <style>
 .card-container::before {
-  content: '';
+  content: "";
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: url('./assets/image.png') rgb(255, 157, 36) repeat;
+  background: url("./assets/image.png") rgb(255, 157, 36) repeat;
   background-blend-mode: multiply;
   opacity: 0.3;
   z-index: -1;
 }
 
-.content {
-  position: relative;
-  z-index: 0; /* 确保内容在背景层上方 */
+
+.start-button{
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh; /* 撑满整个视口高度 */
 }
 </style>

@@ -5,7 +5,7 @@
   --pixel-border: #555;
   --pixel-text: #000;
   --pixel-disabled: #555;
-  --pixel-highlight: #fff;
+  --pixel-highlight: #ffffff;
   --pixel-ghost: #bbb;
 }
 * {
@@ -31,10 +31,10 @@ textarea,
   display: flex;
   flex-direction: column;
   flex: 1;
-  z-index: 7;
+  z-index: 1;
   padding: 20px;
   background: var(--pixel-background);
-  overflow: auto;
+  overflow: hidden;
 }
 
 table {
@@ -47,5 +47,21 @@ th, td {
   text-align: center;
 }
 td {
-  background-color: #ffffff;
+  background-color: #fff;
+}
+/* 滚动条整体样式 */
+::-webkit-scrollbar {
+  width: 20px;  /* 默认宽度从16px缩减50%[1,6](@ref) */
+  height: 20px; /* 水平滚动条高度 */
+}
+
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb {
+  background: #888; 
+  border: 2px solid, #eee;
+}
+
+/* 滚动条轨道 */
+::-webkit-scrollbar-track {
+  background: #eee; /* 浅灰轨道提升对比度[2](@ref) */
 }

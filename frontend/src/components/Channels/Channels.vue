@@ -1,5 +1,4 @@
 <template>
-  <div></div>
   <div class="roll">
     <div class="header-bar" :style="{ width: 100 + 5 + 200 * this.n_bars + 'px' }">
       <span
@@ -18,13 +17,12 @@
     <div class="content-area">
       <PatternManager />
     </div>
-    <!-- </my-left-bar> -->
   </div>
 </template>
 
 <script>
 // import Score from './Score.vue'
-import PatternManager from './PatternManager.vue'
+import PatternManager from './Displays.vue'
 import ChannelNames from './ChannelNames.vue'
 export default {
   name: 'Channels',
@@ -51,17 +49,16 @@ export default {
 .roll {
   position: relative;
   height: 400px;
-  width: 100%;
+  width: calc(100% - 100px);
   background: #ccc;
   overflow-x: scroll;
-  overflow-y: scroll;
+  overflow-y: auto;
   z-index: 0;
 
   .content-area {
     left: 80px;
     position: relative;
     width: calc(100%);
-    height: calc(100%);
     z-index: 1;
   }
 

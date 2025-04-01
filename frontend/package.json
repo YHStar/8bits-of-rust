@@ -11,8 +11,10 @@
     "core-js": "^3.8.3",
     "element-plus": "^2.9.6",
     "vue": "^3.2.13",
+    "vue-draggable-plus": "^0.6.0",
     "vue-knob-control": "^1.7.0",
     "vue-router": "^4.5.0",
+    "vuedraggable": "^2.24.3",
     "vuex": "^4.1.0",
     "vuex-persistedstate": "^4.1.0"
   },

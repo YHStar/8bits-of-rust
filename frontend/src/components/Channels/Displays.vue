@@ -1,28 +1,14 @@
 <template>
   <div
     @mousedown.left="handleCanvasMouseDown"
-    @mouseup="handleCanvasMouseUp"
-    @mousemove="handleCanvasMouseMove"
   >
-    <!-- <div 
-		v-for="row in 88"
-	>
-		<div
-			v-for="col in 5"
-			class ="pattern"
-			:style="patternStyle(row, 3*(col - 1), 2)"
-			@mousedown.right="deletepattern(pattern.id)"
-			@mousedown.left="startDragpattern(pattern, $event)"
-		>
-		</div>
-	</div> -->
     <div
-      v-for="pattern in patterns"
+      v-for="display in displays"
       class="pattern"
-      :style="patternStyle(88 - pattern.pitch, pattern.starttime, 2)"
-      @mousedown.right="deletePattern(pattern.id)"
-      @mousedown.left="dragPattern(pattern, $event)"
-    ></div>
+      :style="patternStyle(display.channel, display.starttime, 2, display.color)"
+      @click.right="deleteDisplay(display.id, display.channel)"
+      >
+    </div>
     <my-grid :n_rows="5" :h_rows="50" ref="gridEl" />
     <div class="pattern-resize-handle"></div>
   </div>
@@ -37,9 +23,10 @@ import { ref, computed, onMounted } from 'vue'
 import { useStore, mapState } from 'vuex'
 
 const store = useStore()
-const patterns = computed(() => store.state.patterns)
+const displays = computed(() => store.state.displays)
+const pattern = computed(() => store.getters.getActivePattern);
+const activePattern = computed(() => store.state.activePattern); // 跟踪激活状态
 
-// store.state.patterns)
 const gridEl = ref(null)
 
 // const patterns = computed(() => {
@@ -51,11 +38,13 @@ const gridEl = ref(null)
 // })
 
 // 音符样式计算
-const patternStyle = (row, col, duration) => ({
+const patternStyle = (row, col, duration, color) => ({
   left: `${col * 25}px`,
   top: `${row * 50 + 1}px`,
   width: `${duration * 25 - 3 - 1}px`,
   height: `${50 - 2}px`,
+  backgroundColor: color,
+  borderRight: `3px solid #666`
 })
 
 // 事件处理函数
@@ -64,14 +53,15 @@ const selectedpatterns = ref(new Set())
 const selectionBox = ref({ x1: 0, y1: 0, x2: 0, y2: 0 })
 
 onMounted(() => {
-  // console.log("patterns: ", patterns.grid[0][0] )
+  // console.log("displays: ", displays)
+  // console.log("Patterns: ", patterns)
   // store.commit('initpatterns')
 })
 
 const handleCanvasMouseDown = (e) => {
-  for (var pattern = 0; pattern < store.state.patterns.length; pattern++) {
-    console.log(pattern.id)
-  }
+  // for (var pattern = 0; pattern < store.state.patterns.length; pattern++) {
+  //   console.log(pattern.id)
+  // }
   // let x2 = e.clientX - rect.left
   // let y2 = e.clientY - rect.top
   if (e.ctrlKey || e.metaKey) return
@@ -93,51 +83,36 @@ const handleCanvasMouseDown = (e) => {
     // const rect = e.target.getBoundingClientRect()
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
-
-    const newPattern = {
-      id: Date.now(),
-      starttime: Math.floor(x / 25),
-      duration: 1,
-      pitch: 88 - Math.floor(y / 50),
+    console.log("add display:", store.state.activePattern)
+    // console.log("add display:", activePattern.value)
+    if(activePattern.value > 0){
+      const newDisplay = {
+        id: pattern.value.id,
+        starttime: Math.floor(x / 25),
+        duration: 1,
+        channel: Math.floor(y / 50),
+        color: pattern.value.color
+      }
+      // console.log('handleCanvasMouseDown', store.state.patterns, newpattern )
+      store.commit('addDisplay', newDisplay)      
     }
-    // console.log('handleCanvasMouseDown', store.state.patterns, newpattern )
-    store.commit('addPattern', newPattern)
   }
 }
 
-const addPattern = (e) => {
-  if (e.ctrlKey || e.metaKey) return
-  // if (e.target.classList.contains('grid')) {
-  // 初始化框选
-  const rect = e.target.getBoundingClientRect()
-  const x = e.clientX - rect.left
-  const y = e.clientY - rect.top
-
-  const newPattern = {
-    id: Date.now(),
-    starttime: Math.floor(x / 25),
-    duration: 1,
-    pitch: 88 - Math.floor(y / 50),
-  }
-  // console.log('handleCanvasMouseDown', store.state.patterns, newpattern )
-  store.commit('addPattern', newPattern)
-  // }
+const deleteDisplay = (id, channel) => {
+  store.commit('deleteDisplay', {id, channel})
 }
 
-const deletePattern = (id) => {
-  store.commit('deletePattern', id)
-}
-
-const dragPattern = (pattern, e) => {
-  dragState = {
-    type: 'move',
-    patternId: pattern.id,
-    offsetX: e.offsetX,
-    startX: e.clientX,
-    startY: e.clientY,
-    originalPos: { ...pattern },
-  }
-}
+// const dragPattern = (pattern, e) => {
+//   dragState = {
+//     type: 'move',
+//     patternId: pattern.id,
+//     offsetX: e.offsetX,
+//     startX: e.clientX,
+//     startY: e.clientY,
+//     originalPos: { ...pattern },
+//   }
+// }
 
 // const handleCanvasMouseMove = (e) => {
 // 	if (!dragState) return
@@ -206,10 +181,8 @@ const dragPattern = (pattern, e) => {
 
 <style scoped>
 .pattern {
-  background-color: rgb(255, 232, 172);
   z-index: 9;
   opacity: 1;
   position: absolute;
-  border-right: 3px solid rgb(255, 191, 0);
 }
 </style>

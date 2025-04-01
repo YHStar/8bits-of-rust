@@ -7,7 +7,6 @@
     <div v-show="isOpen" class="dropdown-options">
       <div
         v-for="(option, index) in options"
-        :key="index"
         class="option"
         @click.stop="selectOption(option)"
       >
@@ -19,6 +18,7 @@
 
 <script>
 export default {
+  name: 'MySelect',
   props: {
     options: {
       type: Array,
