@@ -12,34 +12,35 @@
 </template>
 
 <script>
-export default { name: 'MyInput' }
+export default { name: 'MyInput' };
 </script>
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch } from 'vue';
+
 const props = defineProps({
   modelValue: String,
   placeholder: {
     type: String,
     default: '请输入...',
   },
-})
+});
 
-const emit = defineEmits(['update:modelValue', 'input', 'change'])
+const emit = defineEmits(['update:modelValue', 'input', 'change']);
 
-const inputValue = ref(props.modelValue)
+const inputValue = ref(props.modelValue);
 
 watch(() => props.modelValue, (newVal) => {
-  inputValue.value = newVal
-})
+  inputValue.value = newVal;
+});
 
 const handleInput = (val) => {
-  emit('update:modelValue', val)
-  emit('input', val)
-}
+  emit('update:modelValue', val);
+  emit('input', val);
+};
 
 const handleChange = (val) => {
-  emit('change', val)
-}
+  emit('change', val);
+};
 </script>
 
 <style lang="scss" scoped>

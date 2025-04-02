@@ -22,7 +22,7 @@
           :text="pattern.name"
           :active="activePattern === pattern.id"
           :color="pattern.color"
-          @click.left="handleLeftClick(pattern.id)"
+          @click.left="handleLeftClick(pattern.id, $event)"
           @click.right="deletePattern(pattern.id)"
           @dblclick="editPattern(pattern.id)"
         />
@@ -30,9 +30,9 @@
           class="rename"
           v-if="isEdit===pattern.id"
           v-model="newPatternName"
-          placeholder="è¾“å…¥æ–°åç§°..."
+          placeholder="ÊäÈëÐÂÃû³Æ..."
           @keyup.enter="renamePattern(pattern.id)"
-          @keyup.esc="stopRenamePattern(pattern.id)"
+          @keyup.esc="stopRenamePattern"
         />
       </div>
     </div>
@@ -48,17 +48,10 @@ import MyInput from "../common/MyInput.vue";
 const { getRandomColor } = useColorGenerator();
 const store = useStore();
 const patterns = computed(() => store.state.patterns);
-const activePattern = computed(() => store.state.activePattern); // è·Ÿè¸ªæ¿€æ´»çŠ¶æ€
+const activePattern = computed(() => store.state.activePattern); 
 const isEdit = ref(-1);
 const patternName = ref("");
 const newPatternName = ref("")
-// ä½ç½®æ ·å¼è®¡ç®—
-
-
-const handleLeftClick = (id) => {
-
-    store.commit("setActivePattern", id);
-}
 
 const addPattern = () => {
   const newPattern = {
@@ -80,30 +73,36 @@ const deletePattern = (id) => {
   if (isEdit.value === id){
     isEdit.value = -1
   }
-  else if(confirm("ç¡®å®šåˆ é™¤è¿™ä¸ªä¹æ®µï¼Ÿ")) {
+  else if(confirm("È·¶¨É¾³ýÀÖ¶ÎÂð")) {
     if(id === activePattern.value){
-      // console.log("need reset active pattern")
+      console.log("need reset active pattern")
       store.commit("setActivePattern", 0);
+      store.commit("emptyNotes")
     }
     store.commit("deletePattern", id);
   }
 };
 
-const draggingIndex = ref(-1); // è¢«æ‹–æ‹½å…ƒç´ çš„ç´¢å¼•
+const draggingIndex = ref(-1);
 
-// æ‹–æ‹½å¼€å§‹
 const dragStart = (index) => {
   draggingIndex.value = index;
 };
 
-// å…è®¸æ”¾ç½®
 const allowDrop = (e) => {
   e.preventDefault();
 };
 
+let timeout;
 const editPattern = (id) => {
-  // console.log("dbclick")
+  clearTimeout(timeout);
   isEdit.value = id;
+};
+
+const handleLeftClick = (id, e) => {
+  store.commit("saveNotes")
+  store.commit("setActivePattern", id);
+  store.commit("loadNotes")
 };
 
 const renamePattern = (id) => {
@@ -115,12 +114,12 @@ const renamePattern = (id) => {
   newPatternName.value = ""
   isEdit.value = -1
 }
-const stopRenamePattern = (id) => {
+const stopRenamePattern = () => {
   console.log("esc")
   newPatternName.value = ""
   isEdit.value = -1
 }
-// æ”¾ç½®
+// ï¿?1ï¿?7ï¿?1ï¿?7ï¿?1ï¿?7ï¿?1ï¿?7
 const drop = (index) => {
   store.commit("sortPattern", {
     index: draggingIndex.value,

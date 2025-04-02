@@ -49,19 +49,19 @@ th, td {
 td {
   background-color: #fff;
 }
-/* ¹ö¶¯ÌõÕûÌåÑùÊ½ */
+/* æ»šåŠ¨æ¡æ•´ä½“æ ·å¼ */
 ::-webkit-scrollbar {
-  width: 20px;  /* Ä¬ÈÏ¿í¶È´Ó16pxËõ¼õ50%[1,6](@ref) */
-  height: 20px; /* Ë®Æ½¹ö¶¯Ìõ¸ß¶È */
+  width: 20px;  /* é»˜è®¤å®½åº¦ä»16pxç¼©å‡50%[1,6](@ref) */
+  height: 20px; /* æ°´å¹³æ»šåŠ¨æ¡é«˜åº¦ */
 }
 
-/* ¹ö¶¯Ìõ»¬¿é */
+/* æ»šåŠ¨æ¡æ»‘å— */
 ::-webkit-scrollbar-thumb {
   background: #888; 
   border: 2px solid, #eee;
 }
 
-/* ¹ö¶¯Ìõ¹ìµÀ */
+/* æ»šåŠ¨æ¡è½¨é“ */
 ::-webkit-scrollbar-track {
-  background: #eee; /* Ç³»Ò¹ìµÀÌáÉı¶Ô±È¶È[2](@ref) */
+  background: #eee; /* æµ…ç°è½¨é“æå‡å¯¹æ¯”åº¦[2](@ref) */
 }

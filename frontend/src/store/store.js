@@ -27,7 +27,8 @@ export default createStore({
       { id: 3, name: '音轨 3', patterns: [] },
       { id: 4, name: '音轨 4', patterns: [] },
       { id: 5, name: '音轨 5', patterns: [] }
-    ]
+    ],
+    currentRoute: '/'
   },
   mutations: {
     setSeparatorPosition(state, position) {
@@ -37,36 +38,77 @@ export default createStore({
       state.scrollX = x;
       state.scrollY = y;
     },
-
+    
+    setCurrentRoute(state, route) {
+      state.currentRoute = route;
+    },
 
     addDisplay(state, newDisplay) {
       state.displays.push(newDisplay)
       // console.log("display pattern")
-      for (var i = 0; i < state.displays.length; ++i){
-        console.log(state.displays[i]);
-      }
+      // for (var i = 0; i < state.displays.length; ++i){
+      //   console.log(state.displays[i]);
+      // }
     },
-    deleteDisplay(state, {id, channel}) {
-      const display = state.displays.find(p => (p.id === id) & (p.channel === channel));
+    deleteDisplay(state, {id}) {
+      const display = state.displays.find(p => (p.id === id));
       if (display) {
-        const index = state.displays.findIndex(p => (p.id === id) & (p.channel === channel));
+        const index = state.displays.findIndex(p => (p.id === id));
         state.displays.splice(index, 1);
       }
     },
-
-
+    updateDisplayPosition(state, { id, starttime, channel }) {
+      const display = state.displays.find(d => d.id === id);
+      if (display) {
+        display.starttime = starttime;
+        display.channel = channel;
+      };
+    },
+    updateDisplayDuration(state, { id, duration }) {
+      state.displays = state.displays.map(display => 
+        display.id === id ? { ...display, duration } : display
+      );
+    },
 
     addNote(state, note) {
       state.notes.push(note)
-      // console.log("add notes")
     },
     deleteNote(state, id) {
       state.notes = state.notes.filter(n => n.id !== id);
     },
-    updateNoteLength(state, { id, length }) {
-      const note = state.notes.find(n => n.id === id);
-      if (note) note.length = length;
+    updateNotePosition(state, { id, starttime, pitch  }) {
+      const note = state.notes.find(n => n.id === id)
+      if (note) {
+        note.pitch = pitch
+        note.starttime = starttime
+      }
     },
+    updateNoteDuration(state, { id, duration }) {
+      state.notes = state.notes.map(note => 
+        note.id === id ? { ...note, duration } : note
+      );
+    },
+    emptyNotes(state){
+      state.notes = []
+    },
+    saveNotes(state){
+      const pattern = state.patterns.find(p => p.id === state.activePattern)
+      if(pattern){
+        console.log("save notes to old pattern", pattern.notes, state.notes)
+        pattern.notes = state.notes
+      }  
+    },
+    loadNotes(state){
+      const pattern = state.patterns.find(p => p.id === state.activePattern)
+      if(pattern){
+        state.notes = pattern.notes
+        console.log("load notes from new pattern", pattern.notes, state.notes)
+      }
+      for(var i = 0; i < state.notes.length; ++i){
+        console.log(state.notes[i].id)
+      }
+    },
+    
 
 
     addPattern:(state, pattern) => {
@@ -112,17 +154,7 @@ export default createStore({
         state.activeComposePage = page;
     },
     setActivePattern(state, id) {
-      const pattern = state.patterns.find(p => p.id === state.activePattern)
-      if(pattern){
-        console.log("save notes to old pattern", pattern.notes, state.notes)
-        pattern.notes = state.notes
-      } 
       state.activePattern = id;
-      const newPattern = state.patterns.find(p => p.id === id)
-      if(newPattern){
-        state.notes = newPattern.notes
-        console.log("load notes from new pattern", newPattern.notes, state.notes)
-      }
     },
     setSongName(state, name) {
         state.songName = name;

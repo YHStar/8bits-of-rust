@@ -28,27 +28,6 @@ export default {
     "channels": Channels,
     "patterns": Patterns,
   },
-  // computed: {
-  //     viewportWidth() {
-  //         return this.$store.state.scrollX;
-  //     }
-  // },
-  // methods: {
-  //     handleTimelineScroll(e) {
-  //         this.$store.commit('setScrollPosition', {
-  //             x: e.target.scrollLeft,
-  //             y: this.$store.state.scrollY
-  //         });
-  //     }
-  // },
-  // mounted() {
-  //     document.addEventListener('mousemove', this.handleResizeMove);
-  //     document.addEventListener('mouseup', this.stopResize);
-  // },
-  // beforeDestroy() {
-  //     document.removeEventListener('mousemove', this.handleResizeMove);
-  //     document.removeEventListener('mouseup', this.stopResize);
-  // },
   methods: {
     // startResize(e) {
     //     this.isDragging = true;

@@ -25,7 +25,6 @@
     </div>
 
     <br />
-    <my-text content="Tips: 用滚轮控制旋钮" />
     <div class="placeholder-block"></div>
 
     <plugin v-if="isComposePage('plugin')"></plugin>
@@ -79,8 +78,7 @@ export default {
   width: 100%;
   gap: 6px;
 }
-.play-unit{
-}
+
 .placeholder-block {
   height: 50px; /* 指定高度 */
 }

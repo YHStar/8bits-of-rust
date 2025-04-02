@@ -18,11 +18,15 @@
 </template>
 <script>
 export default {
-  name: "Mytest",
+  name: "MyTest",
+  components: {
+    popover: ElPopover
+  }
 };
 </script>
 <script setup>
 import { ref, defineProps, nextTick, defineEmits } from "vue";
+import { ElPopover } from "element-plus";
 // import $ from 'jquery'
 const props = defineProps({
   modelValue: String,
@@ -39,7 +43,6 @@ const rename = (edit, e) => {
   e.stopPropagation();
   e.preventDefault();
   clearTimeout(timeout);
-  // 避免重复触发
   if (isEdit.value === edit) return;
   isEdit.value = edit;
   emits("edit", edit);
@@ -56,7 +59,6 @@ const rename = (edit, e) => {
   });
 };
 
-// 为了确保双击不会触发单击的事件
 const dbDiff = (e) => {
   e.stopPropagation();
   clearTimeout(timeout);

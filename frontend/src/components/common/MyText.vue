@@ -4,21 +4,22 @@
 
 <script>
 export default {
-  name: 'MyText',
-  props: {
-    content: String, // 文本内容
-    size: {
-      type: String, // 文本字体大小
-      default: 'medium',
-      validator: (v) => ['small', 'medium', 'large'].includes(v),
-    },
+  name: 'MyText'
+};
+</script>
+<script setup>
+import { computed } from 'vue';
+
+const props = defineProps({
+  content: String,
+  size: {
+    type: String,
+    default: 'medium',
+    validator: (v) => ['small', 'medium', 'large'].includes(v),
   },
-  computed: {
-    sizeClass() {
-      return `text-${this.size}`
-    },
-  },
-}
+});
+
+const sizeClass = computed(() => `text-${props.size}`);
 </script>
 
 <style>

@@ -75,5 +75,4 @@ defineExpose({
 </script>
 
 <style scoped>
-/* 保持原有样式 */
 </style>

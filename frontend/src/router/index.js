@@ -1,14 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Compose from '../views/Compose.vue';
-import Songs from '../views/Songs.vue';
-import Developers from '../views/Developers.vue';
+import Compose from '@/views/Compose.vue';
+import Songs from '@/views/Songs.vue';
+import Developers from '@/views/Developers.vue';
+import StartScreen from '@/views/StartScreen.vue';
 
 const routes = [
-  // {
-  //   path: '/',
-  //   name: 'Home',
-  //   Component: Compose,
-  // },
+  {
+    path: '/',
+    name: 'Start',
+    component: StartScreen,
+  },
   {
     path: '/compose',
     name: 'Compose',

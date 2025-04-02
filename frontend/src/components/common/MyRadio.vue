@@ -8,43 +8,39 @@
 </template>
 
 <script>
-export default {
-  name: 'MyRadio',
-  model: {
-    prop: 'value',
-    event: 'input',
+export default { name: 'MyRadio' };
+</script>
+<script setup>
+import { ref, computed } from 'vue';
+
+const props = defineProps({
+  value: {
+    type: [String, Number],
+    default: '',
   },
-  props: {
-    value: {
-      type: [String, Number],
-      default: '',
-    },
-    label: {
-      type: String,
-      required: true,
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    checkedValue: {
-      type: [String, Number],
-      required: true,
-    },
+  label: {
+    type: String,
+    required: true,
   },
-  computed: {
-    isChecked() {
-      return this.value === this.checkedValue
-    },
+  disabled: {
+    type: Boolean,
+    default: false,
   },
-  methods: {
-    toggleRadio() {
-      if (!this.disabled) {
-        this.$emit('input', this.checkedValue)
-      }
-    },
+  checkedValue: {
+    type: [String, Number],
+    required: true,
   },
-}
+});
+
+const emit = defineEmits(['input']);
+
+const isChecked = computed(() => props.value === props.checkedValue);
+
+const toggleRadio = () => {
+  if (!props.disabled) {
+    emit('input', props.checkedValue);
+  }
+};
 </script>
 
 <style scoped>

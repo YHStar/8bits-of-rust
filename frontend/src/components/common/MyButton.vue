@@ -24,7 +24,7 @@ export default {
   props: {
     color: {
       type: String,
-      default: '' // 空值表示使用默认配色
+      default: '' 
     },
     active: {
       type: Boolean,
@@ -116,9 +116,9 @@ export default {
   border: 1px solid var(--pixel-ghost);
 }
 .my-button:not(.disabled):hover {
-  transform: scale(1.08); /* 放大 8% */
-  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* 平滑动画 */
-  z-index: 1; /* 防止被相邻元素遮挡 */
+  transform: scale(1.08); 
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+  z-index: 1; 
 }
 .my-button:not(.disabled):hover {
   background-color: var(--pixel-secondary);

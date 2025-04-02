@@ -11,7 +11,6 @@
         {{ beat - 1 }}
       </span>
     </div>
-    <!-- <my-left-bar class="left-bar" :component-name="leftBarStyle" /> -->
     <div class="left-bar">
       <PianoKeys />
     </div>

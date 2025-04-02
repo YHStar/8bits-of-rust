@@ -4,42 +4,35 @@
     @mouseup="handleCanvasMouseUp"
     @mousemove="handleCanvasMouseMove"
   >
-    <!-- <div 
-		v-for="row in 88"
-	>
-		<div
-			v-for="col in 5"
-			class ="note"
-			:style="noteStyle(row, 3*(col - 1), 2)"
-			@mousedown.right="deleteNote(note.id)"
-			@mousedown.left="startDragNote(note, $event)"
-		>
-		</div>
-	</div> -->
-    <div
-      v-for="note in notes"
-      class="note"
-      :style="noteStyle(88 - note.pitch, note.starttime, 2)"
-      @mousedown.right="deleteNote(note.id)"
-      @mousedown.left="dragNote(note, $event)"
-    ></div>
+    <div v-for="note in notes">
+      <div
+        class="note"
+        :style="noteStyle(note.pitch, note.starttime, note.duration)"
+        @mousedown.right="deleteNote(note.id)"
+        @mousedown.left="startMoveNote(note, $event)"
+      ></div>
+
+      <div
+        class="note-resize-handle"
+        :style="resizeHandleStyle(note.pitch, note.starttime, note.duration)"
+        @mousedown.left="startResizeNote(note, $event)"
+      ></div>
+    </div>
     <my-grid :n_rows="88" :h_rows="20" ref="gridEl" />
-    <div class="note-resize-handle"></div>
   </div>
 </template>
 <script>
-export default {
-}
+export default {};
 </script>
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useStore, mapState } from 'vuex'
+import { ref, computed, onMounted } from "vue";
+import { useStore, mapState } from "vuex";
 
-const store = useStore()
-const notes = computed(() => store.state.notes)
+const store = useStore();
+const notes = computed(() => store.state.notes);
 
 // store.state.notes)
-const gridEl = ref(null)
+const gridEl = ref(null);
 
 // const notes = computed(() => {
 // 	let note;
@@ -53,19 +46,30 @@ const gridEl = ref(null)
 const noteStyle = (row, col, duration) => ({
   left: `${col * 25}px`,
   top: `${row * 20 + 1}px`,
-  width: `${duration * 25 - 3 - 1}px`,
+  width: `${duration * 25 - 1}px`,
   height: `${20 - 2}px`,
-})
+});
+
+const resizeHandleStyle = (row, starttime, duration) => ({
+  left: `${(starttime + duration) * 25 - 5}px`,
+  top: `${row * 20 + 1}px`,
+  width: `5px`,
+  height: `${20 - 2}px`,
+});
 
 // 事件处理函数
-let dragState = null
-const selectedNotes = ref(new Set())
-const selectionBox = ref({ x1: 0, y1: 0, x2: 0, y2: 0 })
+let dragState = null;
+const selectedNotes = ref(new Set());
+const selectionBox = ref({ x1: 0, y1: 0, x2: 0, y2: 0 });
+const moveX = ref(0);
+const moveY = ref(0);
+const resizeX = ref(0);
+const tmpDuration = ref(2);
 
 onMounted(() => {
   // console.log("notes: ", notes.grid[0][0] )
   // store.commit('initNotes')
-})
+});
 
 const handleCanvasMouseDown = (e) => {
   // for (var note = 0; note < store.state.notes.length; note++) {
@@ -73,11 +77,11 @@ const handleCanvasMouseDown = (e) => {
   // }
   // let x2 = e.clientX - rect.left
   // let y2 = e.clientY - rect.top
-  if (e.ctrlKey || e.metaKey) return
+  if (e.ctrlKey || e.metaKey) return;
 
-  if (e.target.classList.contains('grid')) {
+  if (e.target.classList.contains("grid")) {
     // 初始化框选
-    const rect = e.target.getBoundingClientRect()
+    const rect = e.target.getBoundingClientRect();
     // let x1 = e.clientX - rect.left
     // let y1 = e.clientY - rect.top
     // selectionBox.value = {
@@ -90,101 +94,111 @@ const handleCanvasMouseDown = (e) => {
     // selectedNotes.value.clear()
     // 创建新音符逻辑
     // const rect = e.target.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
     const newNote = {
       id: Date.now(),
       starttime: Math.floor(x / 25),
-      duration: 1,
-      pitch: 88 - Math.floor(y / 20),
-    }
-    // console.log('handleCanvasMouseDown', store.state.notes, newNote )
-    store.commit('addNote', newNote)
+      duration: tmpDuration,
+      pitch: Math.floor(y / 20),
+    };
+    console.log("handleCanvasMouseDown", newNote.id);
+    store.commit("addNote", newNote);
   }
-}
-
-const addNote = (e) => {
-  if (e.ctrlKey || e.metaKey) return
-  // if (e.target.classList.contains('grid')) {
-  // 初始化框选
-  const rect = e.target.getBoundingClientRect()
-  const x = e.clientX - rect.left
-  const y = e.clientY - rect.top
-
-  const newNote = {
-    id: Date.now(),
-    starttime: Math.floor(x / 25),
-    duration: 1,
-    pitch: 88 - Math.floor(y / 20),
-  }
-  // console.log('handleCanvasMouseDown', store.state.notes, newNote )
-  store.commit('addNote', newNote)
-  // }
-}
+};
 
 const deleteNote = (id) => {
-  store.commit('deleteNote', id)
-}
+  store.commit("deleteNote", id);
+};
 
-const dragNote = (note, e) => {
+const startMoveNote = (note, e) => {
+  const gridRect = gridEl.value.$el.getBoundingClientRect();
+
   dragState = {
-    type: 'move',
+    type: "move",
     noteId: note.id,
-    offsetX: e.offsetX,
-    startX: e.clientX,
-    startY: e.clientY,
+    startX: Math.floor((e.clientX - gridRect.left) / 25),
+    startY: Math.floor((e.clientY - gridRect.top) / 20),
     originalPos: { ...note },
+  };
+};
+
+const startResizeNote = (note, e) => {
+  e.stopPropagation();
+  const gridRect = gridEl.value.$el.getBoundingClientRect();
+  console.log(note.id);
+  dragState = {
+    type: "resize",
+    noteId: note.id,
+    startX: Math.floor((e.clientX - gridRect.left) / 25),
+    originalPos: { ...note },
+  };
+};
+
+const handleCanvasMouseMove = (e) => {
+  if (!dragState) return;
+  if (dragState.type === "resize") {
+    resizeNote(e);
+    return;
   }
-}
+  if (dragState.type === "move") {
+    moveNote(e);
+    return;
+  }
+};
 
-// const handleCanvasMouseMove = (e) => {
-// 	if (!dragState) return
+const moveNote = (e) => {
+  const gridRect = gridEl.value.$el.getBoundingClientRect();
 
-// 	// 处理框选更新
-// 	if (dragState.type === 'select') {
-// 		const rect = e.target.getBoundingClientRect()
-// 		selectionBox.value.x2 = e.clientX - rect.left
-// 		selectionBox.value.y2 = e.clientY - rect.top
+  // 计算相对网格的坐标
+  const x = Math.floor((e.clientX - gridRect.left) / 25);
+  const y = Math.floor((e.clientY - gridRect.top) / 20);
+  if (moveX.value === x && moveY.value === y) return;
+  moveX.value = x;
+  moveY.value = y;
+  // 计算移动距离
+  const dx = x - dragState.startX;
+  const dy = y - dragState.startY;
 
-// 		// 计算选中范围
-// 		store.state.notes.forEach(note => {
-// 			const noteRect = {
-// 				left: note.start * 25,
-// 				top: (88 - note.pitch) * 20,
-// 				right: (note.start + note.duration) * 25,
-// 				bottom: (88 - note.pitch + 1) * 20
-// 			}
+  if (dragState.type !== "move") return;
+  // 计算新位置并应用边界检查
+  let newStarttime = dragState.originalPos.starttime + dx;
+  let newPitch = dragState.originalPos.pitch + dy;
 
-// 			if (isRectOverlap(selectionBox.value, noteRect)) {
-// 				selectedNotes.value.add(note.id)
-// 			} else {
-// 				selectedNotes.value.delete(note.id)
-// 			}
-// 		})
-// 	}
+  // 边界检查
+  newStarttime = Math.max(0, newStarttime);
+  newPitch = Math.max(0, Math.min(87, newPitch)); // 88个琴键(0-87)
 
-// 	// 处理拖拽移动逻辑
-// 	const dx = e.clientX - dragState.startX
-// 	const dy = e.clientY - dragState.startY
+  // 只有位置确实改变时才提交更新
+  store.commit("updateNotePosition", {
+    id: dragState.noteId,
+    starttime: newStarttime,
+    pitch: newPitch,
+  });
+};
 
-// 	if (dragState.type === 'move') {
-// 		const newNote = {
-// 			...dragState.originalPos,
-// 			start: Math.floor((dragState.originalPos.start * 25 + dx) / 25),
-// 			row: 88 - Math.floor((dragState.originalPos.row * 20 + dy) / 20)
-// 		}
-// 		store.commit('updateNotelength', newNote)
-// 	}
-// }
+const resizeNote = (e) => {
+  const gridRect = gridEl.value.$el.getBoundingClientRect();
 
-// const handleCanvasMouseUp = () => {
-// 	if (dragState?.type === 'select') {
-// 		// 提交框选结果
-// 		store.commit('updateSelection', Array.from(selectedNotes.value))
-// 	}
-// 	dragState = null
-// }
+  const x = Math.floor((e.clientX - gridRect.left) / 25);
+  if (x === resizeX.value) return;
+  resizeX.value = x;
+
+  const dx = x - dragState.startX;
+
+  let newDuration = dragState.originalPos.duration + dx;
+  newDuration = Math.max(1, newDuration); // 最小长度为1
+
+  store.commit("updateNoteDuration", {
+    id: dragState.noteId,
+    duration: newDuration,
+  });
+};
+
+const handleCanvasMouseUp = () => {
+  dragState = null;
+};
 
 // // 矩形碰撞检测
 // const isRectOverlap = (a, b) => {
@@ -209,6 +223,18 @@ const dragNote = (note, e) => {
   z-index: 9;
   opacity: 1;
   position: absolute;
-  border-right: 3px solid rgb(255, 191, 0);
+  box-sizing: border-box;
+  transition: transform 0.2s ease;
+}
+
+.note-resize-handle {
+  position: absolute;
+  background-color: rgba(255, 191, 0, 0.5);
+  cursor: ew-resize;
+  z-index: 10;
+}
+
+.note-resize-handle:hover {
+  background-color: rgba(255, 255, 255, 0.5);
 }
 </style>

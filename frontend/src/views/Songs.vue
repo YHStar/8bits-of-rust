@@ -12,6 +12,10 @@ export default {
     components: { 
         SongsForm,
     },
+    setup() {
+        const newSongName = ref('');
+        return { newSongName };
+    }
 };
 </script>
 <style>

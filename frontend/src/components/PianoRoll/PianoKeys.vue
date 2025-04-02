@@ -44,6 +44,5 @@ export default {
   z-index: 2;
   height: 20px !important;
   border-left: 30px solid #fff !important;
-  /* border-top:2px solid #fff!important; */
 }
 </style>
