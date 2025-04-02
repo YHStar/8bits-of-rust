@@ -86,6 +86,7 @@
     - 左键点击选中pattern
     - 右键点击，经确认后删除Pattern、将放置到对应的轨道上 `./components/Patterns`
     - 双击重命名Pattern，在出现的输入框中输入新名字，按enter重命名，按esc或者右键点击pattern取消重命名
+    - 左键按住pattern可以上下拖拽排序
   - 在轨道中显示pattern,一个"显示"称为一个Display `./components/Channels`
     - 左键将选中的Pattern放入轨道中,显示对应颜色的Display
     - 右键将轨道中的Display删除

@@ -53,7 +53,7 @@ td {
 }
 /* 滚动条整体样式 */
 ::-webkit-scrollbar {
-  width: 20px; /* 默认宽度从16px缩减50%[1,6](@ref) */
+  width: 20px;  /* 默认宽度从16px缩减50%[1,6](@ref) */
   height: 20px; /* 水平滚动条高度 */
 }
 
