@@ -84,7 +84,6 @@ const handleCanvasMouseDown = (e) => {
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
     console.log("add display:", store.state.activePattern)
-    // console.log("add display:", activePattern.value)
     if(activePattern.value > 0){
       const newDisplay = {
         id: pattern.value.id,

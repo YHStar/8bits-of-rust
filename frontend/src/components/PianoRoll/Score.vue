@@ -68,9 +68,9 @@ onMounted(() => {
 })
 
 const handleCanvasMouseDown = (e) => {
-  for (var note = 0; note < store.state.notes.length; note++) {
-    console.log(note.id)
-  }
+  // for (var note = 0; note < store.state.notes.length; note++) {
+  //   console.log(note.id)
+  // }
   // let x2 = e.clientX - rect.left
   // let y2 = e.clientY - rect.top
   if (e.ctrlKey || e.metaKey) return

@@ -81,9 +81,15 @@
   - 点击插件能够将插件分页显示的内容变更为对应的插件</u>
   - 每条音轨单独调节音量、声相
 - 编曲分页 `./components/Compose/Arrangement.vue`
+  - 一个Pattern的侧边栏，显示当前所有的Pattern，可以：`./components/Patterns`
+    - 在输入框中输入新的Pattern名称（也可以不输入，采用默认名称），点击加号新建
+    - 左键点击选中pattern
+    - 右键点击，经确认后删除Pattern、将放置到对应的轨道上 `./components/Patterns`
+    - 双击重命名Pattern，在出现的输入框中输入新名字，按enter重命名，按esc或者右键点击pattern取消重命名
   - 显示五条轨道上所有歌曲的Pattern `./components/Channels`
-  - 一个Pattern的侧边栏，显示当前所有的Pattern，可以新建、<u>删除Pattern、将Patter拖动到对应的轨道上 `./components/Patterns
-  - 一个钢琴窗界面，点按对应的Pattern，可以编辑音符 `./components/PianoRoll`</u>
+    - 左键将选中的Pattern放入轨道中
+    - 右键将轨道中的Pattern删除
+  - 一个钢琴窗界面，点按对应的Pattern，可以编辑音符 `./components/PianoRoll`
     - 左键点击空白处绘制音符，右键点击音符删除之<u>
     - 拖动音符末尾改变长度
     - 框选多个音符拖拽移动、Ctrl + C复制和 Delete删除</u>

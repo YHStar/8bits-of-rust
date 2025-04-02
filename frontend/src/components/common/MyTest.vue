@@ -1,61 +1,74 @@
 <template>
-  <div>
-    <ul>
-      <li
-        v-for="(question, index) in questions"
-        :key="question.id"
-        draggable="true"
-        @dragstart="dragStart(index)"
-        @dragover="allowDrop"
-        @drop="drop(index)"
-        class="draggable-item"
-      >
-        {{ question.text }}
-      </li>
-    </ul>
+  <div
+    @dblclick="rename(true, $event)"
+    @click="dbDiff"
+    :class="isEdit ? 'is-sedit' : ''"
+    ref="reDom"
+  >
+    <el-input
+      @blur="rename(false, $event)"
+      maxlength="40"
+      @keyup.enter="rename(false, $event)"
+      v-model="label"
+      v-if="isEdit && !props.disabled"
+      ref="inpRef"
+    />
+    <popover :list="modelValue" v-else></popover>
   </div>
 </template>
 <script>
 export default {
-  name: "MyTest",
+  name: "Mytest",
 };
 </script>
 <script setup>
-import { ref } from "vue";
-
-const questions = ref([
-  { id: 1, text: "问题 1" },
-  { id: 2, text: "问题 2" },
-  { id: 3, text: "问题 3" },
-  { id: 4, text: "问题 4" },
-]);
-
-const draggingIndex = ref(-1); // 被拖拽元素的索引
-
-// 拖拽开始
-const dragStart = (index) => {
-  draggingIndex.value = index;
-};
-
-// 允许放置
-const allowDrop = (e) => {
+import { ref, defineProps, nextTick, defineEmits } from "vue";
+// import $ from 'jquery'
+const props = defineProps({
+  modelValue: String,
+  successRename: Function,
+  disabled: Boolean,
+});
+const emits = defineEmits(["update:modelValue", "edit", "singleClick"]);
+const isEdit = ref(false);
+const label = ref(props.modelValue);
+const inpRef = ref(null);
+const reDom = ref();
+let timeout = null;
+const rename = (edit, e) => {
+  e.stopPropagation();
   e.preventDefault();
+  clearTimeout(timeout);
+  // 避免重复触发
+  if (isEdit.value === edit) return;
+  isEdit.value = edit;
+  emits("edit", edit);
+  nextTick(() => {
+    if (isEdit.value) {
+      inpRef.value.focus();
+      label.value = props.modelValue;
+    } else {
+      if (label.value && label.value !== props.modelValue) {
+        emits("update:modelValue", label.value);
+        props.successRename && props.successRename(label.value);
+      }
+    }
+  });
 };
 
-// 放置
-const drop = (index) => {
-  const draggedItem = questions.value.splice(draggingIndex.value, 1)[0]; // 移除被拖拽的元素
-  questions.value.splice(index, 0, draggedItem); // 将被拖拽的元素插入到新位置
-  draggingIndex.value = -1; // 重置被拖拽元素的索引
+// 为了确保双击不会触发单击的事件
+const dbDiff = (e) => {
+  e.stopPropagation();
+  clearTimeout(timeout);
+  if (isEdit.value) return;
+  timeout = setTimeout(function () {
+    emits("singleClick", e);
+    reDom.value.parentNode.click();
+  }, 300);
 };
 </script>
-
-<style scoped>
-.draggable-item {
-  padding: 10px;
-  margin: 5px;
-  border: 1px solid #ccc;
-  cursor: move;
-  background-color: #f9f9f9;
+<style lang="scss" scoped>
+.is-edit {
+  background-color: rgb(228, 215, 250);
 }
 </style>

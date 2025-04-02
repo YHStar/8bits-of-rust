@@ -19,14 +19,14 @@ import SongsList from "./SongsList.vue";
 export default {
   data() {
     return {
-      songName: "",
+      songName: "untitled",
     };
   },
-  mounted() {
-    this.$nextTick(() => {
-      console.log("songsForm已初始化:", this.$refs.songsListRef.songs);
-    });
-  },
+  // mounted() {
+  //   this.$nextTick(() => {
+  //     console.log("songsForm已初始化:", this.$refs.songsListRef.songs);
+  //   });
+  // },
   components: {
     SongsList,
   },
@@ -34,8 +34,10 @@ export default {
     addItem() {
       if (this.songName.trim()) {
         this.$refs.songsListRef.addItem(this.songName);
-        console.log("SongsForm addItem:", this.songName);
+      } else {
+        this.$refs.songsListRef.addItem("untitled");
       }
+      this.songName = "";
     },
   },
 };

@@ -18,6 +18,7 @@ export default createStore({
     exportFormat: '',
     songName: '',
     estimated_space: 0,
+
     scrollX: 0,
     scrollY: 0,
     channels: [
@@ -40,7 +41,7 @@ export default createStore({
 
     addDisplay(state, newDisplay) {
       state.displays.push(newDisplay)
-      console.log("display pattern")
+      // console.log("display pattern")
       for (var i = 0; i < state.displays.length; ++i){
         console.log(state.displays[i]);
       }
@@ -57,7 +58,7 @@ export default createStore({
 
     addNote(state, note) {
       state.notes.push(note)
-      console.log("add notes")
+      // console.log("add notes")
     },
     deleteNote(state, id) {
       state.notes = state.notes.filter(n => n.id !== id);
@@ -68,24 +69,22 @@ export default createStore({
     },
 
 
-    addPattern:(state, pattern) =>
+    addPattern:(state, pattern) => {
       state.patterns.push(pattern)
-    ,
+    },
     deletePattern(state, id) {
       state.patterns = state.patterns.filter(n => n.id !== id);
+      state.displays = state.displays.filter(n => n.id !== id);
+      state.notes = []
+    },
+    renamePattern(state, {id, name}){
+      // console.log("renamepattern", name)
+      const pattern = state.patterns.find(p => p.id === id)
+      if(pattern) pattern.name = name
     },
     sortPattern(state, {index, newIndex}) {
-      console.log("old", index, newIndex);
-      for (var i = 0; i < state.patterns.length; ++i){
-        console.log(state.patterns[i]);
-      }
       const draggedItem = state.patterns.splice(index, 1)[0]; // 移除被拖拽的元素
       state.patterns.splice(newIndex, 0, draggedItem);
-      
-      console.log("new");
-      for (var i = 0; i < state.patterns.length; ++i){
-        console.log(state.patterns[i]);
-      }
     },
 
 
@@ -113,7 +112,17 @@ export default createStore({
         state.activeComposePage = page;
     },
     setActivePattern(state, id) {
+      const pattern = state.patterns.find(p => p.id === state.activePattern)
+      if(pattern){
+        console.log("save notes to old pattern", pattern.notes, state.notes)
+        pattern.notes = state.notes
+      } 
       state.activePattern = id;
+      const newPattern = state.patterns.find(p => p.id === id)
+      if(newPattern){
+        state.notes = newPattern.notes
+        console.log("load notes from new pattern", newPattern.notes, state.notes)
+      }
     },
     setSongName(state, name) {
         state.songName = name;
