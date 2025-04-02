@@ -1,3 +1,4 @@
+<!-- 像素风格输入框组件 -->
 <template>
   <div class="pixel-input">
     <el-input
@@ -5,42 +6,44 @@
       :placeholder="placeholder"
       @input="handleInput"
       @change="handleChange"
-      class="pixel-style"
-    >
+      class="pixel-style">
     </el-input>
   </div>
 </template>
 
 <script>
-export default { name: 'MyInput' };
+export default { name: "MyInput" }
 </script>
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch } from "vue"
 
 const props = defineProps({
   modelValue: String,
   placeholder: {
     type: String,
-    default: '请输入...',
+    default: "请输入...",
   },
-});
+})
 
-const emit = defineEmits(['update:modelValue', 'input', 'change']);
+const emit = defineEmits(["update:modelValue", "input", "change"])
 
-const inputValue = ref(props.modelValue);
+const inputValue = ref(props.modelValue)
 
-watch(() => props.modelValue, (newVal) => {
-  inputValue.value = newVal;
-});
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    inputValue.value = newVal
+  },
+)
 
 const handleInput = (val) => {
-  emit('update:modelValue', val);
-  emit('input', val);
-};
+  emit("update:modelValue", val)
+  emit("input", val)
+}
 
 const handleChange = (val) => {
-  emit('change', val);
-};
+  emit("change", val)
+}
 </script>
 
 <style lang="scss" scoped>
@@ -56,7 +59,7 @@ const handleChange = (val) => {
     max-width: 200px;
     height: 50px;
     padding: 4px 8px;
-    font-family: 'Zpix', monospace;
+    font-family: "Zpix", monospace;
     font-size: 14px;
   }
 }

@@ -1,22 +1,10 @@
+<!-- 歌曲界面 -->
 <template>
-<div>
-    <songs-form v-model="newSongName" ref="songsFormRef" />
-</div>
+  <div>
+    <songs-form/>
+  </div>
 </template>
-<script>
 
-// import SongsList from "@/components/songs/SongsList.vue";
-import { ref } from 'vue';
-import SongsForm from '@/components/Songs/SongsForm.vue';
-export default {
-    components: { 
-        SongsForm,
-    },
-    setup() {
-        const newSongName = ref('');
-        return { newSongName };
-    }
-};
+<script setup>
+import SongsForm from "@/components/songs/SongsForm.vue"
 </script>
-<style>
-</style>

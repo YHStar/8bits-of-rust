@@ -1,3 +1,4 @@
+<!-- 像素风格(并非)旋钮 -->
 <template>
   <div
     class="round_box"
@@ -6,8 +7,7 @@
     @mousemove="handleMouseMove"
     @mouseup="handleMouseUp"
     @mouseleave="handleMouseUp"
-    @dblclick="handleDoubleClick"
-  >
+    @dblclick="handleDoubleClick">
     <div class="round_right" :style="{ transform: `rotate(${ang}deg)` }"></div>
     <div class="round_num">
       <my-text :content="String(modelValue)" />
@@ -15,10 +15,10 @@
   </div>
 </template>
 <script>
-export default { name: 'MyKnob' }
+export default { name: "MyKnob" }
 </script>
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from "vue"
 
 const props = defineProps({
   modelValue: {
@@ -44,7 +44,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(["update:modelValue"])
 
 const ang = ref(0)
 const angleRange = computed(() => props.maxAng - props.minAng)
@@ -52,7 +52,8 @@ const valueRange = computed(() => props.maxVal - props.minVal)
 
 const initializeAngle = () => {
   ang.value =
-    props.minAng + ((props.modelValue - props.minVal) / valueRange.value) * angleRange.value
+    props.minAng +
+    ((props.modelValue - props.minVal) / valueRange.value) * angleRange.value
   // console.log(props.minVal, props.maxVal, props.minAng, props.maxAng, props.modelValue)
 }
 
@@ -64,11 +65,11 @@ watch(
     const clampedValue = Math.max(props.minVal, Math.min(props.maxVal, newVal))
 
     if (clampedValue !== newVal) {
-      emit('update:modelValue', clampedValue)
+      emit("update:modelValue", clampedValue)
       return
     }
     initializeAngle()
-  }
+  },
 )
 
 // 鼠标事件处理
@@ -80,7 +81,7 @@ const handleMouseDown = (event) => {
   isDragging.value = true
   startX.value = event.clientX
   startValue.value = props.modelValue
-  document.body.style.userSelect = 'none'
+  document.body.style.userSelect = "none"
 }
 
 const handleMouseMove = (event) => {
@@ -91,14 +92,16 @@ const handleMouseMove = (event) => {
   const newVal = startValue.value + deltaX * sensitivity
   const clampedValue = Math.max(props.minVal, Math.min(props.maxVal, newVal))
   // 将限制后的数值转换为对应角度
-  ang.value = props.minAng + ((clampedValue - props.minVal) / valueRange.value) * angleRange.value
+  ang.value =
+    props.minAng +
+    ((clampedValue - props.minVal) / valueRange.value) * angleRange.value
 
-  emit('update:modelValue', Math.round(clampedValue))
+  emit("update:modelValue", Math.round(clampedValue))
 }
 
 const handleMouseUp = () => {
   isDragging.value = false
-  document.body.style.userSelect = ''
+  document.body.style.userSelect = ""
 }
 
 // 滚轮事件处理
@@ -113,13 +116,15 @@ const handleWheel = (event) => {
   } else {
     ang.value = newAngle
   }
-  const newValue = props.minVal + ((ang.value - props.minAng) / angleRange.value) * valueRange.value
-  emit('update:modelValue', Math.round(newValue))
+  const newValue =
+    props.minVal +
+    ((ang.value - props.minAng) / angleRange.value) * valueRange.value
+  emit("update:modelValue", Math.round(newValue))
 }
 
 const handleDoubleClick = () => {
   const defaultValue = 0
-  emit('update:modelValue', defaultValue)
+  emit("update:modelValue", defaultValue)
 }
 </script>
 

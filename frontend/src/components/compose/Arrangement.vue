@@ -1,61 +1,37 @@
+<!-- 编曲界面 -->
 <template>
   <div>
-    <div
-      class="main-container"
-    >
-      <div class = "a">
-        <!-- <div class="main-container"> -->
+    <div class="main-container">
+      <div class="a">
         <patterns ref="patterns" class="patterns" />
-        <!-- <span ref="patterns" class="patterns" >1</span> -->
-        <!-- </div> -->
-        <!-- <div class="main-container"> -->
-        <!-- <span ref="channels" class="channels" >2</span> -->
         <channels ref="channels" class="channels" />
-        <!-- </div> -->        
       </div>
     </div>
     <piano-roll />
   </div>
 </template>
-<script>
-import PianoRoll from "../PianoRoll/PianoRoll.vue";
-import Channels from "../Channels/Channels.vue";
-import Patterns from "../Patterns/Patterns.vue";
 
-export default {
-  components: {
-    "piano-roll": PianoRoll,
-    "channels": Channels,
-    "patterns": Patterns,
-  },
-  methods: {
-    // startResize(e) {
-    //     this.isDragging = true;
-    //     this.initialX = e.clientX;
-    //     this.initialWidth = this.$refs.channelSection.offsetWidth;
-    // },
-    // syncScroll() {
-    //     this.$refs.pianoSection.scrollLeft = this.$refs.channelSection.scrollLeft;
-    // }
-  },
-};
+<script setup>
+import PianoRoll from "../pianoRoll/PianoRoll.vue"
+import Channels from "../channels/Channels.vue"
+import Patterns from "../patterns/Patterns.vue"
 </script>
+
 <style scoped>
 .a {
   height: 400px;
-  display: flex;          /* 启用弹性布局 */
-  flex-direction: row;    /* 默认值，可省略 */
+  display: flex;
+  flex-direction: row;
   overflow-x: visible;
-  gap:20px ;
+  gap: 20px;
 }
 .patterns {
-  width: 150px;          /* 固定左侧宽度 */
-  height: 100%;          /* 继承父容器高度 */
+  width: 150px;
+  height: 100%;
 }
 
 .channels {
-  flex: 1;               /* 右侧自适应剩余宽度 */
-  min-width: 0;          /* 防止内容溢出 */
+  flex: 1;
+  min-width: 0;
 }
-
 </style>

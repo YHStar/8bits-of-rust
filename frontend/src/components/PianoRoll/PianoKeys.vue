@@ -1,11 +1,11 @@
+<!-- ¸ÖÇÙ´°ÇÙ¼ü½çÃæ -->
 <template>
   <div class="key-column">
     <div
-      v-for="pitch in this.pitchRange"
+      v-for="pitch in proxy.PITCH_RANGE"
       class="key"
       :class="{ black: [1, 3, 6, 8, 10].includes((pitch + 9) % 12) }"
-      :style="{ height: '20px', top: (pitch - 1) * 20 + 'px' }"
-    >
+      :style="{ height: '20px', top: (pitch - 1) * 20 + 'px' }">
       <span v-if="(pitch + 5) % 12 === 0" class="c-label">
         C{{ Math.floor(10 - (pitch + 12) / 12) }}
       </span>
@@ -13,15 +13,9 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    pitchRange: {
-      type: Number,
-      default: 88,
-    },
-  },
-}
+<script setup>
+import { getCurrentInstance } from "vue"
+const { proxy } = getCurrentInstance()
 </script>
 
 <style scoped>

@@ -1,3 +1,4 @@
+<!-- 像素风格去年牛 -->
 <template>
   <button
     class="my-button"
@@ -6,8 +7,7 @@
     :style="{ '--dynamic-bg': color }"
     :aria-label="ariaLabel || text"
     @click="$emit('click', $event)"
-    @keydown.enter="$emit('click', $event)"
-  >
+    @keydown.enter="$emit('click', $event)">
     <span class="content-wrapper">
       <slot name="icon"></slot>
       <span>
@@ -19,44 +19,43 @@
 
 <script>
 export default {
-  name: 'MyButton',
-  components: {},
-  props: {
-    color: {
-      type: String,
-      default: '' 
-    },
-    active: {
-      type: Boolean,
-      default: false,
-    },
-    text: {
-      type: String,
-      default: '',
-    },
-    variant: {
-      type: String,
-      default: 'primary',
-      validator: (v) => ['primary', 'secondary', 'ghost'].includes(v),
-    },
-    size: {
-      type: String,
-      default: 'medium',
-      validator: (v) => ['small', 'medium', 'large'].includes(v),
-    },
-    disabled: Boolean,
-    ariaLabel: String,
-  },
-  emits: ['click'],
-  computed: {
-    sizeClass() {
-      return `size-${this.size}`
-    },
-    dynamicStyle() {
-      return this.color ? this.color: ''
-    },
-  },
+  name: "MyButton"
 }
+</script>
+<script setup>
+import { computed } from 'vue'
+
+const props = defineProps({
+  color: {
+    type: String,
+    default: "",
+  },
+  active: {
+    type: Boolean,
+    default: false,
+  },
+  text: {
+    type: String,
+    default: "",
+  },
+  variant: {
+    type: String,
+    default: "primary",
+    validator: (v) => ["primary", "secondary", "ghost"].includes(v),
+  },
+  size: {
+    type: String,
+    default: "medium",
+    validator: (v) => ["small", "medium", "large"].includes(v),
+  },
+  disabled: Boolean,
+  ariaLabel: String,
+})
+
+const emit = defineEmits(['click'])
+
+const sizeClass = computed(() => `size-${props.size}`)
+const dynamicStyle = computed(() => props.color ? props.color : "")
 </script>
 
 <style scoped>
@@ -67,8 +66,8 @@ export default {
 
   position: relative;
   cursor: pointer;
-  transition: 
-    background-color 0.2s ease, 
+  transition:
+    background-color 0.2s ease,
     transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   display: inline-flex;
   align-items: center;
@@ -116,9 +115,9 @@ export default {
   border: 1px solid var(--pixel-ghost);
 }
 .my-button:not(.disabled):hover {
-  transform: scale(1.08); 
-  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
-  z-index: 1; 
+  transform: scale(1.08);
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 1;
 }
 .my-button:not(.disabled):hover {
   background-color: var(--pixel-secondary);

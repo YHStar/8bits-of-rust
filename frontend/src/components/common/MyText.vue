@@ -1,34 +1,35 @@
+<!-- 像素风格文本 -->
 <template>
   <span class="my-text" :class="[sizeClass]">{{ content }}</span>
 </template>
 
 <script>
 export default {
-  name: 'MyText'
-};
+  name: "MyText",
+}
 </script>
 <script setup>
-import { computed } from 'vue';
+import { computed } from "vue"
 
 const props = defineProps({
   content: String,
   size: {
     type: String,
-    default: 'medium',
-    validator: (v) => ['small', 'medium', 'large'].includes(v),
+    default: "medium",
+    validator: (v) => ["small", "medium", "large"].includes(v),
   },
-});
+})
 
-const sizeClass = computed(() => `text-${props.size}`);
+const sizeClass = computed(() => `text-${props.size}`)
 </script>
 
 <style>
 @font-face {
-  font-family: 'Zpix';
-  src: url('@/assets/zpix.ttf') format('truetype');
+  font-family: "Zpix";
+  src: url("@/assets/zpix.ttf") format("truetype");
 }
 .my-text {
-  font-family: 'Zpix', sans-serif;
+  font-family: "Zpix", sans-serif;
   color: black;
 }
 

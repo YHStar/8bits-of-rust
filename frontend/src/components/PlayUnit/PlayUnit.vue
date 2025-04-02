@@ -1,3 +1,4 @@
+<!-- ²¥·Åµ¥Ôª -->
 <template>
   <div class="play-unit">
     <div class="button-unit">
@@ -31,27 +32,24 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      playStatus: "stopped",
-      progress: 0,
-    };
-  },
-  methods: {
-    play() {
-      this.playStatus = "playing";
-    },
-    pause() {
-      this.playStatus = "paused";
-    },
-    reset() {
-      this.playStatus = "stopped";
-      this.progress = 0;
-    },
-  },
-};
+<script setup>
+import { ref } from "vue"
+
+const playStatus = ref("stopped")
+const progress = ref(0)
+
+const play = () => {
+  playStatus.value = "playing"
+}
+
+const pause = () => {
+  playStatus.value = "paused"
+}
+
+const reset = () => {
+  playStatus.value = "stopped"
+  progress.value = 0
+}
 </script>
 
 <style scoped>

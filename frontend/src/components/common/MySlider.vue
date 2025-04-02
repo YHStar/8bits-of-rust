@@ -1,3 +1,4 @@
+<!-- 像素风格推子 -->
 <template>
   <div :class="['slider-container', { vertical: orientation === 'vertical' }]">
     <input
@@ -9,17 +10,16 @@
       @wheel="handleWheel"
       @dblclick="handleDoubleClick"
       class="pixel-slider"
-      :style="sliderStyle"
-    />
+      :style="sliderStyle" />
   </div>
 </template>
 
 <script>
-export default { name: 'my-slider' }
+export default { name: "my-slider" }
 </script>
 
 <script setup>
-import { computed } from 'vue'
+import { computed } from "vue"
 
 // 1. Props 声明
 const props = defineProps({
@@ -37,19 +37,19 @@ const props = defineProps({
   },
   orientation: {
     type: String,
-    default: 'horizontal',
-    validator: (value) => ['horizontal', 'vertical'].includes(value),
+    default: "horizontal",
+    validator: (value) => ["horizontal", "vertical"].includes(value),
   },
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(["update:modelValue"])
 
 const sliderStyle = computed(() => ({
-  width: props.orientation === 'horizontal' ? '200px' : '30px',
+  width: props.orientation === "horizontal" ? "200px" : "30px",
 }))
 
 const emitValue = (event) => {
-  emit('update:modelValue', Number(event.target.value))
+  emit("update:modelValue", Number(event.target.value))
 }
 
 const handleWheel = (event) => {
@@ -57,12 +57,12 @@ const handleWheel = (event) => {
   const delta = Math.sign(event.deltaY) * 2
   const newValue = props.modelValue - delta
   const clampedValue = Math.max(props.min, Math.min(props.max, newValue))
-  emit('update:modelValue', clampedValue)
+  emit("update:modelValue", clampedValue)
 }
 
 const handleDoubleClick = () => {
   const defaultValue = 80
-  emit('update:modelValue', defaultValue)
+  emit("update:modelValue", defaultValue)
 }
 </script>
 

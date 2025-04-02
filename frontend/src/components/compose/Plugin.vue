@@ -1,3 +1,4 @@
+<!-- 插件界面 -->
 <template>
   <div>
     <my-text v-bind:content="'波形预设: ' + preset" size="large" />
@@ -28,20 +29,16 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      preset: 'default',
-      attack: 0,
-      decay: 0,
-      sustain: 0,
-      release: 0,
-      fm_range: 0,
-      fm_frequency: 0,
-    }
-  },
-}
+<script setup>
+import { ref } from "vue"
+
+const preset = ref("default")
+const attack = ref(0)
+const decay = ref(0)
+const sustain = ref(0)
+const release = ref(0)
+const fm_range = ref(0)
+const fm_frequency = ref(0)
 </script>
 
 <style>

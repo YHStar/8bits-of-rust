@@ -1,3 +1,4 @@
+<!-- 像素风格下拉选择框 -->
 <template>
   <div class="pixel-select" @click="toggleDropdown">
     <div class="selected-option">
@@ -8,8 +9,7 @@
       <div
         v-for="(option, index) in options"
         class="option"
-        @click.stop="selectOption(option)"
-      >
+        @click.stop="selectOption(option)">
         <my-text :content="option.label" size="medium" />
       </div>
     </div>
@@ -17,42 +17,47 @@
 </template>
 
 <script>
-export default { name: 'MySelect' };
+export default { name: "MySelect" }
 </script>
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch } from "vue"
 
 const props = defineProps({
   options: {
     type: Array,
     required: true,
-    validator: (value) => value.every((opt) => 'value' in opt && 'label' in opt),
+    validator: (value) =>
+      value.every((opt) => "value" in opt && "label" in opt),
   },
   value: {
     type: [String, Number],
-    default: '',
+    default: "",
   },
-});
+})
 
-const emit = defineEmits(['input']);
+const emit = defineEmits(["input"])
 
-const isOpen = ref(false);
-const selectedLabel = ref('');
+const isOpen = ref(false)
+const selectedLabel = ref("")
 
-watch(() => props.value, (newVal) => {
-  const selected = props.options.find((opt) => opt.value === newVal);
-  selectedLabel.value = selected ? selected.label : '';
-}, { immediate: true });
+watch(
+  () => props.value,
+  (newVal) => {
+    const selected = props.options.find((opt) => opt.value === newVal)
+    selectedLabel.value = selected ? selected.label : ""
+  },
+  { immediate: true },
+)
 
 const toggleDropdown = () => {
-  isOpen.value = !isOpen.value;
-};
+  isOpen.value = !isOpen.value
+}
 
 const selectOption = (option) => {
-  emit('input', option.value);
-  selectedLabel.value = option.label;
-  isOpen.value = false;
-};
+  emit("input", option.value)
+  selectedLabel.value = option.label
+  isOpen.value = false
+}
 </script>
 
 <style scoped>

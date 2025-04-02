@@ -55,7 +55,7 @@
 下划线是TODO内容
 
 ## 前端
-- 前端基于**Vue3**，安装教程地址 https://www.runoob.com/vue3/vue3-install.html
+- 前端基于**Vue3**，代码风格是**组合式api**，安装教程地址 https://www.runoob.com/vue3/vue3-install.html
 - 在`./frontend`目录下，执行 `npm run serve` 预览前端网页
 - 要修改的文件基本在`./frontend/src`中，所以文件路径都是相对`./frontend/src`而言的
 
@@ -86,13 +86,16 @@
     - 左键点击选中pattern
     - 右键点击，经确认后删除Pattern、将放置到对应的轨道上 `./components/Patterns`
     - 双击重命名Pattern，在出现的输入框中输入新名字，按enter重命名，按esc或者右键点击pattern取消重命名
-  - 显示五条轨道上所有歌曲的Pattern `./components/Channels`
-    - 左键将选中的Pattern放入轨道中
-    - 右键将轨道中的Pattern删除
+  - 在轨道中显示pattern,一个"显示"称为一个Display `./components/Channels`
+    - 左键将选中的Pattern放入轨道中,显示对应颜色的Display
+    - 右键将轨道中的Display删除
+    - 拖动Display改变Display位置
+    - 拖动Display末尾改变长度
   - 一个钢琴窗界面，点按对应的Pattern，可以编辑音符 `./components/PianoRoll`
-    - 左键点击空白处绘制音符，右键点击音符删除之<u>
+    - 左键点击空白处绘制音符，右键点击音符删除之
+    - 拖动音符改变音符位置
     - 拖动音符末尾改变长度
-    - 框选多个音符拖拽移动、Ctrl + C复制和 Delete删除</u>
+    - <u>框选多个音符拖拽移动、Ctrl + C复制和 Delete删除</u>
 
 **Songs**
 - 歌曲列表，调取歌曲信息并用表格呈现 `./components/Songs/SongList.vue`

@@ -1,3 +1,5 @@
+
+<!-- 歌曲列表逻辑 -->
 <template>
   <div class="main-container">
     <table>
@@ -23,56 +25,40 @@
   </div>
 </template>
 
-<script>
-export default {};
-</script>
-
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useStore } from "vuex";
+import { ref, computed, onMounted } from "vue"
+import { useStore } from "vuex"
+import { getCurrentInstance } from "vue"
+const { proxy } = getCurrentInstance()
 
-// 定义 Props [3,5](@ref)
-const props = defineProps({
-  max_song_num: {
-    type: Number,
-    default: 10,
-  },
-});
+const store = useStore()
+const songs = computed(() => store.state.songs)
+// 获取间格式化的时间
+const getCurrentTime = () =>
+  new Date().toISOString().slice(0, 16).replace("T", " ")
 
-const store = useStore();
-const songs = computed(() => store.state.songs);
-
-// 时间格式化方法
-const getCurrentTime = () => {
-  const now = new Date();
-  return now.toISOString().slice(0, 16).replace("T", " ");
-};
-
-// 添加歌曲方法
+// 检查歌曲数量上限并添加歌曲
 const addItem = (name) => {
-  store.commit("addSong", {
-    name: name,
-    date: getCurrentTime(),
-  });
-};
+  console.log("add", songs.value.length)
+  if (songs.value.length >= proxy.MAX_SONG_NUM) {
+    alert("歌曲数量达到上限！")
+  } else {
+    store.commit("addSong", {
+      name: name,
+      date: getCurrentTime(),
+    })
+  }
+}
 
-// 删除歌曲方法
+// 删除歌曲
 const deleteItem = (index) => {
   if (confirm("确定删除这首歌曲吗？")) {
-    store.commit("deleteSong", index);
+    store.commit("deleteSong", index)
   }
-};
-
-// 生命周期钩子 [4](@ref)
-onMounted(() => {
-  console.log("songsList已初始化:", songs.value);
-});
+}
 
 defineExpose({
   addItem,
   deleteItem,
-});
+})
 </script>
-
-<style scoped>
-</style>

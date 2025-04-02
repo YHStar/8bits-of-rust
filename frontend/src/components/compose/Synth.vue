@@ -1,3 +1,4 @@
+<!-- 合成器界面 -->
 <template>
   <my-text v-bind:content="'波形预设:' + preset" size="large" /><br />
 
@@ -13,27 +14,25 @@
   <my-text v-bind:content="'/semitone  速率：'" /><my-knob class="label" />
   <my-text v-bind:content="'/Hz'" />
 </template>
-<script>
-import MyText from '@/components/utils/MyText.vue'
-import MyButton from '@/components/utils/MyButton.vue'
-import MyKnob from '@/components/utils/MyKnob.vue'
-export default {
-  components: {
-    'my-text': MyText,
-    'my-button': MyButton,
-    'my-knob': MyKnob,
-  },
-  data() {
-    return {
-      preset: 'default',
-      attack: 0,
-      decay: 0,
-      sustain: 0,
-      release: 0,
-    }
-  },
-}
+
+<script setup>
+import { ref } from "vue"
+
+const preset = ref("default")
+const attack = ref(0)
+const decay = ref(0)
+const sustain = ref(0)
+const release = ref(0)
+
+defineExpose({
+  preset,
+  attack,
+  decay,
+  sustain,
+  release,
+})
 </script>
+
 <style>
 .label {
   display: inline-block;
