@@ -16,7 +16,7 @@
 
 <script setup>
 import { ref } from "vue"
-import SongsList from ".//SongsList.vue"
+import SongsList from "./SongsList.vue"
 
 const songName = ref("")
 const songsListRef = ref(null)
