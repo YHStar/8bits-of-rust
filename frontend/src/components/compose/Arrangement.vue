@@ -1,4 +1,4 @@
-<!-- ±àÇú½çÃæ -->
+<!-- ç¼–æ›²ç•Œé¢ -->
 <template>
   <div>
     <div class="main-container">
@@ -12,9 +12,9 @@
 </template>
 
 <script setup>
-import PianoRoll from "../pianoRoll/PianoRoll.vue"
-import Channels from "../channels/Channels.vue"
-import Patterns from "../patterns/Patterns.vue"
+import PianoRoll from "../PianoRoll/PianoRoll.vue"
+import Channels from "../Channels/Channels.vue"
+import Patterns from "../Patterns/Patterns.vue"
 </script>
 
 <style scoped>

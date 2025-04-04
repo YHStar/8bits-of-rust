@@ -1,4 +1,4 @@
-// Ë÷ÒýÎÄ¼þ
+// ç´¢å¼•æ–‡ä»¶
 import MyButton from "./MyButton.vue"
 import MyInput from "./MyInput.vue"
 import MyText from "./MyText.vue"

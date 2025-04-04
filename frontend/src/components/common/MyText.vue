@@ -1,4 +1,4 @@
-<!-- 像素风格文本 -->
+<!-- 鍍忕礌椋庢牸鏂囨湰 -->
 <template>
   <span class="my-text" :class="[sizeClass]">{{ content }}</span>
 </template>

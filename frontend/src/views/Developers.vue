@@ -12,3 +12,5 @@
     <my-text content="刘宗熹 任致远 商邑飞 吴童" size="medium" />
   </div>
 </template>
+<style>
+</style>
