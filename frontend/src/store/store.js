@@ -1,7 +1,7 @@
 // 状态管理
 import { createStore } from "vuex"
 import createPersistedState from "vuex-persistedstate"
-import { songWrapper, patternWrapper, init, init_panic_hook } from "eight_bits_of_rust"
+// import { songWrapper, patternWrapper, init, init_panic_hook } from "eight_bits_of_rust"
 
 export default createStore({
   state: {
@@ -35,11 +35,11 @@ export default createStore({
   },
   mutations: {
     // WASM相关
-    initWasmInstance(state) {
-      init_panic_hook()
-      state.current_song = songWrapper.new("tmp")
-      state.current_pattern = patternWrapper.new(0, "SB")
-    },
+    // initWasmInstance(state) {
+    //   init_panic_hook()
+    //   state.current_song = songWrapper.new("tmp")
+    //   state.current_pattern = patternWrapper.new(0, "SB")
+    // },
 
     // 页面状态相关
     setCurrentRoute(state, route) {
@@ -85,10 +85,11 @@ export default createStore({
       // state.current_pattern.insert_note(note.pitch, note.starttime, note.starttime + note.duration.value)
       state.notes.push(note)
     },
-    deleteNote(state, id) {
+    deleteNote(state, note) {
+      console.log("deleted note i")
       // const note_to_delete = state.notes.find((n) => n.id == id)
       // state.current_pattern.delete_note(note_to_delete.pitch, note_to_delete.starttime, note_to_delete.starttime + note_to_delete.duration)
-      state.notes = state.notes.filter((n) => n.id !== id)
+      state.notes = state.notes.filter((n) => n.id !== note.id)
     },
     updateNotePosition(state, { id, starttime, pitch }) {
       const note = state.notes.find((n) => n.id === id)
@@ -104,10 +105,8 @@ export default createStore({
       if (note) {
         //state.current_pattern.delete_note(note.pitch, note.starttime, note.starttime + note.duration.value)
         //state.current_pattern.insert_note(note.pitch, note.starttime, note.starttime + duration.value)
+        note.duration = duration
       }
-      state.notes = state.notes.map((note) =>
-        note.id === id ? { ...note, duration } : note, // 必须深拷贝
-      )
     },
     emptyNotes(state) {
       state.notes = []

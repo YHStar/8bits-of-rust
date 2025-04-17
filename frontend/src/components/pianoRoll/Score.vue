@@ -9,7 +9,7 @@
       <div
         class="note"
         :style="noteStyle(note.pitch, note.starttime, note.duration)"
-        @mousedown.right="deleteNote(note.id, $event)"
+        @mousedown.right="deleteNote(note, $event)"
         @mousedown.left="startMoveNote(note, $event)"></div>
 
       <div
@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue"
+import { ref, reactive, computed, onMounted } from "vue"
 import { useStore, mapState } from "vuex"
 
 const store = useStore()
@@ -30,6 +30,7 @@ const notes = computed(() => store.state.notes)
 const gridEl = ref(null)
 
 // 音符样式计算
+// ref响应式变量在template中会自动解包，这里的函数传入参数都是自动解包后ref变量
 const noteStyle = (row, col, duration) => ({
   left: `${col * 25}px`,
   top: `${row * 20 + 1}px`,
@@ -49,9 +50,12 @@ let dragState = null
 const selectedNotes = ref(new Set())
 const selectionBox = ref({ x1: 0, y1: 0, x2: 0, y2: 0 })
 
-const moveX = ref(0)
-const moveY = ref(0)
-const resizeX = ref(0)
+const dragParams = reactive({
+  moveX: 0,
+  moveY: 0,
+  resizeX: 0
+});
+
 // 下一次新建note时,duration设置为最近操作过音符的note
 const tmpDuration = ref(2)
 
@@ -94,22 +98,21 @@ const addNote = (e) => {
   const newNote = {
     id: Date.now(),
     starttime: Math.floor(x / 25),
-    duration: tmpDuration,
+    duration: tmpDuration.value,
     pitch: Math.floor(y / 20),
   }
   store.commit("addNote", newNote)
 }
 
 // 删除音符
-const deleteNote = (id, e) => {
+const deleteNote = (note, e) => {
   e.preventDefault()
-  store.commit("deleteNote", id)
+  store.commit("deleteNote", note)
 }
 
 // 开始挪动音符
 const startMoveNote = (note, e) => {
   const gridRect = gridEl.value.$el.getBoundingClientRect()
-
   dragState = {
     type: "move",
     noteId: note.id,
@@ -138,9 +141,9 @@ const moveNote = (e) => {
   // 计算相对网格的坐标
   const x = Math.floor((e.clientX - gridRect.left) / 25)
   const y = Math.floor((e.clientY - gridRect.top) / 20)
-  if (moveX.value === x && moveY.value === y) return
-  moveX.value = x
-  moveY.value = y
+  if (dragParams.moveX === x && dragParams.moveY === y) return
+  dragParams.moveX = x
+  dragParams.moveY = y
   // 计算移动距离
   const dx = x - dragState.startX
   const dy = y - dragState.startY
@@ -167,8 +170,8 @@ const resizeNote = (e) => {
   const gridRect = gridEl.value.$el.getBoundingClientRect()
 
   const x = Math.floor((e.clientX - gridRect.left) / 25)
-  if (x === resizeX.value) return
-  resizeX.value = x
+  if (x === dragParams.resizeX) return
+  dragParams.resizeX = x
 
   const dx = x - dragState.startX
 
