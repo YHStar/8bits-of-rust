@@ -7,6 +7,7 @@ pub type FTimestamp = f32;
 pub type NoteType = i8;
 pub type Note = u8;
 pub type ChannelID = u8;
+pub type PatternID = u32;
 
 pub struct Midi {
     pub note: Note,

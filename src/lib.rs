@@ -30,8 +30,6 @@ use util::synth::synth;
 
 use util::basefn::mixer;
 
-use util::test::init_test_channel;
-use util::test::init_test_pattern;
 use util::test::init_test_song;
 
 use util::parameter::baseconst::BPM;

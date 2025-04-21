@@ -29,8 +29,6 @@ use util::synth::synth;
 
 use util::basefn::mixer;
 
-use util::test::init_test_channel;
-use util::test::init_test_pattern;
 use util::test::init_test_song;
 
 use util::parameter::baseconst::BPM;
@@ -63,8 +61,8 @@ use util::parameter::baseconst::MAX_POLY;
 
 fn main() {
     let mut song = init_test_song();
-    song.save_to_file("my_song.song");
-    song.read_from_file("my_song.song").unwrap();
+    // song.save_to_file("my_song.song");
+    // song.read_from_file("my_song.song").unwrap();
     let name = "my_wave";
     let sample = mixer(&song);
     // let sample = mixer(&SONG);

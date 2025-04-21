@@ -1,8 +1,170 @@
+use super::pattern::display::Display;
 use super::song::Song;
 use crate::midi_generator;
 use crate::Channel;
 use crate::Pattern;
 
+pub fn init_test_song() -> Song {
+    let mut song = Song::new("my_wav");
+    song.new_channel("1", "saw", 0.065, 1, 0, true);
+    song.new_channel("2", "square", 0.05, 1, 0, true);
+    song.new_channel("3", "triangle", 0.6, 1, 0, false);
+    song.new_channel("4", "spike", 0.1, 1, 0, true);
+    song.new_channel("5", "noise", 0.06, 1, 0, false);
+
+    for i in 0..11 {
+        song.new_pattern(&i.to_string(), i);
+    }
+
+    song.copy_pattern_from(
+        0,
+        &midi_generator(
+            "
+        --------|------C4(-),D4(-),||
+
+        D#4(-----),G4(-),F4(-),D#4(-),|F4(-),D4(-----),A#3(-),C4(-),|
+        D4(-----),F4(-),D#4(-),D4(-),|D#4(-),C4(-----),D#4(-),F4(-),|
+        G4(-----),A#4(-),G#4(-),G4(-),|G#4(-),F4(-----),C4(-),D4(-),|
+        D#4(-----),F4(-),D#4(-),C4(-),|D4(------),C4(-),D4(-),||",
+        ),
+    );
+    song.copy_pattern_from(
+        1,
+        &midi_generator(
+            "
+        D#4(-----),G4(-),F4(-),D#4(-),|F4(-),D4(-----),A#3(-),C4(-),|
+        D4(-----),F4(-),D#4(-),D4(-),|D#4(-),C4(-----),D#4(-),F4(-),|
+        G4(-----),A#4(-),G#4(-),G4(-),|G#4(-),F4(-----),C4(-),D4(-),|
+        D#4(-----),F4(-),D#4(-),C4(-),|G4(------),F4(-),G4(-),||",
+        ),
+    );
+    song.copy_pattern_from(2, &midi_generator("
+    G#4(------),D4(-),D#4(-)|F4(------),C4(-),D4(-)|
+    D#4(------),C4(-),G3(-)|C4(-)D4(-)C4(-)D4(-)D#4(--)G4(-)G#4(-)||
+    C5(-----)G#4(--)A#4(-)|D5(-----)G#4(--)A#4(-)|
+    C4(=)D#4(=)F#4(=)A4(=)C5(=)D#5(=)F#5(=)A5(=)C6(=)A5(=)F#5(=)D#5(=)C5(=)A4(=)F#4(=)D#4(=)|D4(--------)||B3(--------)||"));
+
+    song.copy_pattern_from(
+        3,
+        &midi_generator(
+            "
+        C6D#6-(-)-(-)-(-)-(-)|-(-)-(-)-(-)-(-)||
+        C6D#6-(-)-(-)-(-)-(-)|A#5D6-(-)-(-)-(-)-(-)|
+         -(-)-(-)-(-)-(-)|G5C6-(-)-(-)-(-)-(-)|
+        A#5D#6-(-)-(-)-(-)-(-),|A#5D6-(-)-(-)-(-)-(-)|
+        G5C6-(-)-(-)-(-)-(-)|G5B5-(-)-(-)-(-)-(-)||",
+        ),
+    );
+    song.copy_pattern_from(
+        4,
+        &midi_generator(
+            "C6D#6-(-)-(-)-(-)-(-)|A#5D6-(-)-(-)-(-)-(-)|
+    -(-)-(-)-(-)-(-)|G5C6-(-)-(-)-(-)-(-)|
+   A#5D#6-(-)-(-)-(-)-(-),|A#5D6-(-)-(-)-(-)-(-)|
+   G5C6-(-)-(-)-(-)-(-)|G5B5-(-)-(-)-(-)-(-)||
+   A#5D6-(-)-(-)----|G5A#5-(-)-(-)----|
+   G#5C6-(-)-(-)----|D#5G5-(-)-(-)----|
+   F5G#5C6-(-)-(=)=(--)--|G5A#5D6-(-)-(=)=(--)--||
+   A#5D6G6(--)-----G5B5D6(=)=|(-)-B5D6F6(=)=G5B5D6(-----)||F5G#5B5(=)=G#5B5F5(-)-F5G#5B5(-----)||",
+        ),
+    );
+
+    song.copy_pattern_from(
+        5,
+        &midi_generator(
+            "
+    C3(-),C4(-),C3(-),C4(-),C3(-),C4(-),C3(-),C4(-),
+    C3(-),C4(-),C3(-),C4(-),C3(-),C4(-),C3(-),C4(-),||
+
+    C3(-),C4(-),C3(-),C4(-),C3(-),C4(-),C3(-),C4(-),
+    G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),
+    A#2(-),A#3(-),A#2(-),A#3(-),A#2(-),A#3(-),A#2(-),A#3(-),
+    F2(-),F3(-),F2(-),F3(-),F2(-),F3(-),F2(-),F3(-),||",
+        ),
+    );
+    song.copy_pattern_from(
+        6,
+        &midi_generator(
+            "D#3(-),D#4(-),D#3(-),D#4(-),D#3(-),D#4(-),D#3(-),D#4(-),
+    A#2(-),A#3(-),A#2(-),A#3(-),A#2(-),A#3(-),A#2(-),A#3(-),
+    G#2(-),G#3(-),G#2(-),G#3(-),G#2(-),G#3(-),G#2(-),G#3(-),
+    G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),||
+
+    C3(-),C4(-),C3(-),C4(-),C3(-),C4(-),C3(-),C4(-),
+    G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),
+    A#2(-),A#3(-),A#2(-),A#3(-),A#2(-),A#3(-),A#2(-),A#3(-),
+    F2(-),F3(-),F2(-),F3(-),F2(-),F3(-),F2(-),F3(-),||",
+        ),);
+    song.copy_pattern_from(
+        7,
+        &midi_generator(
+            "D#3(-),D#4(-),D#3(-),D#4(-),D#3(-),D#4(-),D#3(-),D#4(-),
+    A#2(-),A#3(-),A#2(-),A#3(-),A#2(-),A#3(-),A#2(-),A#3(-),
+    G#2(-),G#3(-),G#2(-),G#3(-),G#2(-),G#3(-),G#2(-),G#3(-),
+    G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),||
+
+    G#2(-),G#3(-),G#2(-),G#3(-),G#2(-),G#3(-),G#2(-),G#3(-),
+    G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),
+    F2(-),F3(-),F2(-),F3(-),F2(-),F3(-),F2(-),F3(-),
+    G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),G2(-),G3(-)||",
+        ),);
+    song.copy_pattern_from(
+        8,
+        &midi_generator(
+            "F2(-),F3(-),F2(-),F3(-),F2(-),F3(-),F2(-),F3(-),
+    G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),|
+    G#2(---=)G3(=-)A#3(-)G#3(=)D3(=-),
+    G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),||
+    G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),G2(-),G3(-),||",
+        ),);
+
+    song.copy_pattern_from(9, &midi_generator("
+    --------|--------||
+    --------|-F5(-),D#5(=),D5(=),D#5(-),F5(-),---|--------|-D#5(-),D5(=),C5(=),D5(-),D#5(-),---|
+    --------|-G#5(-),G5(=),F5(=),G5(-),G#5(-),---|--------|-G5(=),F5(=),D#5(-),F5(-),D5(-),---||
+    --------|-F5(-),D#5(=),D5(=),D#5(-),F5(-),---|--------|-D#5(-),D5(=),C5(=),D5(-),D#5(-),---|
+    --------|-G#5(-),G5(=),F5(=),G5(-),G#5(-),---|--------|-F5(=),D#5(=),D5(-),D#5(-),C5(--),B4(--)||
+    --D5(-)C5(-)F5(--)--|--C5(-)B4(-)D5(--)--|--G#4(-)G4(-)D5(-)B4(=)C5(=)G4(--)|G5(-),G#5(-),G5(-),F#5(-),G5(--)--|
+    --------|--------|
+    C4(=)D#4(=)F#4(=)A4(=)C5(=)D#5(=)F#5(=)A5(=)C6(=)A5(=)F#5(=)D#5(=)C5(=)A4(=)F#4(=)D#4(=)|"));
+
+    song.copy_pattern_from(
+        10,
+        &midi_generator(
+            "C2
+    -(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=
+    -(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=||
+    -(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=
+    -(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=
+    -(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=
+    -(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=||
+    -(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=
+    -(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=
+    -(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=
+    -(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=||
+    -(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=
+    -(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=
+    -(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=
+    -(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=-(=)=||",
+        ),);
+
+    // 然后处理display
+    song.channels[0].push_display(Display::new(0, song.patterns[0].get_len(), 0));
+    song.channels[0].push_display(Display::new(1, song.patterns[1].get_len(), song.patterns[0].get_len()));
+    song.channels[0].push_display(Display::new(2, song.patterns[2].get_len(), song.patterns[0].get_len()+song.patterns[1].get_len()));
+    song.channels[1].push_display(Display::new(3, song.patterns[3].get_len(), 0));
+    song.channels[1].push_display(Display::new(4, song.patterns[4].get_len(), song.patterns[3].get_len()));
+    song.channels[2].push_display(Display::new(5, song.patterns[5].get_len(), 0));
+    song.channels[2].push_display(Display::new(6, song.patterns[6].get_len(), song.patterns[5].get_len()));
+    song.channels[2].push_display(Display::new(7, song.patterns[7].get_len(), song.patterns[5].get_len()+song.patterns[6].get_len()));
+    song.channels[2].push_display(Display::new(8, song.patterns[8].get_len(), song.patterns[5].get_len()+song.patterns[6].get_len()+song.patterns[7].get_len()));
+    song.channels[3].push_display(Display::new(9, song.patterns[9].get_len(), 0));
+    song.channels[4].push_display(Display::new(10, song.patterns[10].get_len(), 0));
+
+    song
+}
+
+/* 
 pub fn test_pattern() {
     let mut p = Pattern::new(0, "test");
     p.insert_note(0, 2, 4).unwrap();
@@ -389,3 +551,4 @@ pub fn init_test_channel() -> Vec<Channel> {
     });
     channels
 }
+*/

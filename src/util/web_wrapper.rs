@@ -1,7 +1,7 @@
 use super::song::Song;
 use super::pattern::pattern::Pattern;
 use crate::Note;
-use super::basetype::Timebase;
+use super::basetype::{PatternID, Timebase};
 extern crate wasm_bindgen;
 use wasm_bindgen::prelude::*;
 
@@ -36,50 +36,30 @@ impl songWrapper {
 
     pub fn new_pattern(
         &mut self,
-        channel_id: usize,
-        start_time: Timebase,
         pattern_name: &str,
+        pattern_id: PatternID
     ) {
-        self.song.new_pattern(channel_id, start_time, pattern_name).unwrap();
-    }
-
-    pub fn move_pattern_time(
-        &mut self,
-        channel_id: usize,
-        pattern_id: usize,
-        new_start_time: Timebase,
-    ) {
-        self.song.move_pattern_time(channel_id, pattern_id, new_start_time).unwrap();
-    }
-
-    pub fn move_pattern_channel(
-        &mut self,
-        channel_id: usize,
-        pattern_id: usize,
-        new_channel_id: usize,
-    ) {
-        self.song.move_pattern_channel(channel_id, pattern_id, new_channel_id).unwrap();
+        self.song.new_pattern(pattern_name, pattern_id);
     }
 
     pub fn edit_pattern(
         &mut self,
-        channel_id: usize,
-        pattern_id: usize,
+        pattern_id: u32,
         mode: &str,
         note_idx: u8,
         start_time: Timebase,
         end_time: Timebase,
     ) {
-        self.song.edit_pattern(channel_id, pattern_id, mode, note_idx, start_time, end_time).unwrap();
+        self.song.edit_pattern(pattern_id, mode, note_idx, start_time, end_time);
     }
 
-    pub fn save_to_file(&self, file_path: &str) {
-        self.song.save_to_file(file_path);
-    }
+    // pub fn save_to_file(&self, file_path: &str) {
+    //     self.song.save_to_file(file_path);
+    // }
 
-    pub fn read_from_file(&mut self, file_path: &str) {
-        self.song.read_from_file(file_path).unwrap();
-    }
+    // pub fn read_from_file(&mut self, file_path: &str) {
+    //     self.song.read_from_file(file_path).unwrap();
+    // }
 } // impl songWrapper
 
 #[wasm_bindgen]

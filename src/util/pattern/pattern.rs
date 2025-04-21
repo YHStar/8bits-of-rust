@@ -3,6 +3,7 @@ use std::io::Write;
 use std::mem::swap;
 
 use crate::util::basetype::ChannelID;
+use crate::util::basetype::PatternID;
 use crate::util::basetype::Midi;
 use crate::util::parameter::baseconst::NOTE_NUM;
 use crate::util::parameter::baseconst::SONG_LEN;
@@ -16,17 +17,17 @@ use crate::START;
 pub struct Pattern {
     name: String,
     score: Score,
-    start_time: Timebase,
+    id: PatternID,
     len: Timebase,
     // channel_id: ChannelID,
 }
 
 impl Pattern {
-    pub fn new(t: Timebase, name: &str) -> Self {
+    pub fn new(id: PatternID, name: &str) -> Self {
         Self {
             name: name.to_string(),
             score: Score::new(),
-            start_time: t,
+            id: id,
             len: 0,
             // channel_id: channel_id,
         }
@@ -39,7 +40,7 @@ impl Pattern {
     pub fn clear(&mut self) {
         self.name.clear();
         self.score.clear();
-        self.start_time = 0;
+        self.id = 0;
         self.len = 0;
     }
 
@@ -51,8 +52,8 @@ impl Pattern {
     //     self.channel_id
     // }
 
-    pub fn get_start_time(&self) -> Timebase {
-        self.start_time
+    pub fn get_id(&self) -> Timebase {
+        self.id
     }
 
     pub fn get_score(&self) -> &Score {
@@ -60,20 +61,15 @@ impl Pattern {
     }
 
     pub fn get_vec(&self, t: Timebase) -> Option<&Vec<Midi>> {
-        // t为音符在全曲的绝对时间，查找是需要减去pattern开始的时间，变成音符相对pattern的时间才能查询到
-        if t < self.start_time {
-            return None;
-        }
-        let relative_time = t - self.start_time;
-        self.get_score().get_vec(&relative_time)
+        self.get_score().get_vec(&t)
     }
 
     // pub fn set_channel_id(&mut self, new_id: ChannelID) {
     //     self.channel_id = new_id;
     // }
 
-    pub fn set_start_time(&mut self, new_start_time: Timebase) {
-        self.start_time = new_start_time;
+    pub fn set_id(&mut self, id: PatternID) {
+        self.id = id;
     }
 
     pub fn copy_notes_from(&mut self, new_notes: &Score) {
@@ -339,7 +335,7 @@ impl Pattern {
         file.write(self.name.as_bytes()).unwrap();
         file.write(b"\n").unwrap();
         // 再写开始时间
-        file.write(self.start_time.to_string().as_bytes()).unwrap();
+        file.write(self.id.to_string().as_bytes()).unwrap();
         file.write(b"\n").unwrap();
         for i in 0..NOTE_NUM as usize {
             for j in &pattern[i] {

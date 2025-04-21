@@ -260,8 +260,17 @@ pub fn mixer(song: &Song) -> Vec<Level> {
 
         while (channel_idx) < channel_num {
             // 初始化音轨设置
-            for pat in &patterns[channel_idx] {
-                if let Some(midis) = pat.get_vec(idx) {
+            for dis in &channels[channel_idx].display {
+                // 如果mixer的当前时间不在display中，如果没有到当前的display，也到不了后面的，break；如果超过了当前的，可能也能到达后面的，continue
+                if idx < dis.start_time{
+                    break;
+                }
+                else if idx > dis.start_time + dis.duration {
+                    continue;
+                }
+                let current_pattern = &patterns[song.pattern_index(dis.pattern_id)];
+                // idx是全局的时间，减去display的开始时间得到在pattern的相对时间
+                if let Some(midis) = current_pattern.get_vec(idx - dis.start_time) {
                     for midi in midis {
                         if midi.typ == START!() as NoteType {
                             synth_parameters.insert(
