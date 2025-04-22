@@ -18,6 +18,11 @@ jobs:
       with:
         node-version: '18.x'
 
+    - name: compile rust
+      run: |
+        cargo install wasm-pack
+        wasm-pack build
+
     - name: Install dependencies
       run: |
         cd frontend
