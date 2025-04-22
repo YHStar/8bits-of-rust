@@ -44,12 +44,30 @@ impl Channel {
         self.display.remove(index)
     }
 
+    pub fn filter_display_without_pattern_id(&mut self, id: PatternID) {
+        if self.display.is_empty() {
+            return;
+        }
+        let mut tmpVec:Vec<Display> = Vec::new();
+        for dis in &self.display {
+            if dis.pattern_id != id {
+                tmpVec.push(*dis);
+            }
+        }
+        // 找到不包含id的pattern，然后置换
+        std::mem::swap(&mut self.display, &mut tmpVec);
+    }
+
     pub fn insert_display(&mut self, index: usize, element: Display) {
         self.display.insert(index, element)
     }
 
     pub fn push_display(&mut self, element: Display) {
         self.display.push(element);
+    }
+
+    pub fn sort_display(&mut self) {
+        self.display.sort_by_key(|a| a.start_time);
     }
 
     pub fn change_display_duration(&mut self, index: usize, new_duration: Timebase) {

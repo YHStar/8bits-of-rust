@@ -9,6 +9,8 @@ pub const LOOP_TIMES: u16 = u16::MAX;
 pub const MAX_POLY: usize = 8;
 pub const NOTE_NUM: u8 = 86;
 
+pub const UNEXIST_PATTERN_INDEX: usize = usize::MAX;
+
 pub const FREQ_DATA: [f32; 86] = [
     0.0, 32.7032, 34.6478, 36.7081, 38.8909, 41.2034, 43.6535, 46.2493, 48.9995, 51.9131, 55.0000,
     58.2705, 61.7354, 65.4064, 69.2957, 73.4162, 77.7817, 82.4069, 87.3071, 92.4986, 97.9989,

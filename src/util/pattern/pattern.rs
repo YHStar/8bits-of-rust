@@ -33,6 +33,10 @@ impl Pattern {
         }
     }
 
+    pub fn clear_notes(&mut self) {
+        self.score.clear();
+    }
+
     pub fn rename(&mut self, new_name: &str) {
         self.name.clone_from(&new_name.to_string());
     }

@@ -1,7 +1,7 @@
 // 状态管理
 import { createStore } from "vuex"
 import createPersistedState from "vuex-persistedstate"
-// import { songWrapper, patternWrapper, init, init_panic_hook } from "eight_bits_of_rust"
+import { songWrapper, init, init_panic_hook } from "eight_bits_of_rust"
 
 export default createStore({
   state: {
@@ -29,17 +29,26 @@ export default createStore({
     scrollX: 0,
     scrollY: 0,
 
-    rust_songs: [],
-    current_song: null,
-    current_pattern: null,
+    wasm_song: null,
   },
   mutations: {
     // WASM相关
-    // initWasmInstance(state) {
-    //   init_panic_hook()
-    //   state.current_song = songWrapper.new("tmp")
-    //   state.current_pattern = patternWrapper.new(0, "SB")
-    // },
+    initWasmInstance(state) {
+      // 初始化错误捕捉函数并初始化wasm实例
+      init_panic_hook()
+      state.wasm_song = songWrapper.new("TMP")
+      // 先创建5个channel
+      state.wasm_song.new_channel("1", "square", 0.05, 1, 0, true)
+      state.wasm_song.new_channel("2", "square", 0.05, 1, 0, true)
+      state.wasm_song.new_channel("3", "square", 0.05, 1, 0, true)
+      state.wasm_song.new_channel("4", "square", 0.05, 1, 0, true)
+      state.wasm_song.new_channel("5", "square", 0.05, 1, 0, true)
+    },
+
+    playSong(state) {
+      alert("PLAYING")
+      state.wasm_song.play()
+    },
 
     // 页面状态相关
     setCurrentRoute(state, route) {
@@ -50,11 +59,14 @@ export default createStore({
     },
     setActivePattern(state, id) {
       state.activePattern = id
+      state.wasm_song.set_active_pattern(id)
     },
 
     // state.displays
     addDisplay(state, newDisplay) {
       state.displays.push(newDisplay)
+      state.wasm_song.push_display(newDisplay.channel, newDisplay.patternId, newDisplay.duration, newDisplay.starttime)
+      state.wasm_song.sort_display()
       // console.log("display pattern")
       // for (var i = 0; i < state.displays.length; ++i){
       //   console.log(state.displays[i]);
@@ -65,6 +77,7 @@ export default createStore({
       if (display) {
         const index = state.displays.findIndex((p) => p.id === id)
         state.displays.splice(index, 1)
+        state.wasm_song.delete_display(display.channel, display.patternId, display.starttime)
       }
     },
     updateDisplayPosition(state, { id, starttime, channel }) {
@@ -72,30 +85,35 @@ export default createStore({
       if (display) {
         display.starttime = starttime
         display.channel = channel
+        // 对wasm，直接先删除再插入
+        state.wasm_song.delete_display(display.channel, display.patternId, display.starttime)
+        state.wasm_song.push_display(channel, display.patternId, display.duration, starttime)
+        state.wasm_song.sort_display()
       }
     },
     updateDisplayDuration(state, { id, duration }) {
-      state.displays = state.displays.map((display) =>
-        display.id === id ? { ...display, duration } : display,
-      )
+      const display = state.displays.find((d) => d.id === id)
+      if (display) {
+        display.duration = duration
+        // 对wasm，直接先删除再插入
+        state.wasm_song.update_display_duration(display.channel, display.patternId, display.starttime, duration)
+      }
     },
 
     // state.notes
     addNote(state, note) {
-      // state.current_pattern.insert_note(note.pitch, note.starttime, note.starttime + note.duration.value)
+      state.wasm_song.edit_pattern("insert", note.pitch, note.starttime, note.starttime + note.duration)
       state.notes.push(note)
     },
     deleteNote(state, note) {
-      console.log("deleted note i")
-      // const note_to_delete = state.notes.find((n) => n.id == id)
-      // state.current_pattern.delete_note(note_to_delete.pitch, note_to_delete.starttime, note_to_delete.starttime + note_to_delete.duration)
+      state.wasm_song.edit_pattern("delete", note.pitch, note.starttime, note.starttime + note.duration)
       state.notes = state.notes.filter((n) => n.id !== note.id)
     },
     updateNotePosition(state, { id, starttime, pitch }) {
       const note = state.notes.find((n) => n.id === id)
       if (note) {
-        // state.current_pattern.delete_note(note.pitch, note.starttime, note.starttime + note.duration.value)
-        // state.current_pattern.insert_note(pitch, starttime, starttime + note.duration.value)
+        state.wasm_song.edit_pattern("delete", note.pitch, note.starttime, note.starttime + note.duration)
+        state.wasm_song.edit_pattern("insert", pitch, starttime, starttime + note.duration)
         note.pitch = pitch
         note.starttime = starttime
       }
@@ -103,14 +121,17 @@ export default createStore({
     updateNoteDuration(state, { id, duration }) {
       const note = state.notes.find((n) => n.id === id)
       if (note) {
-        //state.current_pattern.delete_note(note.pitch, note.starttime, note.starttime + note.duration.value)
-        //state.current_pattern.insert_note(note.pitch, note.starttime, note.starttime + duration.value)
+        if (duration < note.duration) {
+          state.wasm_song.edit_pattern("delete", note.pitch, duration, note.duration)
+        }
+        else if (duration > note.duration) {
+          state.wasm_song.edit_pattern("insert", note.pitch, note.duration, duration)
+        }
         note.duration = duration
       }
     },
     emptyNotes(state) {
       state.notes = []
-      // state.current_pattern.clear()
     },
     // 切换选中的pattern时,将note复制回旧pattern,从新pattern中复制note
     saveNotes(state) {
@@ -134,20 +155,25 @@ export default createStore({
     // state.patterns
     addPattern: (state, pattern) => {
       state.patterns.push(pattern)
+      state.wasm_song.new_pattern(pattern.name, pattern.id)
     },
     deletePattern(state, id) {
       state.patterns = state.patterns.filter((n) => n.id !== id)
       state.displays = state.displays.filter((n) => n.id !== id)
       state.notes = []
+      state.wasm_song.delete_pattern(id)
+      state.wasm_song.filter_display_without_pattern_id(id)
     },
     renamePattern(state, { id, name }) {
       // console.log("renamepattern", name)
       const pattern = state.patterns.find((p) => p.id === id)
       if (pattern) pattern.name = name
+      state.wasm_song.rename_pattern(id, name)
     },
     sortPattern(state, { index, newIndex }) {
       const draggedItem = state.patterns.splice(index, 1)[0] // 移除被拖拽的元素
       state.patterns.splice(newIndex, 0, draggedItem)
+      state.wasm_song.sort_display()
     },
 
 
@@ -185,5 +211,5 @@ export default createStore({
     getActivePattern: (state) =>
       state.patterns.find((p) => p.id === state.activePattern),
   },
-  plugins: [createPersistedState()],
+  // plugins: [createPersistedState()],
 })

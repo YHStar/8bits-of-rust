@@ -2,7 +2,7 @@ use crate::util::basetype::Timebase;
 
 use crate::util::basetype::PatternID;
 
-
+#[derive(Copy, Clone)]
 pub struct Display {
     pub pattern_id: PatternID,
     pub duration: Timebase,

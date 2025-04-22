@@ -34,12 +34,15 @@
 
 <script setup>
 import { ref } from "vue"
+import { useStore } from "vuex"
 
 const playStatus = ref("stopped")
 const progress = ref(0)
+const store = useStore()
 
 const play = () => {
   playStatus.value = "playing"
+  store.commit("playSong")
 }
 
 const pause = () => {
