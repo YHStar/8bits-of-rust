@@ -16,6 +16,8 @@
 - `multimap`：用于处理多值映射。
 - `rand`：用于生成随机噪声。
 - `libm`：用于数学运算。
+- `wasm-bindgen`：用于编译rust代码为WASM。
+- `console_error_panic_hook`：用于把rust中的panic输出到前端的log中。
 
 ## 使用方法
 
@@ -27,6 +29,16 @@
 cargo build
 ```
 
+为了编译rust为wasm，安装wasm pack工具包
+```bash
+cargo install wasm-pack
+```
+
+对于前端的环境，请确保安装了nodejs、npm和vue，建议使用nvm等工具来管理node和npm的版本
+```bash
+npm install npm@latest -g
+```
+
 ### 运行程序
 
 运行程序以生成和播放音频（记得戴上耳机，音量别太大）：
@@ -35,11 +47,26 @@ cargo build
 cargo run
 ```
 
-程序内部存储了一首示例歌曲，运行后将生成一个名为 `my_wave.wav` 的音频文件，并尝试播放它。
+程序内部存储了一首示例歌曲，该命令以[main.rs](src/main.rs)为主文件编译代码，运行后将生成一个名为 `my_wave.wav` 的音频文件，并尝试播放它。
+
+在运行前，利用wasm-pack把代码编译成可供JavaScript使用的库。在项目根目录下执行以下命令，该命令以[lib.rs](src/lib.rs)为主文件编译：
+
+```bash
+wasm-pack build
+```
+
+之后启动前端服务：
+
+```bash
+cd frontend
+npm install
+npm build
+npm run serve
+```
 
 ### 自定义音频
 
-你可以在代码中修改 `CHANNELS` 数组中的 MIDI 数据来生成不同的音频。每个通道支持不同的波形和音符序列。
+你可以在代码中修改[test.rs](src/util/test.rs)中的 MIDI 数据来生成不同的音频。每个通道支持不同的波形和音符序列。
 
 ### 音频文件存储
 
@@ -47,7 +74,9 @@ cargo run
 
 ## 代码结构
 
-- **`src/main.rs`** 之后再打包吧（摊手）
+- **`src/main.rs`** 
+- **`src/lib.rs`** 
+- **`src/util/mod.rs`** 
 
 ## 注意事项
 
