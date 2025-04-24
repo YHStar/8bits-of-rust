@@ -2,10 +2,11 @@ use super::{pattern::display::Display, song::Song};
 use super::pattern::pattern::Pattern;
 use crate::Note;
 use crate::{mixer, generate_wav, load_wav};
-use super::parameter::baseconst::UNEXIST_PATTERN_INDEX;
+use super::parameter::baseconst::{ UNEXIST_PATTERN_INDEX, SAMPLE_RATE };
 use super::basetype::{PatternID, Timebase};
 extern crate wasm_bindgen;
 use wasm_bindgen::prelude::*;
+use web_sys::{AudioContext, AudioBuffer, AudioBufferSourceNode};
 
 #[wasm_bindgen]
 pub struct songWrapper {
@@ -122,11 +123,31 @@ impl songWrapper {
         self.song.push_display(channel_index, pattern_id, duration, start_time);
     }
 
-    pub fn play(&self) {
-        let name = "my_wave";
+    pub fn play(&self) -> Result<(), JsValue> {
         let sample = mixer(&self.song);
-        generate_wav(name, sample);
-        load_wav(name);
+        
+        // 转换 i8 到 Float32
+        let float_samples: Vec<f32> = sample
+        .iter()
+        .map(|&x| x as f32 / 128.0)
+        .collect();
+
+        // 创建 AudioContext
+        let audio_ctx = AudioContext::new()?;
+
+        // 创建 AudioBuffer
+        let buffer = audio_ctx
+        .create_buffer(1, sample.len() as u32, SAMPLE_RATE as f32)
+        .expect("Failed to create audio buffer");
+        buffer.copy_to_channel(&float_samples, 0)?;
+
+        // 创建并播放音频源
+        let source = AudioBufferSourceNode::new(&audio_ctx)?;
+        source.set_buffer(Some(&buffer));
+        source.connect_with_audio_node(&audio_ctx.destination())?;
+        source.start()?;
+
+        Ok(())
     }
 
     // pub fn save_to_file(&self, file_path: &str) {

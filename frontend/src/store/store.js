@@ -38,18 +38,16 @@ export default createStore({
       init_panic_hook()
       state.wasm_song = songWrapper.new("TMP")
       // 先创建5个channel
-      state.wasm_song.new_channel("1", "square", 0.05, 1, 0, true)
-      state.wasm_song.new_channel("2", "square", 0.05, 1, 0, true)
-      state.wasm_song.new_channel("3", "square", 0.05, 1, 0, true)
-      state.wasm_song.new_channel("4", "square", 0.05, 1, 0, true)
-      state.wasm_song.new_channel("5", "square", 0.05, 1, 0, true)
+      state.wasm_song.new_channel("1", "square", 0.5, 1, 0, true)
+      state.wasm_song.new_channel("2", "square", 0.5, 1, 0, true)
+      state.wasm_song.new_channel("3", "square", 0.5, 1, 0, true)
+      state.wasm_song.new_channel("4", "square", 0.5, 1, 0, true)
+      state.wasm_song.new_channel("5", "square", 0.5, 1, 0, true)
     },
-
-    playSong(state) {
-      alert("PLAYING")
+    play(state) {
       state.wasm_song.play()
     },
-
+    
     // 页面状态相关
     setCurrentRoute(state, route) {
       state.currentRoute = route

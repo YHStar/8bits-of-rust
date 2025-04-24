@@ -42,7 +42,7 @@ const store = useStore()
 
 const play = () => {
   playStatus.value = "playing"
-  store.commit("playSong")
+  store.commit("play")
 }
 
 const pause = () => {

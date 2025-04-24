@@ -46,12 +46,13 @@ use util::parameter::baseconst::MAX_POLY;
 extern crate wasm_bindgen;
 extern crate console_error_panic_hook;
 use wasm_bindgen::prelude::*;
+use web_sys::{AudioContext, AudioBuffer, AudioBufferSourceNode};
 
 #[wasm_bindgen]
 pub fn init_panic_hook() {
     console_error_panic_hook::set_once();
 }
 #[wasm_bindgen]
-pub fn test() -> String {
-    "Wasm Vue test!".to_string()
+pub fn test() {
+    
 }
