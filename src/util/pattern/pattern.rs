@@ -15,10 +15,10 @@ use crate::END;
 use crate::START;
 
 pub struct Pattern {
-    name: String,
-    score: Score,
-    id: PatternID,
-    len: Timebase,
+    name: String, // pattern的名称
+    score: Score, // pattern中的midi乐谱
+    id: PatternID, // pattern的唯一id
+    len: Timebase, // pattern的长度，单位：Timebase
     // channel_id: ChannelID,
 }
 
@@ -33,14 +33,17 @@ impl Pattern {
         }
     }
 
+    // 清除pattern所有音符
     pub fn clear_notes(&mut self) {
         self.score.clear();
     }
 
+    // 重命名pattern
     pub fn rename(&mut self, new_name: &str) {
         self.name.clone_from(&new_name.to_string());
     }
 
+    // 清除pattern的所有信息
     pub fn clear(&mut self) {
         self.name.clear();
         self.score.clear();
@@ -82,6 +85,7 @@ impl Pattern {
         self.update_len();
     }
 
+    
     pub fn insert_note(
         &mut self,
         note_idx: Note,

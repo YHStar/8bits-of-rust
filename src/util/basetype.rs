@@ -23,9 +23,9 @@ impl Clone for Midi {
     }
 }
 
-pub struct ModulateParameters {
-    pub frequency: f32,
-    pub range: f32,
+pub struct ModulateParameters { // fm调制参数
+    pub frequency: f32, //fm调制频率
+    pub range: f32, //fm调制幅度
 }
 
-pub type Score = MultiMap<Timebase, Midi>;
+pub type Score = MultiMap<Timebase, Midi>; // 乐谱类型

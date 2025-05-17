@@ -256,29 +256,47 @@ pub fn mixer(song: &Song) -> Vec<Level> {
     let mut synth_parameters: HashMap<usize, SynthParameters> = HashMap::new();
 
 
-    let mut idx: Timebase = 0;
+    let mut song_tbase: Timebase = 0;
 
     log!("————————————");
-    
-    while idx < SONG_LEN {
-        let mut channel_idx = 0;
 
+    // 按时基遍历歌曲
+    while song_tbase < SONG_LEN {
+        let mut channel_idx = 0;
+        if song_tbase < 8{
+            log!("——>>timebase: ", song_tbase);
+
+        }
+        // 按channel遍历歌曲
         while (channel_idx) < channel_num {
-            // 初始化音轨设置
+            // 按display遍历歌曲，找到mixer当前时间所在的display
             for dis in &channels[channel_idx].display {
                 // 如果mixer的当前时间不在display中，如果没有到当前的display，也到不了后面的，break；如果超过了当前的，可能也能到达后面的，continue
-                if idx < dis.start_time{
+                if song_tbase < dis.start_time{
                     break;
                 }
-                else if idx > dis.start_time + dis.duration {
+                else if song_tbase > dis.start_time + dis.duration {
                     continue;
                 }
+
+                // 获取当前的pattern
                 let current_pattern = &patterns[song.pattern_index(dis.pattern_id)];
+                // 当到达current_pattern的结束时基时，将所有的midi信号全部移除，完全结束这个pattern的midi信号
+                if song_tbase == dis.start_time + dis.duration{
+                    synth_parameters.retain(|i, _| {
+                        // 条件判断：返回 true 保留元素，false 删除元素
+                        // 示例：保留所有键不等于当前值的元素
+                        (i/128 != channel_idx)
+                    });
+                    continue;
+                }
                 // idx是全局的时间，减去display的开始时间得到在pattern的相对时间
-                if let Some(midis) = current_pattern.get_vec(idx - dis.start_time) {
+                // 在current_pattern中获得midi信号
+                if let Some(midis) = current_pattern.get_vec(song_tbase - dis.start_time) {
                     for midi in midis {
                         log!("test_midi type: ", midi.typ, "pitch: ", midi.note);
                         if midi.typ == START!() as NoteType {
+                            // 若midi信号的类型是START，就设置合成器相关参数
                             synth_parameters.insert(
                                 channel_idx * 128 + midi.note as usize,
                                 SynthParameters::new(
@@ -307,7 +325,7 @@ pub fn mixer(song: &Song) -> Vec<Level> {
             clock += 1;
         }
 
-        idx += 1;
+        song_tbase += 1;
     }
     sample
 }
