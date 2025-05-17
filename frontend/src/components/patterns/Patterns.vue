@@ -131,16 +131,18 @@ const stopRenamePattern = () => {
 </script>
 
 <style scoped>
+.container {
+  display: flex;
+  flex-direction: column !important;
+  height: 100%;
+  padding: 10px;
+  background-color: var(--global-ghost);
+}
+
 .input-container {
   display: flex;
   flex-direction: row;
   position: sticky;
-}
-
-.container {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
 }
 
 .patterns-container {
@@ -157,8 +159,6 @@ const stopRenamePattern = () => {
   width: 125px;
 }
 .pattern {
-  /* max-height: 48px; */
   z-index: 6;
-  max-width: 80px;
 }
 </style>

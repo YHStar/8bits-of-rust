@@ -14,9 +14,12 @@ winapi = { version = "0.3", features = ["winuser"] }
 wasm-bindgen = "0.2.100"
 console_error_panic_hook = "0.1.7"
 web-sys = { version = "0.3", features = ["AudioContext", "AudioBuffer", "AudioBufferSourceNode"] }
+log = "0.4"      # 官方日志接口
+gloo-console = "0.3.0"   # 日志实现，支持文件输出和级别控制
 
 [lib]
 crate-type = ["cdylib", "rlib"]
+
 
 # [profile.release]
 # windows_subsystem = 'windows'

@@ -135,14 +135,14 @@ const handleDoubleClick = () => {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  border: 10px solid var(--pixel-border);
-  background: var(--pixel-background) !important;
+  border: 10px solid var(--global-border);
+  background: var(--global-background) !important;
   cursor: pointer;
   .round_right {
     position: absolute;
     width: 20%;
     height: 20%;
-    background: var(--pixel-primary) !important;
+    background: var(--global-primary) !important;
     border-radius: 50%;
     transform-origin: 250% 250%;
     transition: transform 0.1s;

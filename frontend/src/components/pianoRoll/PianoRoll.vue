@@ -42,7 +42,6 @@ const getBeatStyle = (beat) => ({
   position: relative;
   height: 600px;
   width: 100%;
-  background: #ccc;
   overflow-x: scroll;
   overflow-y: scroll;
   z-index: 0;
@@ -66,7 +65,7 @@ const getBeatStyle = (beat) => ({
   position: sticky;
   top: 0;
   height: 20px;
-  background: #444;
+  background: var(--global-headbar);
   z-index: 3;
 }
 </style>

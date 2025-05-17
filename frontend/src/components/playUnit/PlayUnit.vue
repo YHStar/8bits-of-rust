@@ -1,7 +1,7 @@
 <!-- 播放单元 -->
 <template>
   <div class="play-unit">
-    <div class="button-unit">
+    <div class="container1">
       <my-button size="small" :active="playStatus === 'playing'" @click="play">
         <template #icon>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -24,10 +24,25 @@
           </svg>
         </template>
       </my-button>
+
+      <my-knob
+        v-model="bpm"
+        :min="10"
+        :max="500"
+        label="BPM"
+        @change="updateInterval" />
+      <my-text class="bpm-value" content="bpm" />
     </div>
 
     <div class="progress-container">
       <div class="progress-bar" :style="{ width: progress + '%' }" />
+    </div>
+
+    <div class="timer-container">
+      <div class="timer-display">
+        <my-text class="time" :content="formattedTime" />
+        <my-text class="measure" :content="measureCount + '  小节'" />
+      </div>
     </div>
   </div>
 </template>
@@ -59,13 +74,8 @@ const reset = () => {
 .play-unit {
   margin-top: -10px;
   padding: 4px;
-  background: var(--pixel-background);
-}
-
-.button-unit {
-  display: flex;
-  flex-direction: row;
-  gap: 4px;
+  background: var(--global-background);
+  border: 10px, solid, var(--global-border);
 }
 
 .my-button svg {
@@ -76,16 +86,29 @@ const reset = () => {
 }
 
 .progress-container {
-  /* margin-top: 15px; */
   height: 8px;
   width: 100%;
-  background: #3a3a3a;
-  /* border-radius: 4px; */
-  /* overflow: hidden; */
+  background: var(--global-secondary);
 }
 .progress-bar {
   height: 100%;
-  background: var(--pixel-highlight);
+  background: var(--global-highlight);
   transition: width 0.3s ease;
 }
+.timer-display {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.timer-display > * {
+  flex-grow: 0;
+  width: 100px;
+}
+.container1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 </style>
+

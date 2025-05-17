@@ -1,14 +1,36 @@
-/* 主要装饰 */
+/* 更换皮肤：改变root中的配色可以修改全局样式，支持定制自己的皮肤 */
+/* :root {
+  --global-primary: #eee;
+  --global-secondary: #000;
+  --global-background: #eee
+  --global-border: #5f5f5f;
+  --global-text: #000;
+  --global-disabled: #555;
+  --global-highlight: #ffffff;
+  --global-ghost: #bbb;
+  --global-text: #000000;
+  --global-text-shadow: #79797971;
+} */
+
+/* 主题1 */
 :root {
-  --pixel-primary: #eee;
-  --pixel-secondary: #000;
-  --pixel-background: #bbb;
-  --pixel-border: #555;
-  --pixel-text: #000;
-  --pixel-disabled: #555;
-  --pixel-highlight: #ffffff;
-  --pixel-ghost: #bbb;
+  --global-primary: #eaeaea;
+  --global-secondary: #000;
+  --global-background: rgba(255, 202, 28, 0.25);
+  /* --global-background: #eee */
+  --global-border: #5f5f5f;
+  --global-grid: #aaa;
+  --global-disabled: #555;
+  --global-highlight: #ffffff;
+  --global-ghost: #bbb;
+  --global-text: #000000;
+  --global-text-shadow: #b4b4b4b7;
+  --global-label-text: #ccc; 
+  --global-headbar: #444;
+  --global-handler: rgb(255, 153, 0);
 }
+
+
 * {
   user-select: none !important;
   -webkit-user-select: none !important;
@@ -24,7 +46,7 @@ textarea,
 .c-label {
   position: absolute;
   font-size: 15px;
-  color: #888;
+  color: var(--global-label-text);
   user-select: none;
 }
 
@@ -33,27 +55,32 @@ textarea,
   flex-direction: column;
   flex: 1;
   z-index: 1;
-  padding: 20px;
-  background: var(--pixel-background);
+  /* background: var(--global-ghost); */
+  background-color: var(--global-background);
+  border: var(--global-border) solid 20px;
   overflow: hidden;
+  /* width: 100%; */
+  max-width: 2000px;
+  min-width: 1000px;
+  min-height: 600px;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
+  border-top: 5px solid var(--global-grid);
+  border-left: 5px solid var(--global-grid);
+  border-right: 5px solid var(--global-grid);
 }
-th,
-td {
-  border: 1px solid #ddd;
+th,td {
+  border-bottom: 5px solid var(--global-grid);
+  /* max-height: 30px; */
   padding: 8px;
   text-align: center;
 }
-td {
-  background-color: #fff;
-}
 /* 滚动条整体样式 */
 ::-webkit-scrollbar {
-  width: 20px;  /* 默认宽度从16px缩减50%[1,6](@ref) */
+  width: 20px; /* 默认宽度从16px缩减50%[1,6](@ref) */
   height: 20px; /* 水平滚动条高度 */
 }
 

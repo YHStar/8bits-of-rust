@@ -187,7 +187,7 @@ const resizeNote = (e) => {
 
 <style scoped>
 .note {
-  background-color: rgb(255, 232, 172);
+  background-color: rgb(255, 220, 62);
   z-index: 9;
   opacity: 1;
   position: absolute;
@@ -197,7 +197,7 @@ const resizeNote = (e) => {
 
 .note-resize-handle {
   position: absolute;
-  background-color: rgba(255, 191, 0, 0.5);
+  background-color: rgb(255, 162, 0);
   cursor: ew-resize;
   z-index: 10;
 }

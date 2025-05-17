@@ -65,9 +65,9 @@ const selectOption = (option) => {
   position: relative;
   max-width: 180px;
   cursor: pointer;
-  background: var(--pixel-primary);
+  background: var(--global-primary);
   border: 3px solid;
-  border-color: var(--pixel-border);
+  border-color: var(--global-border);
   padding: 8px;
 }
 
@@ -92,16 +92,14 @@ const selectOption = (option) => {
   top: 100%;
   left: -3px;
   right: -3px;
-  background: var(--pixel-primary);
-  border: 3px solid var(--pixel-border);
+  background: var(--global-primary);
+  border: 3px solid var(--global-border);
   margin-top: 4px;
   z-index: 1;
 }
 
 .option {
   padding: 8px;
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
 }
 </style>
+

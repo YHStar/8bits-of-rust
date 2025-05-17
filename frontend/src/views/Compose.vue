@@ -22,11 +22,13 @@
     </div>
 
     <div class="placeholder-block"></div>
+    <div class="main-container">
+      <plugin v-if="isComposePage('plugin')"></plugin>
+      <mixer v-if="isComposePage('mixer')"></mixer>
+      <arrangement v-if="isComposePage('arrangement')"></arrangement>
+      <export-song v-if="isComposePage('export')"></export-song>      
+    </div>
 
-    <plugin v-if="isComposePage('plugin')">1</plugin>
-    <mixer v-if="isComposePage('mixer')">2</mixer>
-    <arrangement v-if="isComposePage('arrangement')">3</arrangement>
-    <export-song v-if="isComposePage('export')">4</export-song>
   </div>
 </template>
 
@@ -55,6 +57,7 @@ const changeComposePage = (page) => {
 .container {
   display: flex;
   flex-direction: row;
+  align-items: center;
   width: 100%;
   gap: 6px;
 }

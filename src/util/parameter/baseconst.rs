@@ -1,17 +1,17 @@
-pub const N_TBASE: u32 = 4;
-pub const SONG_LEN: u32 = (16 + 64 + 64 + 64 + 8) * 2;
-pub const SAMPLE_RATE: u32 = 44100; // 采样率
-pub const BPM: u32 = 145;
-pub const T_BEAT: f32 = 60.0 / BPM as f32;
-pub const T_BASE: f32 = 60.0 / (BPM * N_TBASE) as f32;
+pub const N_TBASE: u32 = 4; // 时基大小
+pub const SONG_LEN: u32 = (16 + 64 + 64 + 64 + 8) * 2; // 歌曲的总的Beat数
+pub const SAMPLE_RATE: u32 = 44100; // 采样率 单位hz
+pub const BPM: u32 = 145; //歌曲速度 单位beat/minute
+pub const T_BEAT: f32 = 60.0 / BPM as f32; // 一个Beat的时长 单位：s
+pub const T_BASE: f32 = 60.0 / (BPM * N_TBASE) as f32; // 一个时基的时长 单位：s
 // pub const LOOP_TIMES:i16 = 8;
-pub const LOOP_TIMES: u16 = u16::MAX;
-pub const MAX_POLY: usize = 8;
-pub const NOTE_NUM: u8 = 86;
+pub const LOOP_TIMES: u16 = u16::MAX; // 循环次数，无限循环设为u16::MAX
+pub const MAX_POLY: usize = 8; // 合成器最大复音数
+pub const NOTE_NUM: u8 = 88; // 音符总数
 
 pub const UNEXIST_PATTERN_INDEX: usize = usize::MAX;
 
-pub const FREQ_DATA: [f32; 86] = [
+pub const FREQ_DATA: [f32; 88] = [
     0.0, 32.7032, 34.6478, 36.7081, 38.8909, 41.2034, 43.6535, 46.2493, 48.9995, 51.9131, 55.0000,
     58.2705, 61.7354, 65.4064, 69.2957, 73.4162, 77.7817, 82.4069, 87.3071, 92.4986, 97.9989,
     103.826, 110.000, 116.541, 123.471, 130.813, 138.591, 146.832, 155.563, 164.814, 174.614,
@@ -20,5 +20,5 @@ pub const FREQ_DATA: [f32; 86] = [
     587.330, 622.254, 659.256, 698.456, 739.989, 783.990, 830.609, 880.000, 932.328, 987.767,
     1046.502, 1108.732, 1174.658, 1244.508, 1318.510, 1396.913, 1479.978, 1567.982, 1661.219,
     1760.000, 1864.659, 1975.533, 2093.005, 2217.461, 2349.325, 2489.026, 2637.027, 2793.826,
-    2959.957, 3135.963, 3322.438, 3520.000, 3729.307, 3951.066, 4186.009,
+    2959.957, 3135.963, 3322.438, 3520.000, 3729.307, 3951.066, 4186.009, 0.0, 0.0
 ];
