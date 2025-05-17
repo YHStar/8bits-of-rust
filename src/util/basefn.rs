@@ -33,6 +33,8 @@ use crate::T_BASE;
 use crate::T_BEAT;
 
 use super::song::Song;
+use gloo_console::log;
+use wasm_bindgen::JsValue;
 
 pub fn midi_generator(note: &str) -> Score {
     let mut tbase: Timebase = 0;
@@ -83,6 +85,7 @@ pub fn midi_generator(note: &str) -> Score {
             _ => {}
         }
     }
+    // log!("midi_generator");
     score
 }
 
@@ -133,9 +136,6 @@ pub fn generate_wav(name: &str, sample: Vec<Level>) {
 }
 
 pub fn load_wav(name: &str) {
-    // 尝试打开音频文件
-    // 20241021House Project(2024 Edit).wav");
-
     // 获取默认音频输出设备
     let (_stream, stream_handle) = match OutputStream::try_default() {
         Ok(stream) => stream,
@@ -253,8 +253,10 @@ pub fn mixer(song: &Song) -> Vec<Level> {
     let mut sample: Vec<Level> = Vec::new();
     let mut synth_parameters: HashMap<usize, SynthParameters> = HashMap::new();
 
+
     let mut idx: Timebase = 0;
 
+    log!("————————————");
     while idx < SONG_LEN {
         let mut channel_idx = 0;
 
@@ -272,6 +274,7 @@ pub fn mixer(song: &Song) -> Vec<Level> {
                 // idx是全局的时间，减去display的开始时间得到在pattern的相对时间
                 if let Some(midis) = current_pattern.get_vec(idx - dis.start_time) {
                     for midi in midis {
+                        log!("test_midi type: ", midi.typ, "pitch: ", midi.note);
                         if midi.typ == START!() as NoteType {
                             synth_parameters.insert(
                                 channel_idx * 128 + midi.note as usize,

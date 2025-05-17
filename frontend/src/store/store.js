@@ -100,18 +100,18 @@ export default createStore({
 
     // state.notes
     addNote(state, note) {
-      state.wasm_song.edit_pattern("insert", note.pitch, note.starttime, note.starttime + note.duration)
+      state.wasm_song.edit_pattern("insert", 88 - note.pitch, note.starttime, note.starttime + note.duration)
       state.notes.push(note)
     },
     deleteNote(state, note) {
-      state.wasm_song.edit_pattern("delete", note.pitch, note.starttime, note.starttime + note.duration)
+      state.wasm_song.edit_pattern("delete", 88 - note.pitch, note.starttime, note.starttime + note.duration)
       state.notes = state.notes.filter((n) => n.id !== note.id)
     },
     updateNotePosition(state, { id, starttime, pitch }) {
       const note = state.notes.find((n) => n.id === id)
       if (note) {
-        state.wasm_song.edit_pattern("delete", note.pitch, note.starttime, note.starttime + note.duration)
-        state.wasm_song.edit_pattern("insert", pitch, starttime, starttime + note.duration)
+        state.wasm_song.edit_pattern("delete", 88 - note.pitch, note.starttime, note.starttime + note.duration)
+        state.wasm_song.edit_pattern("insert", 88 - pitch, starttime, starttime + note.duration)
         note.pitch = pitch
         note.starttime = starttime
       }
@@ -120,10 +120,10 @@ export default createStore({
       const note = state.notes.find((n) => n.id === id)
       if (note) {
         if (duration < note.duration) {
-          state.wasm_song.edit_pattern("delete", note.pitch, duration, note.duration)
+          state.wasm_song.edit_pattern("delete", 88 - note.pitch, duration, note.duration)
         }
         else if (duration > note.duration) {
-          state.wasm_song.edit_pattern("insert", note.pitch, note.duration, duration)
+          state.wasm_song.edit_pattern("insert", 88 - note.pitch, note.duration, duration)
         }
         note.duration = duration
       }
