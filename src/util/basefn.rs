@@ -293,13 +293,13 @@ pub fn mixer(song: &Song) -> Vec<Level> {
                 // 在current_pattern中获得midi信号
                 if let Some(midis) = current_pattern.get_vec(song_tbase - dis.start_time) {
                     for midi in midis {
-                        log!("test_midi type: ", midi.typ, "pitch: ",FREQ_DATA[midi.note as usize]);
+                        log!("test_midi type: ", midi.typ, "pitch: ",FREQ_DATA[midi.note as usize] * 2.0);
                         if midi.typ == START!() as NoteType {
                             // 若midi信号的类型是START，就设置合成器相关参数
                             synth_parameters.insert(
                                 channel_idx * 128 + midi.note as usize,
                                 SynthParameters::new(
-                                    FREQ_DATA[midi.note as usize],
+                                    FREQ_DATA[midi.note as usize] * 2.0,
                                     channels[channel_idx].volume,
                                     &channels[channel_idx].preset,
                                     channels[channel_idx].n_poly,
