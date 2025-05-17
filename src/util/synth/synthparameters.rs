@@ -27,7 +27,7 @@ impl SynthParameters {
             panic!("Division by zero frequency");
         }
         let range = 0.01;
-        let mut delta_time: [FTimestamp; MAX_POLY] = [frequency / SAMPLE_RATE as f32; MAX_POLY];
+        let mut delta_time: [FTimestamp; MAX_POLY] = [(2.0 * frequency) / SAMPLE_RATE as f32; MAX_POLY];
         let t: [Cell<f32>; MAX_POLY] = std::array::from_fn(|_| Cell::new(0.0));
 
         let preset = String::from(preset);

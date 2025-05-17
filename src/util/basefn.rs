@@ -285,7 +285,6 @@ pub fn mixer(song: &Song) -> Vec<Level> {
                 if song_tbase == dis.start_time + dis.duration{
                     synth_parameters.retain(|i, _| {
                         // 条件判断：返回 true 保留元素，false 删除元素
-                        // 示例：保留所有键不等于当前值的元素
                         (i/128 != channel_idx)
                     });
                     continue;
@@ -294,7 +293,7 @@ pub fn mixer(song: &Song) -> Vec<Level> {
                 // 在current_pattern中获得midi信号
                 if let Some(midis) = current_pattern.get_vec(song_tbase - dis.start_time) {
                     for midi in midis {
-                        log!("test_midi type: ", midi.typ, "pitch: ", midi.note);
+                        log!("test_midi type: ", midi.typ, "pitch: ",FREQ_DATA[midi.note as usize]);
                         if midi.typ == START!() as NoteType {
                             // 若midi信号的类型是START，就设置合成器相关参数
                             synth_parameters.insert(
