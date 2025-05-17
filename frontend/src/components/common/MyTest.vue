@@ -24,7 +24,7 @@ export default {
 }
 </script>
 <script setup>
-import { ref, defineProps, nextTick, defineEmits } from "vue"
+import { ref, nextTick} from "vue"
 import { ElPopover } from "element-plus"
 // import $ from 'jquery'
 const props = defineProps({
