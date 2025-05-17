@@ -243,6 +243,8 @@ pub fn mixer(song: &LazyLock<[Channel; N_CHAN]>) -> Vec<Level> {
     // println!("{}", f);
 }
 */
+
+// 混音器
 pub fn mixer(song: &Song) -> Vec<Level> {
     let patterns = &song.patterns;
     let channels = &song.channels;
@@ -257,6 +259,7 @@ pub fn mixer(song: &Song) -> Vec<Level> {
     let mut idx: Timebase = 0;
 
     log!("————————————");
+    
     while idx < SONG_LEN {
         let mut channel_idx = 0;
 

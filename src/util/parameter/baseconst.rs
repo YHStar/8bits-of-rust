@@ -1,13 +1,13 @@
-pub const N_TBASE: u32 = 4;
-pub const SONG_LEN: u32 = (16 + 64 + 64 + 64 + 8) * 2;
-pub const SAMPLE_RATE: u32 = 44100; // 采样率
-pub const BPM: u32 = 145;
-pub const T_BEAT: f32 = 60.0 / BPM as f32;
-pub const T_BASE: f32 = 60.0 / (BPM * N_TBASE) as f32;
+pub const N_TBASE: u32 = 4; // 时基大小
+pub const SONG_LEN: u32 = (16 + 64 + 64 + 64 + 8) * 2; // 歌曲的总的Beat数
+pub const SAMPLE_RATE: u32 = 44100; // 采样率 单位hz
+pub const BPM: u32 = 145; //歌曲速度 单位beat/minute
+pub const T_BEAT: f32 = 60.0 / BPM as f32; // 一个Beat的时长 单位：s
+pub const T_BASE: f32 = 60.0 / (BPM * N_TBASE) as f32; // 一个时基的时长 单位：s
 // pub const LOOP_TIMES:i16 = 8;
-pub const LOOP_TIMES: u16 = u16::MAX;
-pub const MAX_POLY: usize = 8;
-pub const NOTE_NUM: u8 = 86;
+pub const LOOP_TIMES: u16 = u16::MAX; // 循环次数，无限循环设为u16::MAX
+pub const MAX_POLY: usize = 8; // 合成器最大复音数
+pub const NOTE_NUM: u8 = 86; // 音符总数
 
 pub const UNEXIST_PATTERN_INDEX: usize = usize::MAX;
 

@@ -125,6 +125,7 @@ impl songWrapper {
         self.song.push_display(channel_index, pattern_id, duration, start_time);
     }
 
+    // 播放当前工程中的音频
     pub fn play(&self) -> Result<(), JsValue> {
         let sample = mixer(&self.song);
         
