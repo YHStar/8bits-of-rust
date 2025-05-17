@@ -4,7 +4,6 @@
     <!-- <start-screen v-if="StartRoute" /> -->
     <navigation-bar v-if="!StartRoute" />
     <!-- <my-test /> -->
-    <div class="bar"></div>
     <router-view></router-view>
   </div>
 </template>
@@ -28,11 +27,3 @@ const StartRoute = computed(() => {
   return router.currentRoute.value.path === "/"
 })
 </script>
-
-<style>
-.bar {
-  margin: 10px;
-  height: 10px;
-  width: 400px;
-}
-</style>

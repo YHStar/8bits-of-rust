@@ -36,16 +36,9 @@ const { proxy } = getCurrentInstance()
   left: 0;
   right: 0;
   height: calc(50px - 2px);
-  background: #fff;
-  border-right: #aaa solid 2px;
-  border-top: #aaa solid 1px;
-  border-bottom: #aaa solid 2px;
-}
-
-.key.black {
-  background: #000000;
-  z-index: 2;
-  height: 20px !important;
-  border-left: 30px solid #fff !important;
+  background: var(--global-highlight);
+  border-right: var(--global-grid) solid 2px;
+  border-top: var(--global-grid) solid 1px;
+  border-bottom: var(--global-grid) solid 2px;
 }
 </style>

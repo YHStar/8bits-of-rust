@@ -48,13 +48,12 @@ const handleChange = (val) => {
 
 <style lang="scss" scoped>
 .pixel-input {
-  --pixel-color: var(--pixel-text);
-  --bg-color: var(--pixel-primary);
+  --bg-color: var(--global-primary);
 
   :deep(.el-input__wrapper) {
     background: var(--bg-color);
     box-sizing: border-box;
-    border: 2px solid var(--pixel-border);
+    border: 2px solid var(--global-border);
     border-radius: 0;
     max-width: 200px;
     height: 50px;

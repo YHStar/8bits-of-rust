@@ -194,8 +194,9 @@ const resizeDisplay = (e) => {
 
 .display-resize-handle {
   position: absolute;
-  background-color: rgba(255, 191, 0, 0.5);
+  background-color: var(--global-handler);
   cursor: ew-resize;
   z-index: 10;
 }
 </style>
+

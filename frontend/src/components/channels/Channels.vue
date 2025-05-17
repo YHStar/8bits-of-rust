@@ -33,7 +33,6 @@ const n_bars = 16
   position: relative;
   height: 400px;
   width: calc(100% - 100px);
-  background: #ccc;
   overflow-x: scroll;
   overflow-y: auto;
   z-index: 0;
@@ -55,8 +54,9 @@ const n_bars = 16
     position: sticky;
     top: 0;
     height: 20px;
-    background: #444;
+    background: var(--global-headbar);
     z-index: 3;
   }
 }
 </style>
+

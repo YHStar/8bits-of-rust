@@ -30,7 +30,9 @@ const sizeClass = computed(() => `text-${props.size}`)
 }
 .my-text {
   font-family: "Zpix", sans-serif;
-  color: black;
+  /* color: black; */
+  color: var(--global-text);
+  text-shadow: 0 0 2px var(--global-text-shadow);
 }
 
 .text-small {

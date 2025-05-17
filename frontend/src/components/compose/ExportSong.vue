@@ -1,6 +1,6 @@
 <!-- 导出歌曲界面 -->
 <template>
-  <div>
+  <div class="container">
     <div class="export-params">
       <div class="selector">
         <my-text content="导出格式：" size="large" />
@@ -29,7 +29,7 @@
         v-bind:content="'预计占用空间：' + estimated_space + 'MB'"
         size="large" />
     </div>
-    <div>
+    <div class="export-button">
       <my-button size="large" text="导出" />
     </div>
   </div>
@@ -57,18 +57,27 @@ const exportBitWidth = computed({
 
 const estimated_space = computed(() => store.state.estimated_space)
 </script>
-<style>
-.export-params {
-  display: inline-block;
-  gap: 20px;
-  margin-bottom: 15px;
-  padding: 10px;
+<style scoped>
+.container {
+  display: flex;
+  flex: row;
+  align-items: center;
+  justify-content: center;
+  height: 600px;
+  gap: 100px;
 }
-.placeholder-block {
-  width: 200px;
-  height: 100px;
+.export-params {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
 }
 .selector {
   display: flex;
+  gap: 40px;
+}
+.export-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

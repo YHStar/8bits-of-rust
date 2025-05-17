@@ -42,14 +42,13 @@ const props = defineProps({
 .grid {
   position: relative;
   height: 100%;
-  background-color: #ccc;
 }
 
 .grid-horizontal {
   position: absolute;
   width: 1px;
   height: 100%;
-  border-left: 2px solid #aaa;
+  border-left: 2px solid var(--global-grid);
   /* z-index: 10; */
 }
 
@@ -57,6 +56,6 @@ const props = defineProps({
   position: absolute;
   height: 1px;
   width: 100%;
-  border-top: 2px solid #aaa;
+  border-top: 2px solid var(--global-grid);
 }
 </style>

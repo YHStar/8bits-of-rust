@@ -1,11 +1,9 @@
 <!-- 编曲界面 -->
 <template>
   <div>
-    <div class="main-container">
-      <div class="a">
-        <patterns ref="patterns" class="patterns" />
-        <channels ref="channels" class="channels" />
-      </div>
+    <div class="container">
+      <patterns ref="patterns" class="patterns" />
+      <channels ref="channels" class="channels" />
     </div>
     <piano-roll />
   </div>
@@ -18,12 +16,11 @@ import Patterns from "../patterns/Patterns.vue"
 </script>
 
 <style scoped>
-.a {
+.container {
   height: 400px;
   display: flex;
   flex-direction: row;
   overflow-x: visible;
-  gap: 20px;
 }
 .patterns {
   width: 150px;

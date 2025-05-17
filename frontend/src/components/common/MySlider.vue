@@ -69,13 +69,13 @@ const handleDoubleClick = () => {
 <style scoped>
 .slider-container {
   margin: 10px;
-  display: inline-block;
+  /* display: inline-block; */
   .pixel-slider {
     -webkit-appearance: none;
     height: 0;
-    width: 100px;
-    background: var(--pixel-primary);
-    border: 2px solid var(--pixel-border);
+    min-width: 50px;
+    background: var(--global-primary);
+    border: 2px solid var(--global-border);
     padding: 2px;
   }
 
@@ -83,15 +83,14 @@ const handleDoubleClick = () => {
     -webkit-appearance: none;
     width: 10px;
     height: 20px;
-    background: var(--pixel-disabled);
+    background: var(--global-disabled);
     cursor: pointer;
-    border: 2px solid var(--pixel-primary);
+    border: 2px solid var(--global-primary);
   }
 }
 
 .slider-container.vertical {
   transform: rotate(270deg);
-  transform-origin: left bottom;
-  margin: 0 40px 20px 20px;
+  transform-origin: center;
 }
 </style>

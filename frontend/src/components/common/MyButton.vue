@@ -60,10 +60,6 @@ const dynamicStyle = computed(() => props.color ? props.color : "")
 
 <style scoped>
 .my-button {
-  --primary-color: rgb(255, 255, 255);
-  --secondary-color: rgb(240, 240, 240);
-  --ghost-color: var(--pixel-ghost);
-
   position: relative;
   cursor: pointer;
   transition:
@@ -93,26 +89,26 @@ const dynamicStyle = computed(() => props.color ? props.color : "")
 }
 
 .my-button.active:not(.disabled) {
-  background-color: var(--dynamic-bg, var(--pixel-highlight)) !important;
-  /* background-color: var(--dynamic-bg, var(--pixel-primary)) !important; */
-  border: 5px solid white;
+  background-color: var(--dynamic-bg, var(--global-highlight)) !important;
+  /* background-color: var(--dynamic-bg, var(--global-primary)) !important; */
+  border: 5px solid var(--global-highlight);
 }
 
 .my-button:not(.disabled) {
-  background-color: var(--dynamic-bg, var(--pixel-primary)) !important;
+  background-color: var(--dynamic-bg, var(--global-primary)) !important;
 }
 /* 
 .my-button:not(.disabled) {
-  background-color: var(--pixel-primary) !important;
-  color: var(--pixel-highlight);
+  background-color: var(--global-primary) !important;
+  color: var(--global-highlight);
 } */
 .my-button.secondary:not(.disabled) {
-  background-color: var(--pixel-secondary) !important;
+  background-color: var(--global-secondary) !important;
 }
 .my-button.ghost:not(.disabled) {
-  background-color: var(--pixel-background) !important;
-  color: var(--pixel-ghost);
-  border: 1px solid var(--pixel-ghost);
+  background-color: var(--global-background) !important;
+  color: var(--global-ghost);
+  border: 1px solid var(--global-ghost);
 }
 .my-button:not(.disabled):hover {
   transform: scale(1.08);
@@ -120,15 +116,15 @@ const dynamicStyle = computed(() => props.color ? props.color : "")
   z-index: 1;
 }
 .my-button:not(.disabled):hover {
-  background-color: var(--pixel-secondary);
+  background-color: var(--global-secondary);
 }
 .my-button:not(.disabled):active {
   transform: scale(1.05);
 }
 
 .my-button.disabled {
-  background-color: var(--pixel-background);
-  color: var(--pixel-disabled);
+  background-color: var(--global-background);
+  color: var(--global-disabled);
   cursor: not-allowed;
   opacity: 0.7;
 }
