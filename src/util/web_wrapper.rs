@@ -8,7 +8,6 @@ extern crate wasm_bindgen;
 use wasm_bindgen::prelude::*;
 use web_sys::{AudioContext, AudioBuffer, AudioBufferSourceNode};
 use gloo_console::log;
-use wasm_bindgen::JsValue;
 
 #[wasm_bindgen]
 pub struct songWrapper {
