@@ -4,16 +4,17 @@ use super::pattern::display;
 use crate::Score;
 use crate::util::pattern::display::Display;
 
+// 通道（由于一个通道对饮一个乐器/音色，这个结构体相当于储存了合成器参数）
 pub struct Channel {
-    pub name: String,
+    pub name: String,// 通道名称
     // score: Score,
     // pub score: Score,
-    pub preset: String,
-    pub volume: f32,
-    pub n_poly: usize,
-    pub pan: i8,
-    pub be_modulated: bool,
-    pub display: Vec<Display>,
+    pub preset: String,// 通道预设名称
+    pub volume: f32, // 通道音量大小
+    pub n_poly: usize, // 通道复音数
+    pub pan: i8, // 通道声像
+    pub be_modulated: bool, // 通道中合成器声音是否经过fm调制
+    pub display: Vec<Display>, // 通道的display列表
 }
 
 impl Channel {
@@ -32,7 +33,7 @@ impl Channel {
             // score: midi_generator(score),
             preset: preset.to_string(),
             volume: volume, // 默认音量
-            n_poly: n_poly, // 默认多音数量
+            n_poly: n_poly, // 默认复音数量
             pan: pan,       // 默认声相（0 表示居中）
             be_modulated: be_modulated,
             display: Vec::new(),

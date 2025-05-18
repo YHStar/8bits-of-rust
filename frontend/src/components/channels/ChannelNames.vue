@@ -28,7 +28,7 @@ const { proxy } = getCurrentInstance()
   position: absolute;
   z-index: 5;
   width: 82px;
-  background: #ffffff;
+  background: var(--global-highlight);
 }
 
 .key {

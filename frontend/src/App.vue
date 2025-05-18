@@ -9,7 +9,6 @@
 </template>
 
 <script setup>
-import Start from "@/views/Start.vue"
 import NavigationBar from "@/views/NavigationBar.vue"
 import BackgroundLayer from "@/views/BackgroundLayer.vue"
 import { computed } from "vue"

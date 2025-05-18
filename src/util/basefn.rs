@@ -36,6 +36,7 @@ use super::song::Song;
 use gloo_console::log;
 use wasm_bindgen::JsValue;
 
+// 测试用函数：将字符串转化为midi信号序列，用于单独测试后端功能
 pub fn midi_generator(note: &str) -> Score {
     let mut tbase: Timebase = 0;
     let mut idx_vec: Vec<Note> = Vec::new();
@@ -263,9 +264,9 @@ pub fn mixer(song: &Song) -> Vec<Level> {
     // 按时基遍历歌曲
     while song_tbase < SONG_LEN {
         let mut channel_idx = 0;
+        // 测试用
         if song_tbase < 8{
             log!("——>>timebase: ", song_tbase);
-
         }
         // 按channel遍历歌曲
         while (channel_idx) < channel_num {

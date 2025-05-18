@@ -126,6 +126,8 @@ impl songWrapper {
 
     // 播放当前工程中的音频
     pub fn play(&self) -> Result<(), JsValue> {
+        // 从歌曲文件渲染采样
+        // TODO：设置音频缓冲区，实时渲染音频并且播放
         let sample = mixer(&self.song);
         
         // 转换 i8 到 Float32
