@@ -18,7 +18,8 @@
                 orientation="vertical"
                 :min="0"
                 :max="100"
-                v-model="volumes[n - 1]" />
+                v-model="volumes[n - 1]"
+                @update:modelValue="val => handleVolumeChange(n-1, val)" />
               <my-text :content="volumes[n - 1] + '%'" class="volume-value" />
             </div>
             <div class="row">
@@ -28,7 +29,9 @@
                 v-model="panValues[n - 1]"
                 :minVal="-100"
                 :maxVal="100"
-                :val="0" />
+                :val="0" 
+                @update:modelValue="val => handlePanChange(n-1, val)"
+              />
             </div>
           </td>
         </tr>
@@ -38,11 +41,34 @@
 </template>
 
 <script setup>
-import { ref } from "vue"
+// import { ref } from "vue"
+import { computed } from 'vue'
+import { useStore } from 'vuex'
 
-const n_channels = ref(5)
-const volumes = ref([80, 80, 80, 80, 80])
-const panValues = ref([0, 0, 0, 0, 0])
+const store = useStore()
+
+// 状态映射
+const n_channels = computed(() => store.state.n_channels)
+const volumes = computed({
+  get: () => store.state.volumes,
+  set: (value) => store.commit('setVolumes', value)
+})
+const panValues = computed({
+  get: () => store.state.panValues,
+  set: (value) => store.commit('setPanValues', value)
+})
+
+const handleVolumeChange = (index, value) => {
+  store.commit('updateVolume', { index, value })
+}
+
+const handlePanChange = (index, value) => {
+  store.commit('updatePanValue', { index, value })
+}
+
+// const n_channels = ref(5)
+// const volumes = ref([80, 80, 80, 80, 80])
+// const panValues = ref([0, 0, 0, 0, 0])
 
 defineExpose({
   n_channels,

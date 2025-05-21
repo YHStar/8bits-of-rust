@@ -14,13 +14,24 @@ export default createStore({
     // display列表
     displays: [],
 
-    selectedNotes: new Set(),
-    separatorPosition: 300,
 
+    //当前路径
     currentRoute: "/",
+    //被激活的页面
     activeComposePage: "plugin",
     // 激活中的pattern的id
     activePattern: 0,
+
+    
+    //mixer状态
+    n_channels: 5,
+    volumes: [80, 80, 80, 80, 80],
+    panValues: [0, 0, 0, 0, 0],
+    
+    
+    //未使用：选中的音符
+    selectedNotes: new Set(),
+    separatorPosition: 300,
 
     exportFormat: "",
     songName: "",
@@ -192,6 +203,34 @@ export default createStore({
     setSongName(state, name) {
       state.songName = name
     },
+
+
+    //mixer状态相关
+    //更新通道音量
+    updateVolume(state, { index, value }) {
+      console.log("updateVolume index = ", index, " value = ", value)
+      state.volumes = state.volumes.map((v, i) => i === index ? value : v)
+      // TODO: add wasm function here
+    },
+    //更新通道声相
+    updatePanValue(state, { index, value }) {
+      console.log("updatePan index = ", index, " value = ", value)
+      state.panValues = state.panValues.map((v, i) => i === index ? value : v)
+      // TODO: add wasm function here
+    },
+    // 设置轨道数量（应该不会使用）
+    setNChannels(state, value) {
+      state.n_channels = value
+    },
+    // 设置音量初值（读取歌曲文件的时候会用）
+    setVolumes(state, newVolumes) {
+      state.volumes = [...newVolumes] // 保证响应式更新[3](@ref)
+    },
+    // 设置声相初值（读取歌曲文件的时候会用）
+    setPanValues(state, newPanValues) {
+      state.panValues = [...newPanValues]
+    },
+
     // 未使用的方法
     setSeparatorPosition(state, position) {
       state.separatorPosition = position
