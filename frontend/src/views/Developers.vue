@@ -6,7 +6,7 @@
 
         <div>
           <my-text content="开发者！" size="large" /><br>
-          <my-text content="刘宗熹 任致远 商邑飞 吴童（音序序）" size="medium" />
+          <my-text content="刘宗熹 任致远 商邑飞 吴童 闫宏远（音序序）" size="medium" />
         </div>
         <div><my-text content="给制作组打钱！" size="large" /></div>
         <div>
