@@ -24,6 +24,10 @@ impl songWrapper {
         }
     } // fn new
 
+    fn pattern_content_log(&self) {
+        log!(self.song.patterns[self.active_pattern_index].score_to_str());
+    } // fn pattern_content_log
+
     pub fn new_channel(
         &mut self,
         name: &str,
@@ -87,6 +91,7 @@ impl songWrapper {
     ) {
         if self.active_pattern_index != UNEXIST_PATTERN_INDEX {
             self.song.edit_pattern(self.active_pattern_index, mode, note_idx, start_time, end_time);
+            self.pattern_content_log();
         }
     }
 

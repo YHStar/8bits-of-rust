@@ -96,6 +96,7 @@ export default createStore({
         state.wasm_song.delete_display(display.channel, display.patternId, display.starttime)
         state.wasm_song.push_display(channel, display.patternId, display.duration, starttime)
         state.wasm_song.sort_display()
+
         display.starttime = starttime
         display.channel = channel
       }
@@ -132,6 +133,7 @@ export default createStore({
     updateNoteDuration(state, { id, duration }) {
       const note = state.notes.find((n) => n.id === id)
       if (note) {
+
         // if (duration < note.duration) {
         //   state.wasm_song.edit_pattern("delete", 88 - note.pitch, note.starttime, note.starttime + note.duration)
         // }
@@ -141,6 +143,7 @@ export default createStore({
         // note.duration = duration
         state.wasm_song.edit_pattern("delete", 88 - note.pitch, note.starttime, note.starttime + note.duration)
         state.wasm_song.edit_pattern("insert", 88 - note.pitch, note.starttime, note.starttime + duration)
+
         note.duration = duration
       }
     },

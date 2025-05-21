@@ -382,8 +382,44 @@ impl Pattern {
         } // for i
     } // fn read from string
 
+    pub fn score_to_str(&self) -> String {
+        let mut score = String::new();
+        // 先创造二维数组
+        let mut pattern: Vec<Vec<Timebase>> = Vec::new();
+        pattern.reserve(NOTE_NUM as usize);
+        for _ in 0..NOTE_NUM {
+            pattern.push(Vec::new());
+        }
+
+        // 遍历score，填充pattern
+        for i in 0..(self.len + 1) {
+            let notes = match self.score.get_vec(&i) {
+                Some(x) => x, // 如果这个时间有音符，查是否有相同的
+                None => {
+                    continue;
+                } // 如果这个时间没有音符，继续查询
+            }; // get notes
+               // 如果这个时刻有音符，插入这个音符的时间
+            for j in notes {
+                let idx = j.note as usize;
+                pattern[idx].push(i);
+            } // for j in notes
+        } // for i in 0..len
+
+        for i in 0..NOTE_NUM as usize {
+            for j in &pattern[i] {
+                // println!("{:?}", j.to_string().as_bytes());
+                score += &j.to_string();
+                score += &" ".to_string();
+            } // for j in pattern[i]
+            score += &"\n".to_string();
+        } // for i in 0..86
+
+        score
+    } // fn score_to_str
+
     pub fn write_to_file(&self, file: &mut File) {
-        // 格式为86行字符串，每行由偶数个数字构成，每对相邻数字为本行对应音符起止时间。
+        // 格式为88行字符串，每行由偶数个数字构成，每对相邻数字为本行对应音符起止时间。
         // 先创造二维数组
         let mut pattern: Vec<Vec<Timebase>> = Vec::new();
         pattern.reserve(NOTE_NUM as usize);
