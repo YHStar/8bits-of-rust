@@ -67,6 +67,7 @@ impl Channel {
         self.display.push(element);
     }
 
+    // 对display按照start_time排序
     pub fn sort_display(&mut self) {
         self.display.sort_by_key(|a| a.start_time);
     }

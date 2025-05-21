@@ -9,7 +9,7 @@ pub const LOOP_TIMES: u16 = u16::MAX; // 循环次数，无限循环设为u16::M
 pub const MAX_POLY: usize = 8; // 合成器最大复音数
 pub const NOTE_NUM: u8 = 88; // 音符总数
 
-pub const UNEXIST_PATTERN_INDEX: usize = usize::MAX;
+pub const UNEXIST_PATTERN_INDEX: usize = usize::MAX; //表示pattrn不存在
 
 pub const FREQ_DATA: [f32; 88] = [
     0.0, 32.7032, 34.6478, 36.7081, 38.8909, 41.2034, 43.6535, 46.2493, 48.9995, 51.9131, 55.0000,

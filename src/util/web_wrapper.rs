@@ -77,6 +77,7 @@ impl songWrapper {
         self.song.delete_pattern(pattern_id);
     }
 
+    // 编辑Pattern中的音符
     pub fn edit_pattern(
         &mut self,
         mode: &str,

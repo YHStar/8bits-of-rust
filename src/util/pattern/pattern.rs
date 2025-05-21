@@ -3,8 +3,8 @@ use std::io::Write;
 use std::mem::swap;
 
 use crate::util::basetype::ChannelID;
-use crate::util::basetype::PatternID;
 use crate::util::basetype::Midi;
+use crate::util::basetype::PatternID;
 use crate::util::parameter::baseconst::NOTE_NUM;
 use crate::util::parameter::baseconst::SONG_LEN;
 use crate::Channel;
@@ -15,11 +15,11 @@ use crate::END;
 use crate::START;
 
 pub struct Pattern {
-    name: String, // pattern的名称
-    score: Score, // pattern中的midi乐谱
+    name: String,  // pattern的名称
+    score: Score,  // pattern中的midi乐谱
     id: PatternID, // pattern的唯一id
     len: Timebase, // pattern的长度，单位：Timebase
-    // channel_id: ChannelID,
+                   // channel_id: ChannelID,
 }
 
 impl Pattern {
@@ -85,7 +85,8 @@ impl Pattern {
         self.update_len();
     }
 
-    
+    //下面两个函数只有一参数不一样，是否需要简化？
+    // 插入音符
     pub fn insert_note(
         &mut self,
         note_idx: Note,
@@ -95,6 +96,7 @@ impl Pattern {
         self.change_note(note_idx, start_time, end_time, false)
     }
 
+    // 删除音符
     pub fn delete_note(
         &mut self,
         note_idx: Note,
@@ -104,6 +106,7 @@ impl Pattern {
         self.change_note(note_idx, start_time, end_time, true)
     }
 
+    // 更新pattern的最大时长，通过查找最后一个音符的位置来实现
     fn update_len(&mut self) {
         let mut max_len: Timebase = 0;
         for i in 0..(SONG_LEN * 16 + 1) {
@@ -120,6 +123,10 @@ impl Pattern {
         self.len = max_len;
     }
 
+    // 每个音符都的结束信号都要完全对应其开始信号，例子（数字表示是音符的序号）：
+    // start1 --- start2 --- end1 --- end2
+    // 如果midi信号不能和音符绑定，则会出现start2和end1配对，start1和end2配对
+
     fn change_note(
         &mut self,
         idx: Note,
@@ -127,165 +134,221 @@ impl Pattern {
         et: Timebase,
         delete: bool,
     ) -> Result<(), &str> {
-        // 如果相同音符的end time在st et中间，删掉end time，插入et；
-        // 如果相同音符的start time在st et中间，删掉start time，插入st；
-        // 如果相同音符的start time和end time都在中间，删掉这两个，插入st和et；
-        // 如果都不在，插入st和et。
-        // 删除模式时，删掉st et中间的note操作保持一致，只是插入的st改为et，插入et改为st，且et、st对应start、end类型交换
         if et <= st {
             return Err("end time is smaller than start time!");
         }
-
-        let mut insert_st: bool = false;
-        let mut insert_et: bool = false;
-
-        let mut deleted_et: Timebase = 0;
-
-        for i in st..(et + 1) {
-            let notes = match self.score.get_vec(&i) {
-                Some(x) => x.clone(), // 如果这个时间有音符，查是否有相同的
-                None => {
-                    continue;
-                } // 如果这个时间没有音符，继续查询
-            }; // get notes
-               // 遍历这个时间内的所有音符
-            for j in notes {
-                if j.note == idx {
-                    // 如果插入范围内有相同音符，删除插入范围内的音符
-                    let remain_vec = match self.score.remove(&i) {
-                        Some(x) => x,
-                        None => {
-                            break;
-                        }
-                    }; // let remain_vec
-                    for k in remain_vec {
-                        if k.note != idx {
-                            self.score.insert(i, k);
-                        } // 插入那些不该删除的
-                    } // for
-                      // 检查范围内的音符的类型
-                    match j.typ {
-                        START!() => {
-                            insert_st = true;
-                        } // START
-                        END!() => {
-                            deleted_et = i;
-                            insert_et = true;
-                        } // END
-                        _ => {}
-                    } // match
-                    break;
-                } // if note == idx
-            } // for j in notes
-        } // for i in time range
-          // 插入新音符
-        if delete {
-            // 检查是否在中间
-            let mut is: bool = false; // st之前是否有note start
-            let mut ie: bool = true; // et之后是否有note end
-            for i in 0..(self.len + 1) {
-                let notes = match self.score.get_vec(&i) {
-                    Some(x) => x,
-                    _ => {
-                        continue;
-                    } // 如果这个时间没有音符，继续查询
-                };
-                for j in notes {
-                    if j.note == idx {
-                        if i < st && j.typ == START!() {
-                            is = true;
-                        } else if i > et && j.typ == END!() {
-                            ie = true;
-                        }
-                    } // if note == idx
-                } // for j in notes
-            } // for i in [0, len]
-            let in_middle: bool = is && ie; // 对于删除，检查st、et在不在旧的st、et的中间
-                                            // 如果删除的地方在中间，插入st作为前面start的end、插入et作为后面end的start
-            if (insert_st && !insert_et) || in_middle {
-                // 如果删除范围内有旧st且没有旧et，可以把参数et作为新的st；如果即有旧st又有旧et，全部删除，不应插入新的
-                // 否则，因为删除旧的st，直接插入新的
-                self.score.insert(
-                    et,
-                    Midi {
-                        note: idx,
-                        typ: START!(),
-                    },
-                );
-            } // if insert et as start
-            if (insert_et && !insert_st) || in_middle {
-                // 如果删除范围内有旧et且没有旧st，可以把参数st作为新的et；如果即有旧st又有旧et，全部删除，不应插入新的
-                // 否则，因为删除旧的et，直接插入新的
-                self.score.insert(
-                    st,
-                    Midi {
-                        note: idx,
-                        typ: END!(),
-                    },
-                );
-            } // if insert st as end
+        if delete == false {
+            self.score.insert(
+                st,
+                Midi {
+                    note: idx,
+                    typ: START!(),
+                },
+            );
+            self.score.insert(
+                et,
+                Midi {
+                    note: idx,
+                    typ: END!(),
+                },
+            );
+        } else {
+            let mut found = false;
+            self.score
+                .entry(st)
+                .or_insert_vec(vec![])
+                .retain(|x| {
+                    if !found && x.note == idx && x.typ == START!()
+                    {
+                        found = true;
+                        false
+                    } else {
+                        true
+                    }
+                });
+            let mut found = false;
+            self.score
+                .entry(et)
+                .or_insert_vec(vec![])
+                .retain(|x| {
+                    if !found && x.note == idx && x.typ == END!()
+                    {
+                        found = true;
+                        false
+                    } else {
+                        true
+                    }
+                });
         }
-        //if delete
-        else {
-            // 如果两个都是false，说明范围内没有相同音符，都插入
-            if insert_st == insert_et {
-                // 对于插入，如果范围内没有旧的st和et，说明插入新的音符，直接都插入
-                // 对于删除，如果范围内没有旧的st和et，不需要做任何操作
-                insert_st = true;
-                insert_et = true;
-            } // if ist == iet
-            if insert_st {
-                self.score.insert(
-                    st,
-                    Midi {
-                        note: idx,
-                        typ: START!(),
-                    },
-                );
-            } // if insert_st
-            if insert_et {
-                self.score.insert(
-                    et,
-                    Midi {
-                        note: idx,
-                        typ: END!(),
-                    },
-                );
-            } // if insert_et
-        } // else (insert mode)
-
-        // 更新pattern的时长
-        if delete {
-            // 如果旧的end time被删除，如果删除的et大于等于len，重新遍历map设置len
-            if insert_et && (deleted_et >= self.len) {
-                let ori_len = self.len;
-                let mut max_len: Timebase = 0;
-                // 如果删除，新的len一定小于等于当前的len
-                // 遍历map从0到len，记录最大到哪个key存在对应的value
-                for i in 0..(ori_len + 1) {
-                    let _notes = match self.score.get_vec(&i) {
-                        Some(_x) => {
-                            max_len = i;
-                            continue;
-                        } // 如果这个时间有音符，查是否有相同的
-                        _ => {
-                            continue;
-                        } // 如果这个时间没有音符，继续查询
-                    };
-                } // for i
-                self.len = max_len;
-                // 否则，不会影响len，因为此时idx对于的note最大时间戳没有减小
-            } // if 删除了旧的et
-        }
-        // if delete
-        else {
-            self.len = match self.len.cmp(&et) {
-                std::cmp::Ordering::Less => et,
-                _ => self.len,
-            };
-        } // else
         return Ok(());
     }
+
+    // fn change_note(
+    //     &mut self,
+    //     idx: Note,
+    //     st: Timebase,
+    //     et: Timebase,
+    //     delete: bool,
+    // ) -> Result<(), &str> {
+    //     // 如果相同音符的end time在st et中间，删掉end time，插入et；
+    //     // 如果相同音符的start time在st et中间，删掉start time，插入st；
+    //     // 如果相同音符的start time和end time都在中间，删掉这两个，插入st和et；
+    //     // 如果都不在，插入st和et。
+    //     // 删除模式时，删掉st et中间的note操作保持一致，只是插入的st改为et，插入et改为st，且et、st对应start、end类型交换
+    //     if et <= st {
+    //         return Err("end time is smaller than start time!");
+    //     }
+
+    //     let mut insert_st: bool = false;
+    //     let mut insert_et: bool = false;
+
+    //     let mut deleted_et: Timebase = 0;
+
+    //     for i in st..(et + 1) {
+    //         let notes = match self.score.get_vec(&i) {
+    //             Some(x) => x.clone(), // 如果这个时间有音符，查是否有相同的
+    //             None => {
+    //                 continue;
+    //             } // 如果这个时间没有音符，继续查询
+    //         }; // get notes
+    //            // 遍历这个时间内的所有音符
+    //         for j in notes {
+    //             if j.note == idx {
+    //                 // 如果插入范围内有相同音符，删除插入范围内的音符
+    //                 let remain_vec = match self.score.remove(&i) {
+    //                     Some(x) => x,
+    //                     None => {
+    //                         break;
+    //                     }
+    //                 }; // let remain_vec
+    //                 for k in remain_vec {
+    //                     if k.note != idx {
+    //                         self.score.insert(i, k);
+    //                     } // 插入那些不该删除的
+    //                 } // for
+    //                   // 检查范围内的音符的类型
+    //                 match j.typ {
+    //                     START!() => {
+    //                         insert_st = true;
+    //                     } // START
+    //                     END!() => {
+    //                         deleted_et = i;
+    //                         insert_et = true;
+    //                     } // END
+    //                     _ => {}
+    //                 } // match
+    //                 break;
+    //             } // if note == idx
+    //         } // for j in notes
+    //     } // for i in time range
+    //       // 插入新音符
+    //     if delete {
+    //         // 检查是否在中间
+    //         let mut is: bool = false; // st之前是否有note start
+    //         let mut ie: bool = true; // et之后是否有note end
+    //         for i in 0..(self.len + 1) {
+    //             let notes = match self.score.get_vec(&i) {
+    //                 Some(x) => x,
+    //                 _ => {
+    //                     continue;
+    //                 } // 如果这个时间没有音符，继续查询
+    //             };
+    //             for j in notes {
+    //                 if j.note == idx {
+    //                     if i < st && j.typ == START!() {
+    //                         is = true;
+    //                     } else if i > et && j.typ == END!() {
+    //                         ie = true;
+    //                     }
+    //                 } // if note == idx
+    //             } // for j in notes
+    //         } // for i in [0, len]
+    //         let in_middle: bool = is && ie; // 对于删除，检查st、et在不在旧的st、et的中间
+    //                                         // 如果删除的地方在中间，插入st作为前面start的end、插入et作为后面end的start
+    //         if (insert_st && !insert_et) || in_middle {
+    //             // 如果删除范围内有旧st且没有旧et，可以把参数et作为新的st；如果即有旧st又有旧et，全部删除，不应插入新的
+    //             // 否则，因为删除旧的st，直接插入新的
+    //             self.score.insert(
+    //                 et,
+    //                 Midi {
+    //                     note: idx,
+    //                     typ: START!(),
+    //                 },
+    //             );
+    //         } // if insert et as start
+    //         if (insert_et && !insert_st) || in_middle {
+    //             // 如果删除范围内有旧et且没有旧st，可以把参数st作为新的et；如果即有旧st又有旧et，全部删除，不应插入新的
+    //             // 否则，因为删除旧的et，直接插入新的
+    //             self.score.insert(
+    //                 st,
+    //                 Midi {
+    //                     note: idx,
+    //                     typ: END!(),
+    //                 },
+    //             );
+    //         } // if insert st as end
+    //     }
+    //     //if delete
+    //     else {
+    //         // 如果两个都是false，说明范围内没有相同音符，都插入
+    //         if insert_st == insert_et {
+    //             // 对于插入，如果范围内没有旧的st和et，说明插入新的音符，直接都插入
+    //             // 对于删除，如果范围内没有旧的st和et，不需要做任何操作
+    //             insert_st = true;
+    //             insert_et = true;
+    //         } // if ist == iet
+    //         if insert_st {
+    //             self.score.insert(
+    //                 st,
+    //                 Midi {
+    //                     note: idx,
+    //                     typ: START!(),
+    //                 },
+    //             );
+    //         } // if insert_st
+    //         if insert_et {
+    //             self.score.insert(
+    //                 et,
+    //                 Midi {
+    //                     note: idx,
+    //                     typ: END!(),
+    //                 },
+    //             );
+    //         } // if insert_et
+    //     } // else (insert mode)
+
+    //     // 更新pattern的时长
+    //     if delete {
+    //         // 如果旧的end time被删除，如果删除的et大于等于len，重新遍历map设置len
+    //         if insert_et && (deleted_et >= self.len) {
+    //             let ori_len = self.len;
+    //             let mut max_len: Timebase = 0;
+    //             // 如果删除，新的len一定小于等于当前的len
+    //             // 遍历map从0到len，记录最大到哪个key存在对应的value
+    //             for i in 0..(ori_len + 1) {
+    //                 let _notes = match self.score.get_vec(&i) {
+    //                     Some(_x) => {
+    //                         max_len = i;
+    //                         continue;
+    //                     } // 如果这个时间有音符，查是否有相同的
+    //                     _ => {
+    //                         continue;
+    //                     } // 如果这个时间没有音符，继续查询
+    //                 };
+    //             } // for i
+    //             self.len = max_len;
+    //             // 否则，不会影响len，因为此时idx对于的note最大时间戳没有减小
+    //         } // if 删除了旧的et
+    //     }
+    //     // if delete
+    //     else {
+    //         self.len = match self.len.cmp(&et) {
+    //             std::cmp::Ordering::Less => et,
+    //             _ => self.len,
+    //         };
+    //     } // else
+    //     return Ok(());
+    // }
 
     pub fn read_from_string(&mut self, lines: &Vec<&str>, line_idx: &mut usize) {
         // 接下来就是读notes了
@@ -301,15 +364,20 @@ impl Pattern {
                 if s.is_empty() {
                     break;
                 }
-                self.score
-                    .insert(s.parse::<Timebase>().unwrap(), Midi { note: i, typ: typ as i8 });
+                self.score.insert(
+                    s.parse::<Timebase>().unwrap(),
+                    Midi {
+                        note: i,
+                        typ: typ as i8,
+                    },
+                );
                 if typ == START!() {
                     typ = END!();
                 } else {
                     typ = START!();
                 } // if change typ
             } // for s
-            // 读完一行就加一
+              // 读完一行就加一
             *line_idx += 1;
         } // for i
     } // fn read from string

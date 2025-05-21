@@ -265,7 +265,7 @@ pub fn mixer(song: &Song) -> Vec<Level> {
     while song_tbase < SONG_LEN {
         let mut channel_idx = 0;
         // 测试用
-        if song_tbase < 8{
+        if song_tbase < 16{
             log!("——>>timebase: ", song_tbase);
         }
         // 按channel遍历歌曲
@@ -285,7 +285,7 @@ pub fn mixer(song: &Song) -> Vec<Level> {
                 // 当到达current_pattern的结束时基时，将所有的midi信号全部移除，完全结束这个pattern的midi信号
                 if song_tbase == dis.start_time + dis.duration{
                     synth_parameters.retain(|i, _| {
-                        // 条件判断：返回 true 保留元素，false 删除元素
+                        // 括号内是retain的条件：true 保留元素，false 删除元素
                         (i/128 != channel_idx)
                     });
                     continue;

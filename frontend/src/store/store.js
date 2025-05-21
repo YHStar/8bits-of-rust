@@ -38,11 +38,11 @@ export default createStore({
       init_panic_hook()
       state.wasm_song = songWrapper.new("TMP")
       // 先创建5个channel
-      state.wasm_song.new_channel("1", "square", 0.5, 1, 0, true)
-      state.wasm_song.new_channel("2", "square", 0.5, 1, 0, true)
-      state.wasm_song.new_channel("3", "square", 0.5, 1, 0, true)
-      state.wasm_song.new_channel("4", "square", 0.5, 1, 0, true)
-      state.wasm_song.new_channel("5", "square", 0.5, 1, 0, true)
+      state.wasm_song.new_channel("1", "square", 0.2, 1, 0, true)
+      state.wasm_song.new_channel("2", "saw", 0.2, 1, 0, true)
+      state.wasm_song.new_channel("3", "spike", 0.2, 1, 0, true)
+      state.wasm_song.new_channel("4", "triangle", 0.2, 1, 0, true)
+      state.wasm_song.new_channel("5", "square", 0.2, 1, 0, true)
     },
     play(state) {
       state.wasm_song.play()
@@ -81,12 +81,12 @@ export default createStore({
     updateDisplayPosition(state, { id, starttime, channel }) {
       const display = state.displays.find((d) => d.id === id)
       if (display) {
-        display.starttime = starttime
-        display.channel = channel
         // 对wasm，直接先删除再插入
         state.wasm_song.delete_display(display.channel, display.patternId, display.starttime)
         state.wasm_song.push_display(channel, display.patternId, display.duration, starttime)
         state.wasm_song.sort_display()
+        display.starttime = starttime
+        display.channel = channel
       }
     },
     updateDisplayDuration(state, { id, duration }) {
@@ -116,15 +116,20 @@ export default createStore({
         note.starttime = starttime
       }
     },
+    // 更新音符持续时间：
+    // 直接删除旧的音符，插入更新后的音符
     updateNoteDuration(state, { id, duration }) {
       const note = state.notes.find((n) => n.id === id)
       if (note) {
-        if (duration < note.duration) {
-          state.wasm_song.edit_pattern("delete", 88 - note.pitch, duration, note.duration)
-        }
-        else if (duration > note.duration) {
-          state.wasm_song.edit_pattern("insert", 88 - note.pitch, note.duration, duration)
-        }
+        // if (duration < note.duration) {
+        //   state.wasm_song.edit_pattern("delete", 88 - note.pitch, note.starttime, note.starttime + note.duration)
+        // }
+        // else if (duration > note.duration) {
+        //   state.wasm_song.edit_pattern("insert", 88 - note.pitch, note.starttime, note.starttime + note.duration)
+        // }
+        // note.duration = duration
+        state.wasm_song.edit_pattern("delete", 88 - note.pitch, note.starttime, note.starttime + note.duration)
+        state.wasm_song.edit_pattern("insert", 88 - note.pitch, note.starttime, note.starttime + duration)
         note.duration = duration
       }
     },
