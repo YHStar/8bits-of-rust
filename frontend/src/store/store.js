@@ -22,11 +22,6 @@ export default createStore({
     // 激活中的pattern的id
     activePattern: 0,
 
-    
-    //mixer状态
-    n_channels: 5,
-    volumes: [80, 80, 80, 80, 80],
-    panValues: [0, 0, 0, 0, 0],
 
     //mixer状态
     channels_params: [
@@ -64,16 +59,16 @@ export default createStore({
       // 初始化错误捕捉函数并初始化wasm实例
       init_panic_hook()
       state.wasm_song = songWrapper.new("TMP")
-      // 先创建5个channel
+      // 先创建channel
       for (var i = 0; i < state.channels_params.length; ++i){
-        console.log(
-          state.channels_params[i].name,
-          state.channels_params[i].volume,
-          state.channels_params[i].pan,
-          state.synths_params[i].preset,
-          state.synths_params[i].n_poly,
-          state.synths_params[i].be_modulated,
-        )
+        // console.log(
+        //   state.channels_params[i].name,
+        //   state.channels_params[i].volume,
+        //   state.channels_params[i].pan,
+        //   state.synths_params[i].preset,
+        //   state.synths_params[i].n_poly,
+        //   state.synths_params[i].be_modulated,
+        // )
         state.wasm_song.new_channel(
           state.channels_params[i].name,
           state.channels_params[i].volume,
@@ -83,11 +78,26 @@ export default createStore({
           state.synths_params[i].be_modulated,
         )
       }
-      // state.wasm_song.new_channel("1", 0.2, 0, "square", 1, true)
-      // state.wasm_song.new_channel("2", 0.2, 0, "saw", 1, true)
-      // state.wasm_song.new_channel("3", 0.2, 0, "spike", 1, true)
-      // state.wasm_song.new_channel("4", 0.2, 0, "triangle", 1, true)
-      // state.wasm_song.new_channel("5", 0.2, 0, "square", 1, true)
+      
+      for (var i = 0; i < state.patterns.length; ++i){
+        var pattern = state.patterns[i]
+        console.log(
+          pattern.name, 
+          pattern.id
+        )
+        state.wasm_song.new_pattern(pattern.name, pattern.id)
+        state.wasm_song.set_active_pattern(pattern.id)
+        for (var j = 0; j < pattern.notes.length; ++j){
+          var note = pattern.notes[j]
+          state.wasm_song.edit_pattern("insert", 88 - note.pitch, note.starttime, note.starttime + note.duration)
+        }
+      }
+      
+      for (var i = 0; i < state.displays.length; ++i){
+        var display = state.displays[i]
+        state.wasm_song.push_display(display.channel, display.patternId, display.duration, display.starttime)
+      }
+      state.wasm_song.sort_display()
     },
     play(state) {
       state.wasm_song.play()
@@ -210,7 +220,7 @@ export default createStore({
     },
     deletePattern(state, id) {
       state.patterns = state.patterns.filter((n) => n.id !== id)
-      state.displays = state.displays.filter((n) => n.id !== id)
+      state.displays = state.displays.filter((n) => n.patternId !== id)// 删除pattern也会删除对应的所有display
       state.notes = []
       state.wasm_song.delete_pattern(id)
       state.wasm_song.filter_display_without_pattern_id(id)
@@ -290,5 +300,5 @@ export default createStore({
     getActivePattern: (state) =>
       state.patterns.find((p) => p.id === state.activePattern),
   },
-  // plugins: [createPersistedState()],
+  plugins: [createPersistedState()],
 })
