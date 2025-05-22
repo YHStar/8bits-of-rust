@@ -155,31 +155,41 @@ impl Song {
         std::mem::swap(&mut self.patterns[index], new_pattern);
     }
 
+    // 暂时不用二分，数据量不够大，而且会引发未知bug
     // pattern的id是由时间获取的，新的pattern id一定大于旧的，id必然按照index递增，故二分查找
     pub fn pattern_index(&self, id: PatternID) -> usize {
-        let mut left = 0 as usize;
-        let mut right = self.patterns.len();
-        let mut mid = right / 2;
+        let mut index = 0;
+        for pattern in &self.patterns{
+            if(pattern.get_id() == id){
+                return index;
+            }
+            index += 1;
+        }
+        return UNEXIST_PATTERN_INDEX;
 
-        // 常规二分
-        while self.patterns[mid].get_id() != id {
-            if right - left <= 1 {
-                if self.patterns[right].get_id() == id {
-                    return right;
-                }
-                else {
-                    return UNEXIST_PATTERN_INDEX;
-                }
-            }
-            if self.patterns[mid].get_id() < id {
-                left = mid;
-            }
-            else {
-                right = mid;
-            }
-            mid = (right - left) / 2 + left;
-        } // while
+        // // 常规二分
+        // let mut left = 0 as usize;
+        // let mut right = self.patterns.len();
+        // let mut mid = right / 2;
 
-        mid
+        // while self.patterns[mid].get_id() != id {
+        //     if right - left <= 1 {
+        //         if self.patterns[right].get_id() == id {
+        //             return right;
+        //         }
+        //         else {
+        //             return UNEXIST_PATTERN_INDEX;
+        //         }
+        //     }
+        //     if self.patterns[mid].get_id() < id {
+        //         left = mid;
+        //     }
+        //     else {
+        //         right = mid;
+        //     }
+        //     mid = (right - left) / 2 + left;
+        // } // while
+
+        // mid
     } // index pattern
 }
