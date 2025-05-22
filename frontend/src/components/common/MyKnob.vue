@@ -10,7 +10,7 @@
     @dblclick="handleDoubleClick">
     <div class="round_right" :style="{ transform: `rotate(${ang}deg)` }"></div>
     <div class="round_num">
-      <my-text :content="String(modelValue)" />
+      <my-text :content="String(parseInt(100 * modelValue))" />
     </div>
   </div>
 </template>
@@ -96,7 +96,7 @@ const handleMouseMove = (event) => {
     props.minAng +
     ((clampedValue - props.minVal) / valueRange.value) * angleRange.value
 
-  emit("update:modelValue", Math.round(clampedValue))
+  emit("update:modelValue", clampedValue)
 }
 
 const handleMouseUp = () => {
@@ -119,7 +119,7 @@ const handleWheel = (event) => {
   const newValue =
     props.minVal +
     ((ang.value - props.minAng) / angleRange.value) * valueRange.value
-  emit("update:modelValue", Math.round(newValue))
+  emit("update:modelValue", newValue)
 }
 
 const handleDoubleClick = () => {

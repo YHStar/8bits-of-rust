@@ -5,6 +5,7 @@
       type="range"
       :min="min"
       :max="max"
+      :step="0.01 * (max - min)" 
       :value="modelValue"
       @input="emitValue($event)"
       @wheel="handleWheel"
@@ -54,7 +55,7 @@ const emitValue = (event) => {
 
 const handleWheel = (event) => {
   event.preventDefault()
-  const delta = Math.sign(event.deltaY) * 2
+  const delta = Math.sign(event.deltaY) * 0.02
   const newValue = props.modelValue - delta
   const clampedValue = Math.max(props.min, Math.min(props.max, newValue))
   emit("update:modelValue", clampedValue)

@@ -17,18 +17,18 @@
               <my-slider
                 orientation="vertical"
                 :min="0"
-                :max="100"
-                v-model="volumes[n - 1]"
+                :max="1"
+                v-model="channels_params[n - 1].volume"
                 @update:modelValue="val => handleVolumeChange(n-1, val)" />
-              <my-text :content="volumes[n - 1] + '%'" class="volume-value" />
+              <my-text :content="parseInt(100 * channels_params[n - 1].volume) + '%'" class="volume-value" />
             </div>
             <div class="row">
               <my-text v-bind:content="'声相：'" />
               <my-knob
                 class="label"
-                v-model="panValues[n - 1]"
-                :minVal="-100"
-                :maxVal="100"
+                v-model="channels_params[n - 1].pan"
+                :minVal="-1"
+                :maxVal="1"
                 :val="0" 
                 @update:modelValue="val => handlePanChange(n-1, val)"
               />
@@ -48,14 +48,10 @@ import { useStore } from 'vuex'
 const store = useStore()
 
 // 状态映射
-const n_channels = computed(() => store.state.n_channels)
-const volumes = computed({
-  get: () => store.state.volumes,
-  set: (value) => store.commit('setVolumes', value)
-})
-const panValues = computed({
-  get: () => store.state.panValues,
-  set: (value) => store.commit('setPanValues', value)
+const n_channels = computed(() => store.state.channels_params.length)
+const channels_params = computed({
+  get: () => store.state.channels_params,
+  set: (value) => store.commit('setchannelparams', value)
 })
 
 const handleVolumeChange = (index, value) => {
@@ -63,18 +59,17 @@ const handleVolumeChange = (index, value) => {
 }
 
 const handlePanChange = (index, value) => {
-  store.commit('updatePanValue', { index, value })
+  store.commit('updatePan', { index, value })
 }
-
 // const n_channels = ref(5)
 // const volumes = ref([80, 80, 80, 80, 80])
 // const panValues = ref([0, 0, 0, 0, 0])
 
-defineExpose({
-  n_channels,
-  volumes,
-  panValues,
-})
+// defineExpose({
+//   n_channels,
+//   volumes,
+//   panValues,
+// })
 </script>
 
 <style scoped>

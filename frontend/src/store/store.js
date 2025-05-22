@@ -245,27 +245,27 @@ export default createStore({
     //mixer状态相关
     //更新通道音量
     updateVolume(state, { index, value }) {
-      console.log("updateVolume index = ", index, " value = ", value)
-      state.volumes = state.volumes.map((v, i) => i === index ? value : v)
+      console.log("updateVolume index = ", index, " value = ", value);
+      state.channels_params[index].volume = value;
       // TODO: add wasm function here
     },
     //更新通道声相
-    updatePanValue(state, { index, value }) {
-      console.log("updatePan index = ", index, " value = ", value)
-      state.panValues = state.panValues.map((v, i) => i === index ? value : v)
+    updatePan(state, { index, value }) {
+      console.log("updatePan index = ", index, " value = ", value);
+      state.channels_params[index].pan = value;
       // TODO: add wasm function here
+    },
+    // // 设置音量初值（读取歌曲文件的时候会用）
+    // setVolumes(state, newVolumes) {
+    //   state.volumes = [...newVolumes] // 保证响应式更新[3](@ref)
+    // },
+    // 设置音轨初值（读取歌曲文件的时候会用）
+    setChannelParams(state, newChannelParams) {
+      state.channels_params = [...newChannelParams];
     },
     // 设置轨道数量（应该不会使用）
     setNChannels(state, value) {
-      state.n_channels = value
-    },
-    // 设置音量初值（读取歌曲文件的时候会用）
-    setVolumes(state, newVolumes) {
-      state.volumes = [...newVolumes] // 保证响应式更新[3](@ref)
-    },
-    // 设置声相初值（读取歌曲文件的时候会用）
-    setPanValues(state, newPanValues) {
-      state.panValues = [...newPanValues]
+      state.n_channels = value;
     },
 
     // 未使用的方法
