@@ -53,6 +53,18 @@ impl Song {
         });
     } // new channel
 
+    pub fn set_channel_preset(&mut self, index: usize, new_preset: &str){
+        self.channels[index].set_preset(index, new_preset);
+    }
+
+    pub fn set_channel_volume(&mut self, index: usize, new_volume: f32){
+        self.channels[index].set_volume(index, new_volume);
+    }
+
+    pub fn set_channel_pan(&mut self, index: usize, new_pan: i8){
+        self.channels[index].set_pan(index, new_pan);
+    }
+
     // 创建新pattern
     pub fn new_pattern(
         &mut self,

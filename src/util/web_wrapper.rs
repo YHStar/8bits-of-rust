@@ -43,8 +43,21 @@ impl songWrapper {
         self.song.new_channel(name, preset, volume, n_poly, pan, be_modulated);
     } // fn new_channel
 
+
     pub fn clear(&mut self) {
         self.song.clear();
+    }
+
+    pub fn set_channel_preset(&mut self, index: usize, new_preset: &str){
+        self.song.set_channel_preset(index, new_preset);
+    }
+
+    pub fn set_channel_volume(&mut self, index: usize, new_volume: f32){
+        self.song.set_channel_volume(index, new_volume);
+    }
+
+    pub fn set_channel_pan(&mut self, index: usize, new_pan: i8){
+        self.song.set_channel_pan(index, new_pan);
     }
 
     pub fn clear_pattern_notes(&mut self) {
@@ -156,6 +169,7 @@ impl songWrapper {
 
         // 创建并播放音频源
         let source = AudioBufferSourceNode::new(&audio_ctx)?;
+        // source.set_loop(true);
         source.set_buffer(Some(&buffer));
         source.connect_with_audio_node(&audio_ctx.destination())?;
         source.start()?;

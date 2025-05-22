@@ -40,6 +40,18 @@ impl Channel {
         }
     } // new
 
+    pub fn set_preset(&mut self, index: usize, new_preset: &str){
+        self.preset = String::from(new_preset);
+    }
+
+    pub fn set_volume(&mut self, index: usize, new_volume: f32){
+        self.volume = new_volume;
+    }
+
+    pub fn set_pan(&mut self, index: usize, new_pan: i8){
+        self.pan = new_pan;
+    }
+
     // 希望把维护display按照start time有序的工作交给前端
     pub fn delete_display(&mut self, index: usize) -> Display {
         self.display.remove(index)

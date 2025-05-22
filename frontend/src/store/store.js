@@ -208,7 +208,7 @@ export default createStore({
     saveNotes(state) {
       const pattern = state.patterns.find((p) => p.id === state.activePattern)
       if (pattern) {
-        console.log("save notes to old pattern", pattern.notes, state.notes)
+        // console.log("save notes to old pattern", pattern.notes, state.notes)
         pattern.notes = state.notes
       }
     },
@@ -216,11 +216,11 @@ export default createStore({
       const pattern = state.patterns.find((p) => p.id === state.activePattern)
       if (pattern) {
         state.notes = pattern.notes
-        console.log("load notes from new pattern", pattern.notes, state.notes)
+        // console.log("load notes from new pattern", pattern.notes, state.notes)
       }
-      for (var i = 0; i < state.notes.length; ++i) {
-        console.log(state.notes[i].id)
-      }
+      // for (var i = 0; i < state.notes.length; ++i) {
+        // console.log(state.notes[i].id)
+      // }
     },
 
     // state.patterns
@@ -267,13 +267,14 @@ export default createStore({
     updateVolume(state, { index, value }) {
       console.log("updateVolume index = ", index, " value = ", value);
       state.channels_params[index].volume = value;
-      // TODO: add wasm function here
+      state.wasm_song.set_channel_volume(index, value)
     },
     //更新通道声相
     updatePan(state, { index, value }) {
-      console.log("updatePan index = ", index, " value = ", value);
       state.channels_params[index].pan = value;
-      // TODO: add wasm function here
+      console.log("updatePan index = ", index, " value = ", state.channels_params[index].pan);
+      state.wasm_song.set_channel_pan(index, value)
+      // TODO: generate sound by the pan
     },
     // // 设置音量初值（读取歌曲文件的时候会用）
     // setVolumes(state, newVolumes) {

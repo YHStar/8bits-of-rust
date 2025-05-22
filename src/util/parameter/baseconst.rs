@@ -1,5 +1,5 @@
 pub const N_TBASE: u32 = 4; // 时基大小
-pub const SONG_LEN: u32 = (16 + 64 + 64 + 64 + 8) * 2; // 歌曲的总的Beat数
+pub const SONG_LEN: u32 = 128; // 歌曲的总的Beat数
 pub const SAMPLE_RATE: u32 = 44100; // 采样率 单位hz
 pub const BPM: u32 = 110; //歌曲速度 单位beat/minute
 pub const T_BEAT: f32 = 60.0 / BPM as f32; // 一个Beat的时长 单位：s
