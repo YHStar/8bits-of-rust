@@ -1,7 +1,7 @@
 // 状态管理
 import { createStore } from "vuex"
 import createPersistedState from "vuex-persistedstate"
-import { songWrapper, init, init_panic_hook } from "eight_bits_of_rust"
+import { songWrapper, init_panic_hook } from "eight_bits_of_rust"
 
 export default createStore({
   state: {
