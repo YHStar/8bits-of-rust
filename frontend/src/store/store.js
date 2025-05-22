@@ -25,10 +25,10 @@ export default createStore({
 
     //mixer状态
     channels_params: [
-      { name: 'lead', volume: 0.2, pan: 0 },
-      { name: 'pad', volume: 0.2, pan: 0 },
-      { name: 'chord', volume: 0.2, pan: 0 },
-      { name: 'bass', volume: 0.2, pan: 0 },
+      { name: 'lead', volume: 0.15, pan: 0 },
+      { name: 'pad', volume: 0.15, pan: 0 },
+      { name: 'chord', volume: 0.1, pan: 0 },
+      { name: 'bass', volume: 0.4, pan: 0 },
       { name: 'noise', volume: 0.2, pan: 0 },
     ],
     //synthesiser状态
@@ -78,7 +78,14 @@ export default createStore({
           state.synths_params[i].be_modulated,
         )
       }
-      
+
+      // 把正在编辑的pattern保存
+      var pattern = state.patterns.find((p) => p.id === state.activePattern)
+      if (pattern) {
+        // console.log("save notes to old pattern", pattern.notes, state.notes)
+        pattern.notes = state.notes
+      }
+      //初始化所有pattern
       for (var i = 0; i < state.patterns.length; ++i){
         var pattern = state.patterns[i]
         console.log(
@@ -92,7 +99,10 @@ export default createStore({
           state.wasm_song.edit_pattern("insert", 88 - note.pitch, note.starttime, note.starttime + note.duration)
         }
       }
-      
+      //初始化active pattern
+      state.wasm_song.set_active_pattern(state.activePattern)
+
+      // 初始化所有display
       for (var i = 0; i < state.displays.length; ++i){
         var display = state.displays[i]
         state.wasm_song.push_display(display.channel, display.patternId, display.duration, display.starttime)
