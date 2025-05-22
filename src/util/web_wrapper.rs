@@ -31,12 +31,15 @@ impl songWrapper {
     pub fn new_channel(
         &mut self,
         name: &str,
-        preset: &str,
+
         volume: f32,
-        n_poly: usize,
         pan: i8,
+
+        preset: &str,
+        n_poly: usize,
         be_modulated: bool,
     ) {
+        log!(name);
         self.song.new_channel(name, preset, volume, n_poly, pan, be_modulated);
     } // fn new_channel
 

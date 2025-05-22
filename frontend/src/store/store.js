@@ -27,7 +27,23 @@ export default createStore({
     n_channels: 5,
     volumes: [80, 80, 80, 80, 80],
     panValues: [0, 0, 0, 0, 0],
-    
+
+    //mixer状态
+    channels_params: [
+      { name: 'lead', volume: 0.2, pan: 0 },
+      { name: 'pad', volume: 0.2, pan: 0 },
+      { name: 'chord', volume: 0.2, pan: 0 },
+      { name: 'bass', volume: 0.2, pan: 0 },
+      { name: 'noise', volume: 0.2, pan: 0 },
+    ],
+    //synthesiser状态
+    synths_params: [
+      { preset: "square", n_poly: 1, be_modulated: true },
+      { preset: "saw", n_poly: 1, be_modulated: true },
+      { preset: "spike", n_poly: 1, be_modulated: true },
+      { preset: "triangle", n_poly: 1, be_modulated: true },
+      { preset: "noise", n_poly: 1, be_modulated: true },
+    ],
     
     //未使用：选中的音符
     selectedNotes: new Set(),
@@ -49,11 +65,29 @@ export default createStore({
       init_panic_hook()
       state.wasm_song = songWrapper.new("TMP")
       // 先创建5个channel
-      state.wasm_song.new_channel("1", "square", 0.2, 1, 0, true)
-      state.wasm_song.new_channel("2", "saw", 0.2, 1, 0, true)
-      state.wasm_song.new_channel("3", "spike", 0.2, 1, 0, true)
-      state.wasm_song.new_channel("4", "triangle", 0.2, 1, 0, true)
-      state.wasm_song.new_channel("5", "square", 0.2, 1, 0, true)
+      for (var i = 0; i < state.channels_params.length; ++i){
+        console.log(
+          state.channels_params[i].name,
+          state.channels_params[i].volume,
+          state.channels_params[i].pan,
+          state.synths_params[i].preset,
+          state.synths_params[i].n_poly,
+          state.synths_params[i].be_modulated,
+        )
+        state.wasm_song.new_channel(
+          state.channels_params[i].name,
+          state.channels_params[i].volume,
+          state.channels_params[i].pan,
+          state.synths_params[i].preset,
+          state.synths_params[i].n_poly,
+          state.synths_params[i].be_modulated,
+        )
+      }
+      // state.wasm_song.new_channel("1", 0.2, 0, "square", 1, true)
+      // state.wasm_song.new_channel("2", 0.2, 0, "saw", 1, true)
+      // state.wasm_song.new_channel("3", 0.2, 0, "spike", 1, true)
+      // state.wasm_song.new_channel("4", 0.2, 0, "triangle", 1, true)
+      // state.wasm_song.new_channel("5", 0.2, 0, "square", 1, true)
     },
     play(state) {
       state.wasm_song.play()
