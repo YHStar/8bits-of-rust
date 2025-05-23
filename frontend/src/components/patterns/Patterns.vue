@@ -68,6 +68,11 @@ const addPattern = () => {
         ? patternName.value
         : "Pattern " + (patterns.value.length + 1),
     notes: [],
+
+    scrollX: 0,
+    scrollY: 0,
+    scaleX: 1,
+    scaleY: 1
   }
   patternName.value = ""
   // console.log("New color:", newPattern.color);

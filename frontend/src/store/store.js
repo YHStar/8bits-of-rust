@@ -39,7 +39,12 @@ export default createStore({
       { preset: "triangle", n_poly: 1, be_modulated: true },
       { preset: "noise", n_poly: 1, be_modulated: true },
     ],
-    
+    //piano roll状态
+    pianoroll_scrollX: 0,     // 横向滚动位置
+    pianoroll_scrollY: 0,     // 纵向滚动位置
+    pianoroll_scaleX: 1.0,          // 横向缩放比例（1.0为原始尺寸）
+    pianoroll_scaleY: 1.0,          // 纵向缩放比例
+
     //未使用：选中的音符
     selectedNotes: new Set(),
     separatorPosition: 300,
@@ -211,6 +216,10 @@ export default createStore({
         // console.log("save notes to old pattern", pattern.notes, state.notes)
         pattern.notes = state.notes
       }
+      pattern.scrollX = state.pianoroll_scrollX
+      pattern.scrollY = state.pianoroll_scrollY 
+      pattern.scaleX = state.pianoroll_scaleX
+      pattern.scaleY = state.pianoroll_scaleY 
     },
     loadNotes(state) {
       const pattern = state.patterns.find((p) => p.id === state.activePattern)
@@ -218,6 +227,10 @@ export default createStore({
         state.notes = pattern.notes
         // console.log("load notes from new pattern", pattern.notes, state.notes)
       }
+      state.pianoroll_scrollX = pattern.scrollX
+      state.pianoroll_scrollY = pattern.scrollY
+      state.pianoroll_scaleX = pattern.scaleX
+      state.pianoroll_scaleY = pattern.scaleY
       // for (var i = 0; i < state.notes.length; ++i) {
         // console.log(state.notes[i].id)
       // }
@@ -226,7 +239,9 @@ export default createStore({
     // state.patterns
     addPattern: (state, pattern) => {
       state.patterns.push(pattern)
-      state.wasm_song.new_pattern(pattern.name, pattern.id)
+      state.wasm_song.new_pattern(pattern.name, pattern.id, 
+        pattern.scrollX, pattern.scrollY,
+        pattern.scaleX, pattern.scaleY)
     },
     deletePattern(state, id) {
       state.patterns = state.patterns.filter((n) => n.id !== id)
@@ -288,6 +303,29 @@ export default createStore({
     setNChannels(state, value) {
       state.n_channels = value;
     },
+
+
+    // 钢琴窗相关状态
+
+    // 设置钢琴窗滚动位置
+    setPianoScroll(state, { x, y }) {
+      state.pianoroll_scrollX = Math.max(0, x)   // 限制最小值
+      state.pianoroll_scrollY = Math.max(0, y)
+    },
+  
+    // 设置缩放比例（带最小限制）
+    setScale(state, { scaleX, scaleY }) {
+      state.pianoroll_scaleX = Math.max(0.1, scaleX)  // 最小缩放10%
+      state.pianoroll_scaleY = Math.max(0.1, scaleY)
+    },
+  
+    // 增量缩放控制（适用于滚轮操作）
+    zoomScale(state, { deltaX, deltaY }) {
+      const ZOOM_FACTOR = 0.1
+      state.pianoroll_scaleX = Math.max(0.1, state.pianoroll_scaleX + deltaX * ZOOM_FACTOR)
+      state.pianoroll_scaleY = Math.max(0.1, state.pianoroll_scaleY + deltaY * ZOOM_FACTOR)
+    },
+
 
     // 未使用的方法
     setSeparatorPosition(state, position) {

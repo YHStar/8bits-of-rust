@@ -1,7 +1,7 @@
 <!-- 钢琴窗组件 -->
 <template>
   <div></div>
-  <div class="roll">
+  <div class="roll" ref="rollContainer" @scroll="handleScroll">
     <div class="header-bar" :style="headerBarStyle">
       <span
         v-for="beat in beats"
@@ -21,7 +21,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue"
+import { ref, computed, onMounted, onUnmounted, watch  } from "vue"
+import { useStore } from "vuex"
+
 import PianoKeys from "./PianoKeys.vue"
 import Score from "./Score.vue"
 
@@ -35,6 +37,46 @@ const headerBarStyle = computed(() => ({
 const getBeatStyle = (beat) => ({
   left: `${80 - 3 + (beat - 1) * 200}px`,
 })
+
+
+const store = useStore()
+const rollContainer = ref(null)
+
+// 监听滚动事件
+const handleScroll = (e) => {
+  store.commit("setPianoScroll", {
+    x: e.target.scrollLeft,
+    y: e.target.scrollTop
+  })
+}
+
+// 初始化时恢复滚动位置
+onMounted(() => {
+  if (rollContainer.value) {
+    rollContainer.value.scrollLeft = store.state.pianoroll_scrollX
+    rollContainer.value.scrollTop = store.state.pianoroll_scrollY
+  }
+})
+
+// 移除事件监听
+onUnmounted(() => {
+  if (rollContainer.value) {
+    rollContainer.value.removeEventListener("scroll", handleScroll)
+  }
+})
+
+
+// 监听Vuex状态变化
+watch(
+  () => [store.state.pianoroll_scrollX, store.state.pianoroll_scrollY],
+  ([newX, newY]) => {
+    if (rollContainer.value) {
+      rollContainer.value.scrollLeft = newX
+      rollContainer.value.scrollTop = newY
+    }
+  },
+  { deep: true }
+)
 </script>
 
 <style scoped>
