@@ -10,15 +10,15 @@ use web_sys::{AudioContext, AudioBuffer, AudioBufferSourceNode};
 use gloo_console::log;
 
 #[wasm_bindgen]
-pub struct songWrapper {
+pub struct SongWrapper {
     song: Song,
     active_pattern_index: usize,
 }
 
 #[wasm_bindgen]
-impl songWrapper {
+impl SongWrapper {
     pub fn new(name: &str) -> Self {
-        songWrapper {
+        SongWrapper {
             song: Song::new(name),
             active_pattern_index: UNEXIST_PATTERN_INDEX,
         }
@@ -189,7 +189,7 @@ impl songWrapper {
     // pub fn read_from_file(&mut self, file_path: &str) {
     //     self.song.read_from_file(file_path).unwrap();
     // }
-} // impl songWrapper
+} // impl SongWrapper
 
 /*
 #[wasm_bindgen]

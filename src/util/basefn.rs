@@ -291,8 +291,8 @@ pub fn mixer(song: &Song) -> (Vec<f32>, Vec<f32>) {
                 // 当到达current_pattern的结束时基时，将所有的midi信号全部移除，完全结束这个pattern的midi信号
                 if song_tbase == dis.start_time + dis.duration{
                     synth_parameters.retain(|i, _| {
-                        // 括号内是retain的条件：true 保留元素，false 删除元素
-                        (i/128 != channel_idx)
+                        // retain的条件：true 保留元素，false 删除元素
+                        i/128 != channel_idx
                     });
                     continue;
                 }

@@ -61,14 +61,14 @@ impl Channel {
         if self.display.is_empty() {
             return;
         }
-        let mut tmpVec:Vec<Display> = Vec::new();
+        let mut tem_vec:Vec<Display> = Vec::new();
         for dis in &self.display {
             if dis.pattern_id != id {
-                tmpVec.push(*dis);
+                tem_vec.push(*dis);
             }
         }
         // 找到不包含id的pattern，然后置换
-        std::mem::swap(&mut self.display, &mut tmpVec);
+        std::mem::swap(&mut self.display, &mut tem_vec);
     }
 
     pub fn insert_display(&mut self, index: usize, element: Display) {
