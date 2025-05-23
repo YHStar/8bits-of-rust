@@ -39,7 +39,7 @@ impl Song {
         preset: &str,
         volume: f32,
         n_poly: usize,
-        pan: i8,
+        pan: f32,
         be_modulated: bool,
     ) {
         self.channels.push(Channel {
@@ -61,7 +61,7 @@ impl Song {
         self.channels[index].set_volume(index, new_volume);
     }
 
-    pub fn set_channel_pan(&mut self, index: usize, new_pan: i8){
+    pub fn set_channel_pan(&mut self, index: usize, new_pan: f32){
         self.channels[index].set_pan(index, new_pan);
     }
 
@@ -172,7 +172,7 @@ impl Song {
     pub fn pattern_index(&self, id: PatternID) -> usize {
         let mut index = 0;
         for pattern in &self.patterns{
-            if(pattern.get_id() == id){
+            if pattern.get_id() == id{
                 return index;
             }
             index += 1;

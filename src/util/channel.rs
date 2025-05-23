@@ -12,7 +12,7 @@ pub struct Channel {
     pub preset: String,// 通道预设名称
     pub volume: f32, // 通道音量大小
     pub n_poly: usize, // 通道复音数
-    pub pan: i8, // 通道声像
+    pub pan: f32, // 通道声像
     pub be_modulated: bool, // 通道中合成器声音是否经过fm调制
     pub display: Vec<Display>, // 通道的display列表
 }
@@ -25,7 +25,7 @@ impl Channel {
         preset: &str,
         volume: f32,
         n_poly: usize,
-        pan: i8,
+        pan: f32,
         be_modulated: bool,
     ) -> Self {
         Channel {
@@ -48,7 +48,7 @@ impl Channel {
         self.volume = new_volume;
     }
 
-    pub fn set_pan(&mut self, index: usize, new_pan: i8){
+    pub fn set_pan(&mut self, index: usize, new_pan: f32){
         self.pan = new_pan;
     }
 

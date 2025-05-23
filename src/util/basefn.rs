@@ -246,14 +246,17 @@ pub fn mixer(song: &LazyLock<[Channel; N_CHAN]>) -> Vec<Level> {
 */
 
 // 混音器
-pub fn mixer(song: &Song) -> Vec<Level> {
+pub fn mixer(song: &Song) -> (Vec<f32>, Vec<f32>) {
     let patterns = &song.patterns;
     let channels = &song.channels;
     let channel_num = channels.len();
     let mut clock = 0 as Timestamp;
     // let full_samples = (SAMPLE_RATE as f32 * T_BEAT) as Timestamp;
     let full_samples = (SAMPLE_RATE as f32 * T_BASE) as Timestamp;
-    let mut sample: Vec<Level> = Vec::new();
+    let mut left_sample: Vec<Vec<f32>> = Vec::new();
+    let mut right_sample: Vec<Vec<f32>> = Vec::new();
+    // let mut left_sample:Vec<f32> = Vec::new();
+    // let mut right_sample:Vec<f32> = Vec::new();
     let mut synth_parameters: HashMap<usize, SynthParameters> = HashMap::new();
 
 
@@ -263,6 +266,9 @@ pub fn mixer(song: &Song) -> Vec<Level> {
 
     // 按时基遍历歌曲
     while song_tbase < SONG_LEN {
+        // if song_tbase > 0{
+        //     break;
+        // }
         let mut channel_idx = 0;
         // 测试用
         if song_tbase < 16{
@@ -294,7 +300,7 @@ pub fn mixer(song: &Song) -> Vec<Level> {
                 // 在current_pattern中获得midi信号
                 if let Some(midis) = current_pattern.get_vec(song_tbase - dis.start_time) {
                     for midi in midis {
-                        log!("test_midi type: ", midi.typ, "pitch: ",FREQ_DATA[midi.note as usize] * 2.0);
+                        // log!("test_midi type: ", midi.typ, "pitch: ",FREQ_DATA[midi.note as usize] * 2.0);
                         if midi.typ == START!() as NoteType {
                             // 若midi信号的类型是START，就设置合成器相关参数
                             synth_parameters.insert(
@@ -302,9 +308,11 @@ pub fn mixer(song: &Song) -> Vec<Level> {
                                 SynthParameters::new(
                                     FREQ_DATA[midi.note as usize] * 2.0,
                                     channels[channel_idx].volume,
+                                    channels[channel_idx].pan,
                                     &channels[channel_idx].preset,
                                     channels[channel_idx].n_poly,
                                     channels[channel_idx].be_modulated,
+                                    
                                 ),
                             );
                         }
@@ -316,16 +324,36 @@ pub fn mixer(song: &Song) -> Vec<Level> {
             }
             channel_idx += 1;
         }
-        for _i in 0..full_samples {
-            let mut res: Level = 0;
-            for params in synth_parameters.values() {
-                res += synth(params, clock);
-            }
-            sample.push(res);
-            clock += 1;
-        }
 
+        // 一个时基内的采样
+        let mut _left_sample: Vec<f32> = vec![0.0;full_samples as usize];
+        let mut _right_sample: Vec<f32> = vec![0.0;full_samples as usize];
+
+        for params in synth_parameters.values() {
+            // 处理声相
+            let angle = (params.pan + 1.0) * std::f32::consts::FRAC_PI_4; // 映射到[0, π/2]
+            // log!(angle);
+            //用声相计算出左右两个声道的能量值
+            let left_gain = angle.cos();
+            let right_gain = angle.sin();
+            // log!(angle, left_gain, right_gain);
+            let mut _clock = clock;
+            for _i in 0..full_samples {
+                _clock += 1;
+                let res = synth(params, _clock) as f32;
+                // left_res += res * left_gain;
+                // right_res += res * right_gain;
+                _left_sample[_i as usize] += res * left_gain;
+                _right_sample[_i as usize] += res * right_gain;
+            }
+        }
+        left_sample.push(_left_sample);
+        right_sample.push(_right_sample);
+        clock += full_samples;
         song_tbase += 1;
     }
-    sample
+    // 合并各个时基内的采样
+    let merged_left_sample = left_sample.into_iter().flatten().collect::<Vec<f32>>();
+    let merged_right_sample = right_sample.into_iter().flatten().collect::<Vec<f32>>();
+    (merged_left_sample, merged_right_sample)
 }

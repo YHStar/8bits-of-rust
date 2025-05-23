@@ -33,7 +33,7 @@ impl songWrapper {
         name: &str,
 
         volume: f32,
-        pan: i8,
+        pan: f32,
 
         preset: &str,
         n_poly: usize,
@@ -56,7 +56,7 @@ impl songWrapper {
         self.song.set_channel_volume(index, new_volume);
     }
 
-    pub fn set_channel_pan(&mut self, index: usize, new_pan: i8){
+    pub fn set_channel_pan(&mut self, index: usize, new_pan: f32){
         self.song.set_channel_pan(index, new_pan);
     }
 
@@ -150,10 +150,15 @@ impl songWrapper {
     pub fn play(&self) -> Result<(), JsValue> {
         // 从歌曲文件渲染采样
         // TODO：设置音频缓冲区，实时渲染音频并且播放
-        let sample = mixer(&self.song);
+        let (left_sample, right_sample) = mixer(&self.song);
         
         // 转换 i8 到 Float32
-        let float_samples: Vec<f32> = sample
+        let float_left_samples: Vec<f32> = left_sample
+        .iter()
+        .map(|&x| x as f32 / 128.0)
+        .collect();        
+
+        let float_right_samples: Vec<f32> = right_sample
         .iter()
         .map(|&x| x as f32 / 128.0)
         .collect();
@@ -163,15 +168,15 @@ impl songWrapper {
 
         // 创建 AudioBuffer
         let buffer = audio_ctx
-        .create_buffer(1, sample.len() as u32, SAMPLE_RATE as f32)
+        .create_buffer(2, left_sample.len() as u32, SAMPLE_RATE as f32)
         .expect("Failed to create audio buffer");
-        buffer.copy_to_channel(&float_samples, 0)?;
+        buffer.copy_to_channel(&float_left_samples, 0)?;
+        buffer.copy_to_channel(&float_right_samples, 1)?;
 
-        // 创建并播放音频源
         let source = AudioBufferSourceNode::new(&audio_ctx)?;
-        // source.set_loop(true);
         source.set_buffer(Some(&buffer));
         source.connect_with_audio_node(&audio_ctx.destination())?;
+        source.set_loop(false);
         source.start()?;
 
         Ok(())

@@ -6,11 +6,11 @@ use crate::Pattern;
 
 pub fn init_test_song() -> Song {
     let mut song = Song::new("my_wav");
-    song.new_channel("1", "saw", 0.065, 1, 0, true);
-    song.new_channel("2", "square", 0.05, 1, 0, true);
-    song.new_channel("3", "triangle", 0.6, 1, 0, false);
-    song.new_channel("4", "spike", 0.1, 1, 0, true);
-    song.new_channel("5", "noise", 0.06, 1, 0, false);
+    song.new_channel("1", "saw", 0.065, 1, 0.0, true);
+    song.new_channel("2", "square", 0.05, 1, 0.0, true);
+    song.new_channel("3", "triangle", 0.6, 1, 0.0, false);
+    song.new_channel("4", "spike", 0.1, 1, 0.0, true);
+    song.new_channel("5", "noise", 0.06, 1, 0.0, false);
 
     for i in 0..11 {
         song.new_pattern(&i.to_string(), i);

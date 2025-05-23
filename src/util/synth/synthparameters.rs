@@ -9,6 +9,7 @@ pub struct SynthParameters {
     pub delta_t: [FTimestamp; MAX_POLY],
     pub frequency: f32,
     pub volume: f32,
+    pub pan: f32,
     pub preset: String,
     pub n_poly: usize,
     pub be_modulated: bool,
@@ -19,6 +20,7 @@ impl SynthParameters {
     pub fn new(
         frequency: f32,
         volume: f32,
+        pan: f32,
         preset: &str,
         n_poly: usize,
         be_modulated: bool,
@@ -40,6 +42,7 @@ impl SynthParameters {
             delta_t: delta_time,
             frequency,
             volume,
+            pan,
             preset,
             n_poly,
             be_modulated: be_modulated,
