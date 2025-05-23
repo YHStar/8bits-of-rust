@@ -1,7 +1,7 @@
 // 状态管理
 import { createStore } from "vuex"
 import createPersistedState from "vuex-persistedstate"
-import { songWrapper, init_panic_hook } from "eight_bits_of_rust"
+import { SongWrapper, init_panic_hook } from "eight_bits_of_rust"
 
 export default createStore({
   state: {
@@ -58,7 +58,7 @@ export default createStore({
     initWasmInstance(state) {
       // 初始化错误捕捉函数并初始化wasm实例
       init_panic_hook()
-      state.wasm_song = songWrapper.new("TMP")
+      state.wasm_song = SongWrapper.new("TMP")
       // 先创建channel
       for (var i = 0; i < state.channels_params.length; ++i){
         // console.log(
