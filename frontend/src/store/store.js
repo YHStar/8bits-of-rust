@@ -125,6 +125,10 @@ export default createStore({
       // console.log("pause")
       //wasm暂停函数
     },
+    reset(state) {// 重置
+      // console.log("reset")
+      //wasm重置函数
+    },
     
     // 页面状态相关
     setCurrentRoute(state, route) {

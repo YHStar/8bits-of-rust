@@ -57,7 +57,7 @@ const playStatus = ref("paused")
 const progress = ref(0)
 const store = useStore()
 
-const play_or_pause = () => {
+const play_or_pause = () => {// 播放/暂停按钮逻辑
   if (playStatus.value == "paused"){
     playStatus.value = "playing"
     store.commit("play")
@@ -71,7 +71,8 @@ const play_or_pause = () => {
   }
 }
 
-const reset = () => {
+const reset = () => {//重播按钮逻辑
+  store.commit("reset")
   playStatus.value = "paused"
   progress.value = 0
 }
