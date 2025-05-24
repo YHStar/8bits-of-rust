@@ -23,7 +23,8 @@
           :color="pattern.color"
           @click.left="handleLeftClick(pattern.id, $event)"
           @click.right="deletePattern(pattern.id)"
-          @dblclick="editPattern(pattern.id)" />
+          @dblclick="editPattern(pattern.id)" 
+          />
         <my-input
           class="rename"
           v-if="isEdit === pattern.id"
@@ -116,7 +117,7 @@ const drop = (index) => {
 
 // 重命名pattern
 const editPattern = (id) => {
-  clearTimeout(timeout)
+  // clearTimeout(timeout)
   isEdit.value = id
 }
 const renamePattern = (id) => {
