@@ -114,8 +114,16 @@ export default createStore({
       }
       state.wasm_song.sort_display()
     },
-    play(state) {
+    play(state) {// 播放
       state.wasm_song.play()
+    },
+    play_single_note(state){// 播放单个音符
+      // console.log("play single note")
+      //预览单个音符
+    },
+    pause(state) {// 暂停
+      // console.log("pause")
+      //wasm暂停函数
     },
     
     // 页面状态相关
