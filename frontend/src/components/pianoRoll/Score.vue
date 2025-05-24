@@ -36,12 +36,8 @@ const gridSize = { cellWidth: 25, cellHeight: 20 };
 const store = useStore();
 const notes = computed(() => store.state.notes);
 const gridEl = ref(null);
-const dragParams = reactive({
-  moveX: 0,
-  moveY: 0,
-  resizeX: 0,
-});
-const { moveNoteHandler, resizeNoteHandler, addNoteHandler } = useNoteHandlers(store, gridEl, dragParams);
+
+const { moveNoteHandler, resizeNoteHandler, addNoteHandler } = useNoteHandlers(store, gridEl);
 
 // 音符样式计算
 // ref响应式变量在template中会自动解包，这里的函数传入参数都是自动解包后ref变量
@@ -65,7 +61,6 @@ const selectedNotes = ref(new Set());
 const selectionBox = ref({ x1: 0, y1: 0, x2: 0, y2: 0 });
 
 
-
 // 下一次新建note时,duration设置为最近操作过音符的note
 const tmpDuration = ref(2);
 
@@ -82,16 +77,12 @@ const handleCanvasMouseLeftDown = (e) => {
 // 处理鼠标移动
 const handleCanvasMouseMove = (e) => {
   if (!dragState) return;
-  if (dragState.type === "resize") {
-    // 拖拽音符尾部,设置时值
-    resizeNoteHandler(dragState, e)
-    // resizeNote(e);
+  if (dragState.type === "resize") {// 拖拽音符尾部,设置时值
+    resizeNoteHandler(dragState, e, tmpDuration)
     return;
   }
-  if (dragState.type === "move") {
-    // 挪动音符位置
-    moveNoteHandler(dragState, e);
-    // moveNote(e);
+  if (dragState.type === "move") {// 挪动音符位置
+    moveNoteHandler(dragState, e, tmpDuration);
     return;
   }
 };
@@ -116,6 +107,7 @@ const startMoveNote = (note, e) => {
     noteId: note.id,
     startX: Math.floor((e.clientX - gridRect.left) / 25),
     startY: Math.floor((e.clientY - gridRect.top) / 20),
+    duration: note.duration,
     originalPos: { ...note },
   };
 };
@@ -123,7 +115,7 @@ const startMoveNote = (note, e) => {
 const startResizeNote = (note, e) => {
   e.stopPropagation();
   const gridRect = gridEl.value.$el.getBoundingClientRect();
-  console.log(note.id);
+  // console.log(note.id);
   dragState = {
     type: "resize",
     noteId: note.id,
