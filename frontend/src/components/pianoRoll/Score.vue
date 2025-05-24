@@ -27,18 +27,29 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from "vue";
 import { useStore, mapState } from "vuex";
+// import { useNoteStyle } from "./noteStyle"; 
+import { useNoteHandlers } from "./noteHandler";
+
+const gridSize = { cellWidth: 25, cellHeight: 20 };
+// const {noteStyle} = useNoteStyle(gridSize);
 
 const store = useStore();
 const notes = computed(() => store.state.notes);
 const gridEl = ref(null);
+const dragParams = reactive({
+  moveX: 0,
+  moveY: 0,
+  resizeX: 0,
+});
+const { moveNoteHandler, resizeNoteHandler, addNoteHandler } = useNoteHandlers(store, gridEl, dragParams);
 
 // 音符样式计算
 // ref响应式变量在template中会自动解包，这里的函数传入参数都是自动解包后ref变量
 const noteStyle = (row, col, duration) => ({
-  left: `${col * 25}px`,
-  top: `${row * 20 + 1}px`,
-  width: `${duration * 25 - 1}px`,
-  height: `${20 - 2}px`,
+  left: `${col * gridSize.cellWidth}px`,
+  top: `${row * gridSize.cellHeight + 1}px`,
+  width: `${duration * gridSize.cellWidth - 1}px`,
+  height: `${gridSize.cellHeight - 2}px`,
 });
 
 const resizeHandleStyle = (row, starttime, duration) => ({
@@ -53,11 +64,7 @@ let dragState = null;
 const selectedNotes = ref(new Set());
 const selectionBox = ref({ x1: 0, y1: 0, x2: 0, y2: 0 });
 
-const dragParams = reactive({
-  moveX: 0,
-  moveY: 0,
-  resizeX: 0,
-});
+
 
 // 下一次新建note时,duration设置为最近操作过音符的note
 const tmpDuration = ref(2);
@@ -68,7 +75,7 @@ const handleCanvasMouseLeftDown = (e) => {
 
   if (e.target.classList.contains("grid")) {
     // 添加音符
-    addNote(e);
+    addNoteHandler(e, tmpDuration);
   }
 };
 
@@ -77,12 +84,14 @@ const handleCanvasMouseMove = (e) => {
   if (!dragState) return;
   if (dragState.type === "resize") {
     // 拖拽音符尾部,设置时值
-    resizeNote(e);
+    resizeNoteHandler(dragState, e)
+    // resizeNote(e);
     return;
   }
   if (dragState.type === "move") {
     // 挪动音符位置
-    moveNote(e);
+    moveNoteHandler(dragState, e);
+    // moveNote(e);
     return;
   }
 };
@@ -92,20 +101,6 @@ const handleCanvasMouseUp = () => {
   dragState = null;
 };
 
-// 添加音符
-const addNote = (e) => {
-  const rect = e.target.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-
-  const newNote = {
-    id: Date.now(),
-    starttime: Math.floor(x / 25),
-    duration: tmpDuration.value,
-    pitch: Math.floor(y / 20),
-  };
-  store.commit("addNote", newNote);
-};
 
 // 删除音符
 const deleteNote = (note, e) => {
@@ -135,56 +130,6 @@ const startResizeNote = (note, e) => {
     startX: Math.floor((e.clientX - gridRect.left) / 25),
     originalPos: { ...note },
   };
-};
-
-// 挪动音符
-const moveNote = (e) => {
-  const gridRect = gridEl.value.$el.getBoundingClientRect();
-
-  // 计算相对网格的坐标
-  const x = Math.floor((e.clientX - gridRect.left) / 25);
-  const y = Math.floor((e.clientY - gridRect.top) / 20);
-  if (dragParams.moveX === x && dragParams.moveY === y) return;
-  dragParams.moveX = x;
-  dragParams.moveY = y;
-  // 计算移动距离
-  const dx = x - dragState.startX;
-  const dy = y - dragState.startY;
-
-  if (dragState.type !== "move") return;
-  // 计算新位置并应用边界检查
-  let newStarttime = dragState.originalPos.starttime + dx;
-  let newPitch = dragState.originalPos.pitch + dy;
-
-  // 边界检查
-  newStarttime = Math.max(0, newStarttime);
-  newPitch = Math.max(0, Math.min(87, newPitch)); // 88个琴键(0-87)
-
-  // 只有位置确实改变时才提交更新
-  store.commit("updateNotePosition", {
-    id: dragState.noteId,
-    starttime: newStarttime,
-    pitch: newPitch,
-  });
-};
-
-// 设置音符时值,逻辑类似moveNote
-const resizeNote = (e) => {
-  const gridRect = gridEl.value.$el.getBoundingClientRect();
-
-  const x = Math.floor((e.clientX - gridRect.left) / 25);
-  if (x === dragParams.resizeX) return;
-  dragParams.resizeX = x;
-
-  const dx = x - dragState.startX;
-
-  let newDuration = dragState.originalPos.duration + dx;
-  newDuration = Math.max(1, newDuration); // 最小长度为1
-
-  store.commit("updateNoteDuration", {
-    id: dragState.noteId,
-    duration: newDuration,
-  });
 };
 </script>
 
