@@ -9,20 +9,20 @@
 </template>
 
 <script setup>
-import NavigationBar from "@/views/NavigationBar.vue"
-import BackgroundLayer from "@/views/BackgroundLayer.vue"
-import { computed } from "vue"
-import { useRouter } from "vue-router"
+import NavigationBar from "@/views/NavigationBar.vue";
+import BackgroundLayer from "@/views/BackgroundLayer.vue";
+import { computed } from "vue";
+import { useRouter } from "vue-router";
 
 // 初始化store中的WASM实例
-import { useStore } from "vuex"
-const store = useStore()
-store.commit("initWasmInstance")
+import { useStore } from "vuex";
+const store = useStore();
+store.commit("initWasmInstance");
 
 // 根据router选择开始界面还是正式界面
-const router = useRouter()
+const router = useRouter();
 
 const StartRoute = computed(() => {
-  return router.currentRoute.value.path === "/"
-})
+  return router.currentRoute.value.path === "/";
+});
 </script>

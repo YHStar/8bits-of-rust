@@ -30,15 +30,15 @@
 </template>
 
 <script setup>
-import { ref } from "vue"
+import { ref } from "vue";
 
-const preset = ref("default")
-const attack = ref(0)
-const decay = ref(0)
-const sustain = ref(0)
-const release = ref(0)
-const fm_range = ref(0)
-const fm_frequency = ref(0)
+const preset = ref("default");
+const attack = ref(0);
+const decay = ref(0);
+const sustain = ref(0);
+const release = ref(0);
+const fm_range = ref(0);
+const fm_frequency = ref(0);
 </script>
 
 <style>

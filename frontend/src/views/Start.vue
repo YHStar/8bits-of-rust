@@ -8,16 +8,16 @@
 </template>
 
 <script setup>
-import { useStore } from "vuex"
-import { useRouter } from "vue-router"
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
-const store = useStore()
-const router = useRouter()
+const store = useStore();
+const router = useRouter();
 
 const navigateTo = (route) => {
-  store.commit("setCurrentRoute", route)
-  router.push(route)
-}
+  store.commit("setCurrentRoute", route);
+  router.push(route);
+};
 </script>
 
 <style scoped>

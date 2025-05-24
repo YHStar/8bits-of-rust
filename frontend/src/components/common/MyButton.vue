@@ -7,7 +7,8 @@
     :style="{ '--dynamic-bg': color }"
     :aria-label="ariaLabel || text"
     @click="$emit('click', $event)"
-    @keydown.enter="$emit('click', $event)">
+    @keydown.enter="$emit('click', $event)"
+  >
     <span class="content-wrapper">
       <slot name="icon"></slot>
       <span>
@@ -19,11 +20,11 @@
 
 <script>
 export default {
-  name: "MyButton"
-}
+  name: "MyButton",
+};
 </script>
 <script setup>
-import { computed } from 'vue'
+import { computed } from "vue";
 
 const props = defineProps({
   color: {
@@ -50,12 +51,12 @@ const props = defineProps({
   },
   disabled: Boolean,
   ariaLabel: String,
-})
+});
 
-const emit = defineEmits(['click'])
+const emit = defineEmits(["click"]);
 
-const sizeClass = computed(() => `size-${props.size}`)
-const dynamicStyle = computed(() => props.color ? props.color : "")
+const sizeClass = computed(() => `size-${props.size}`);
+const dynamicStyle = computed(() => (props.color ? props.color : ""));
 </script>
 
 <style scoped>

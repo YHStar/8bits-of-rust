@@ -6,7 +6,8 @@
         v-for="beat in n_bars + 1"
         :key="'h' + beat"
         :style="{ left: 80 - 3 + (beat - 1) * 200 + 'px' }"
-        class="c-label">
+        class="c-label"
+      >
         {{ beat - 1 }}
       </span>
     </div>
@@ -21,11 +22,11 @@
 </template>
 
 <script setup>
-import PatternManager from "./Displays.vue"
-import ChannelNames from "./ChannelNames.vue"
-import { getCurrentInstance } from "vue"
-const { proxy } = getCurrentInstance()
-const n_bars = 16
+import PatternManager from "./Displays.vue";
+import ChannelNames from "./ChannelNames.vue";
+import { getCurrentInstance } from "vue";
+const { proxy } = getCurrentInstance();
+const n_bars = 16;
 </script>
 
 <style scoped>
@@ -59,4 +60,3 @@ const n_bars = 16
   }
 }
 </style>
-
