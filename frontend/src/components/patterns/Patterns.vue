@@ -44,9 +44,11 @@
 import { ref, computed } from "vue";
 import { useStore } from "vuex";
 import { useColorGenerator } from "@/components/common/ColorGenerator.js";
+import {useDragDrop} from "./dragDrop";
 
 const { getRandomColor } = useColorGenerator();
 const store = useStore();
+const {dragStart, allowDrop, drop} = useDragDrop(store.commit);
 const patterns = computed(() => store.state.patterns);
 const activePattern = computed(() => store.state.activePattern);
 // 是否正在编辑
@@ -95,25 +97,6 @@ const deletePattern = (id) => {
     }
     store.commit("deletePattern", id);
   }
-};
-
-// 拖拽排序逻辑
-const draggingIndex = ref(-1);
-
-const dragStart = (index) => {
-  draggingIndex.value = index;
-};
-
-const allowDrop = (e) => {
-  e.preventDefault();
-};
-
-const drop = (index) => {
-  store.commit("sortPattern", {
-    index: draggingIndex.value,
-    newIndex: index,
-  });
-  draggingIndex.value = -1;
 };
 
 // 重命名pattern
