@@ -25,7 +25,7 @@ impl SongWrapper {
     } // fn new
 
     fn pattern_content_log(&self) {
-        log!(self.song.patterns[self.active_pattern_index].score_to_str());
+        // log!(self.song.patterns[self.active_pattern_index].score_to_str());
     } // fn pattern_content_log
 
     pub fn new_channel(
@@ -105,6 +105,7 @@ impl SongWrapper {
         start_time: Timebase,
         end_time: Timebase,
     ) {
+        log!("edit pattern!");
         if self.active_pattern_index != UNEXIST_PATTERN_INDEX {
             self.song.edit_pattern(self.active_pattern_index, mode, note_idx, start_time, end_time);
             self.pattern_content_log();
@@ -148,6 +149,7 @@ impl SongWrapper {
 
     // 播放当前工程中的音频
     pub fn play(&self) -> Result<(), JsValue> {
+        log!("need play song!");
         // 从歌曲文件渲染采样
         // TODO：设置音频缓冲区，实时渲染音频并且播放
         let (left_sample, right_sample) = mixer(&self.song);

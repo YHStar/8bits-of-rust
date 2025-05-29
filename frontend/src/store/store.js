@@ -166,10 +166,12 @@ export default createStore({
 
     // state.notes
     addNote(state, note) {
+      console.log("add note %d",note.pitch)
       state.wasm_song.edit_pattern("insert", 88 - note.pitch, note.starttime, note.starttime + note.duration)
       state.notes.push(note)
     },
     deleteNote(state, note) {
+      console.log("delete note %d",note.pitch)
       state.wasm_song.edit_pattern("delete", 88 - note.pitch, note.starttime, note.starttime + note.duration)
       state.notes = state.notes.filter((n) => n.id !== note.id)
     },

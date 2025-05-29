@@ -9,6 +9,7 @@ use std::sync::LazyLock;
 use std::thread;
 use std::time::Duration;
 
+use crate::util::channel;
 use crate::Channel;
 use crate::Level;
 use crate::Midi;
@@ -302,7 +303,7 @@ pub fn mixer(song: &Song) -> (Vec<f32>, Vec<f32>) {
                     for midi in midis {
                         // log!("test_midi type: ", midi.typ, "pitch: ",FREQ_DATA[midi.note as usize] * 2.0);
                         if midi.typ == START!() as NoteType {
-                            // 若midi信号的类型是START，就设置合成器相关参数
+                            // 若midi信号的类型是START，就设置合成器相关参数,并且加入到synth_parameters中
                             synth_parameters.insert(
                                 channel_idx * 128 + midi.note as usize,
                                 SynthParameters::new(
@@ -312,12 +313,21 @@ pub fn mixer(song: &Song) -> (Vec<f32>, Vec<f32>) {
                                     &channels[channel_idx].preset,
                                     channels[channel_idx].n_poly,
                                     channels[channel_idx].be_modulated,
-                                    
+                                //这里应该添加音量包络的参数     
                                 ),
                             );
                         }
                         if midi.typ == END!() as NoteType {
-                            synth_parameters.remove(&(channel_idx * 128 + midi.note as usize));
+                            log!("End Signal");
+                            // 若midi信号的类型是END，则遍历synth_parameters，找到对应的midi信号，状态设置为Release
+                            for (note_idx,param) in synth_parameters.iter_mut() {
+                                let key = channel_idx * 128 + midi.note as usize;
+                                log!("note_idx is %d,and key is %d",*note_idx,key);
+                                if key == *note_idx {
+                                    param.note_off();
+                                }
+                            }
+                            // synth_parameters.remove(&(channel_idx * 128 + midi.note as usize));
                         }
                     }
                 }
@@ -328,8 +338,11 @@ pub fn mixer(song: &Song) -> (Vec<f32>, Vec<f32>) {
         // 一个时基内的采样
         let mut _left_sample: Vec<f32> = vec![0.0;full_samples as usize];
         let mut _right_sample: Vec<f32> = vec![0.0;full_samples as usize];
-
-        for params in synth_parameters.values() {
+        let orginal_size = synth_parameters.len();
+        synth_parameters.retain(|_note_idx,params| params.is_active);   //去除掉已经彻底结束的音符
+        let new_size = synth_parameters.len();
+        log!("old_synth_parameters size: %d,new_synth_parameters size: %d",orginal_size,new_size);
+        for params in synth_parameters.values_mut() {
             // 处理声相
             let angle = (params.pan + 1.0) * std::f32::consts::FRAC_PI_4; // 映射到[0, π/2]
             // log!(angle);
