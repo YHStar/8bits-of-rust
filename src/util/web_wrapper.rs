@@ -107,7 +107,7 @@ impl SongWrapper {
     ) {
         if self.active_pattern_index != UNEXIST_PATTERN_INDEX {
             self.song.edit_pattern(self.active_pattern_index, mode, note_idx, start_time, end_time);
-            self.pattern_content_log();
+            // self.pattern_content_log();
         }
     }
 
@@ -174,9 +174,9 @@ impl SongWrapper {
         buffer.copy_to_channel(&float_right_samples, 1)?;
 
         let source = AudioBufferSourceNode::new(&audio_ctx)?;
+        source.set_loop(true);
         source.set_buffer(Some(&buffer));
         source.connect_with_audio_node(&audio_ctx.destination())?;
-        source.set_loop(false);
         source.start()?;
 
         Ok(())

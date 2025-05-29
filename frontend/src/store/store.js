@@ -123,11 +123,11 @@ export default createStore({
       // 播放
       state.wasm_song.play();
     },
-    play_single_note(state) {
-      // 播放单个音符
-      // console.log("play single note")
-      //预览单个音符
-    },
+    // play_single_note(state) {
+    //   // 播放单个音符
+    //   // console.log("play single note")
+    //   //预览单个音符
+    // },
     pause(state) {
       // 暂停
       // console.log("pause")
@@ -250,6 +250,8 @@ export default createStore({
         note.pitch = pitch;
         note.starttime = starttime;
       }
+      //wasm播放这个音符
+      // state.wasm_song.play_single_note(note.pitch, note.starttime, note.duration)
     },
     // 更新音符持续时间：
     // 直接删除旧的音符，插入更新后的音符
