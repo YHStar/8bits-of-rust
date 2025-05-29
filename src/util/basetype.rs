@@ -1,4 +1,6 @@
 use multimap::MultiMap;
+use crate::MAX_POLY;
+use std::cell::Cell;
 
 pub type Level = i8; // 电平大小，在8bit音乐中，用有符号8位整数[-127,128]表示
 pub type Timebase = u32; // 时基
@@ -23,9 +25,47 @@ impl Clone for Midi {
     }
 }
 
-pub struct ModulateParameters { // fm调制参数
-    pub frequency: f32, //fm调制频率
-    pub range: f32, //fm调制幅度
+// --- 包络阶段定义 ---
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum EnvelopeStage {
+    Attack,
+    Decay,
+    Sustain,
+    Release,
+    Off, // 包络不活动
+}
+
+// --- 每个声音的包络状态 ---
+#[derive(Copy, Clone, Debug)]
+pub struct EnvelopeState {
+    pub stage: EnvelopeStage,
+    pub current_level: f32,
+    pub time_in_stage: FTimestamp,
+    // 在进入Release阶段时，记录当时的电平，以便从该点开始释放
+    pub level_at_release_start: f32,
+}
+
+impl Default for EnvelopeState {
+    fn default() -> Self {
+        EnvelopeState {
+            stage: EnvelopeStage::Off,
+            current_level: 0.0,
+            time_in_stage: 0.0,
+            level_at_release_start: 0.0,
+        }
+    }
+}
+
+pub struct ModulateParameters { 
+    // ========= fm调制参数 ========= //
+    pub frequency: f32, 
+    pub range: f32, 
+    // ========= 音量包络参数 ======== //
+    pub attack_time: f32, 
+    pub decay_time: f32,
+    pub sustain_level: f32,
+    pub release_time: f32,
+    pub envelope_state: Cell<EnvelopeState>,
 }
 
 pub type Score = MultiMap<Timebase, Midi>; // 乐谱类型
