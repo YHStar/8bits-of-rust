@@ -10,10 +10,18 @@ pub struct Channel {
     // score: Score,
     // pub score: Score,
     pub preset: String,// 通道预设名称
+    
     pub volume: f32, // 通道音量大小
     pub n_poly: usize, // 通道复音数
     pub pan: f32, // 通道声像
+    
     pub be_modulated: bool, // 通道中合成器声音是否经过fm调制
+
+    pub attack: f32, // 通道合成器声音的attack时间
+    pub decay: f32, // 通道合成器声音的decay时间
+    pub sustain: f32, // 通道合成器声音的sustain时间
+    pub release: f32, // 通道合成器声音的release时间
+
     pub display: Vec<Display>, // 通道的display列表
 }
 
@@ -27,6 +35,11 @@ impl Channel {
         n_poly: usize,
         pan: f32,
         be_modulated: bool,
+
+        attack: f32,
+        decay: f32,
+        sustain: f32,
+        release: f32,
     ) -> Self {
         Channel {
             name: name.to_string(),
@@ -36,20 +49,43 @@ impl Channel {
             n_poly: n_poly, // 默认复音数量
             pan: pan,       // 默认声相（0 表示居中）
             be_modulated: be_modulated,
+
+            attack: attack,
+            decay: decay,
+            sustain: sustain,
+            release: release,
+
             display: Vec::new(),
         }
-    } // new
-
-    pub fn set_preset(&mut self, index: usize, new_preset: &str){
-        self.preset = String::from(new_preset);
     }
 
-    pub fn set_volume(&mut self, index: usize, new_volume: f32){
-        self.volume = new_volume;
+    // 设置各个字段的方法
+    pub fn set_preset(&mut self, value: &str){
+        self.preset = String::from(value);
     }
 
-    pub fn set_pan(&mut self, index: usize, new_pan: f32){
-        self.pan = new_pan;
+    pub fn set_volume(&mut self, value: f32){
+        self.volume = value;
+    }
+
+    pub fn set_pan(&mut self, value: f32){
+        self.pan = value;
+    }
+
+    pub fn set_attack(&mut self, value: f32){
+        self.attack = value;
+    }
+
+    pub fn set_decay(&mut self, value: f32){
+        self.decay = value;
+    }
+
+    pub fn set_sustain(&mut self, value: f32){
+        self.sustain = value;
+    }
+
+    pub fn set_release(&mut self, value: f32){
+        self.release = value;
     }
 
     // 希望把维护display按照start time有序的工作交给前端

@@ -10,8 +10,8 @@ use crate::MAX_POLY;
 
 pub fn synth(params: &mut SynthParameters, clock: Timestamp) -> Level {
     params.update_envelope();                                                       //更新当前包络状态
-    let envelope_level = params.modulate.envelope_state.get().current_level;
-    let stage = params.modulate.envelope_state.get().stage;
+    let envelope_level = params.envelope_state.get().current_level;
+    let stage = params.envelope_state.get().stage;
 
     if stage == EnvelopeStage::Off || envelope_level <= 0.0001 {
         return 0;

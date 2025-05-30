@@ -12,13 +12,26 @@ pub struct SynthParameters {
     pub t: [Cell<FTimestamp>; MAX_POLY],
     pub delta_t: [FTimestamp; MAX_POLY],
     pub frequency: f32,
+    
     pub volume: f32,
     pub pan: f32,
+
     pub preset: String,
+    
     pub n_poly: usize,
+    
     pub is_active: bool,
+
+    // ========= fm调制参数 ========= //
     pub be_modulated: bool,
     pub modulate: ModulateParameters, // modulate: ModulateParameters,
+
+    // ========= 音量包络参数 ======== //
+    pub attack_time: f32, 
+    pub decay_time: f32,
+    pub sustain_level: f32,
+    pub release_time: f32,
+    pub envelope_state: Cell<EnvelopeState>,
 }
 
 impl SynthParameters {
@@ -29,6 +42,11 @@ impl SynthParameters {
         preset: &str,
         n_poly: usize,
         be_modulated: bool,
+
+        attack_time: f32,
+        decay_time: f32,
+        sustain_level: f32,
+        release_time: f32,
     ) -> Self {
         if frequency == 0.0 {
             panic!("Division by zero frequency");
@@ -56,52 +74,52 @@ impl SynthParameters {
             modulate: ModulateParameters {
                 frequency: 50.0,
                 range: 0.01,
-                attack_time: 0.8,
-                decay_time: 0.5,
-                sustain_level: 0.5,
-                release_time: 1.0,
-                envelope_state: envelope_state,
             },
+            envelope_state: envelope_state,
+            attack_time: attack_time,
+            decay_time: decay_time,
+            sustain_level: sustain_level,
+            release_time: release_time,
         };
         params.note_on();                       //立即调用使得音符开始
         params
     }
     pub fn note_on(&mut self) {
-        let mut env_state = self.modulate.envelope_state.get();
+        let mut env_state = self.envelope_state.get();
         env_state.stage = EnvelopeStage::Attack;
         env_state.current_level = 0.0;
         env_state.time_in_stage = 0.0;
-        self.modulate.envelope_state.set(env_state);
+        self.envelope_state.set(env_state);
         self.is_active = true;
     } //
 
     pub fn note_off(&mut self) {
-        let mut env_state = self.modulate.envelope_state.get();
+        let mut env_state = self.envelope_state.get();
         // 只有当音符确实在发声或维持时，才进入Release阶段
         if env_state.stage != EnvelopeStage::Off && env_state.stage != EnvelopeStage::Release {
             env_state.level_at_release_start = env_state.current_level;
             env_state.stage = EnvelopeStage::Release;
             env_state.time_in_stage = 0.0;
-            self.modulate.envelope_state.set(env_state);
+            self.envelope_state.set(env_state);
         }
         // is_active 保持 true 直到 Release 阶段结束
     }
 
         // 这个函数可以在 synth 调用后检查，以确定是否可以移除
     pub fn is_finished(&self) -> bool {
-        !self.is_active && self.modulate.envelope_state.get().stage == EnvelopeStage::Off
+        !self.is_active && self.envelope_state.get().stage == EnvelopeStage::Off
     }
 
          // update_envelope_state 应该作为 SynthParameters 的一个方法或被 synth 函数调用
     pub fn update_envelope(&mut self) {
-        let mut env_state = self.modulate.envelope_state.get();
+        let mut env_state = self.envelope_state.get();
         // log!("cur_level is %f",env_state.current_level);
         let dt = 1.0 / SAMPLE_RATE as FTimestamp;
 
         match env_state.stage {
             EnvelopeStage::Attack => {
-                if self.modulate.attack_time > 0.0001 {
-                    env_state.current_level += (1.0 / self.modulate.attack_time as f32) * dt as f32;
+                if self.attack_time > 0.0001 {
+                    env_state.current_level += (1.0 / self.attack_time as f32) * dt as f32;
                 } else {
                     env_state.current_level = 1.0;
                 }
@@ -113,15 +131,15 @@ impl SynthParameters {
                 }
             }
             EnvelopeStage::Decay => {
-                if self.modulate.decay_time > 0.0001 {
-                    let decay_rate = (1.0 - self.modulate.sustain_level) / self.modulate.decay_time as f32;
+                if self.decay_time > 0.0001 {
+                    let decay_rate = (1.0 - self.sustain_level) / self.decay_time as f32;
                     env_state.current_level -= decay_rate * dt as f32;
                 } else {
-                    env_state.current_level = self.modulate.sustain_level;
+                    env_state.current_level = self.sustain_level;
                 }
                 env_state.time_in_stage += dt;
-                if env_state.current_level <= self.modulate.sustain_level {
-                    env_state.current_level = self.modulate.sustain_level;
+                if env_state.current_level <= self.sustain_level {
+                    env_state.current_level = self.sustain_level;
                     env_state.stage = EnvelopeStage::Sustain;
                     env_state.time_in_stage = 0.0;
                 }
@@ -130,13 +148,13 @@ impl SynthParameters {
                 // 等待 Note Off 事件改变 stage
             }
             EnvelopeStage::Release => {
-                if self.modulate.release_time > 0.0001 { // 确保 release_time 有效且大于一个极小值
+                if self.release_time > 0.0001 { // 确保 release_time 有效且大于一个极小值
                     // env_state.time_in_stage 是自 Release 阶段开始以来已经过的时间
                     // 在第一次进入 Release 时，time_in_stage 应为 0
 
                     // 计算归一化时间 (0.0 到 1.0)
                     // FTimestamp 用于更高精度的时间计算
-                    let normalized_time = env_state.time_in_stage / self.modulate.release_time;
+                    let normalized_time = env_state.time_in_stage / self.release_time;
 
                     if normalized_time < 1.0 {
                         // 使用 (1-x)^2 的二次方衰减曲线
@@ -178,7 +196,7 @@ impl SynthParameters {
                 self.is_active = false; // 确保标记为不活动
             }
         }
-        self.modulate.envelope_state.set(env_state);
+        self.envelope_state.set(env_state);
         if env_state.stage == EnvelopeStage::Off {
             // 如果 SynthParameters 实例知道自己是否应该被移除，可以在这里做一些标记
             self.is_active = false; // 标记为不活动
