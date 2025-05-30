@@ -43,10 +43,10 @@ const props = defineProps({
     type: Number,
     default: 175,
   },
-  ratio:{
-      type: Number,
-      default: 100,
-    },
+  ratio: {
+    type: Number,
+    default: 100,
+  },
 });
 
 const emit = defineEmits(["update:modelValue"]);

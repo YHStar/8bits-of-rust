@@ -12,7 +12,7 @@ export default {
     ],
   }),
   mutations: {
-    //更新通道音量
+    // 更新通道音量
     updateVolume(state, { index, value }) {
       state.params[index].volume = value;
       // state.wasm_song.set_channel_volume(index, value);
@@ -36,14 +36,14 @@ export default {
     },
   },
   getters: {
-    // 修复getter语法
-    getN_Channels: state => state.params.length
+    getN_Channels: (state) => state.params.length,
   },
   actions: {
     // 更新通道音量（包含 WASM 操作）
-    updateVolume({ rootState }, { index, value }) {
-      console.log("Action updateVolume index = ", index, " value = ", value);      
+    updateVolume({ commit, rootState }, { index, value }) {
+      console.log("Action updateVolume index = ", index, " value = ", value);
       // 访问根状态中的 wasm_song
+      commit("updateVolume", { index, value });
       if (rootState.wasm_song) {
         rootState.wasm_song.set_channel_volume(index, value);
       } else {
@@ -51,8 +51,9 @@ export default {
       }
     },
     // 更新通道声相（包含 WASM 操作）
-    updatePan({ rootState }, { index, value }) {
+    updatePan({ commit, rootState }, { index, value }) {
       console.log("Action updatePan index = ", index, " value = ", value);
+      commit("updatePan", { index, value });
       // 访问根状态中的 wasm_song
       if (rootState.wasm_song) {
         rootState.wasm_song.set_channel_pan(index, value);
@@ -63,15 +64,17 @@ export default {
     // 初始化通道的 WASM 引用
     initChannels({ state, rootState }) {
       if (!rootState.wasm_song) {
-        console.warn("WASM song instance not available for channel initialization");
+        console.warn(
+          "WASM song instance not available for channel initialization",
+        );
         return;
       }
-      
+
       // 为每个通道设置初始值
       state.params.forEach((channel, index) => {
         rootState.wasm_song.set_channel_volume(index, channel.volume);
         rootState.wasm_song.set_channel_pan(index, channel.pan);
       });
     },
-  }
-}
+  },
+};

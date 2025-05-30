@@ -19,7 +19,7 @@ export default {
         pattern.scrollX,
         pattern.scrollY,
         pattern.scaleX,
-        pattern.scaleY
+        pattern.scaleY,
       );
     },
     deletePattern(state, id) {
@@ -46,7 +46,7 @@ export default {
         "insert",
         88 - note.pitch,
         note.starttime,
-        note.starttime + note.duration
+        note.starttime + note.duration,
       );
       state.notes.push(note);
     },
@@ -55,7 +55,7 @@ export default {
         "delete",
         88 - note.pitch,
         note.starttime,
-        note.starttime + note.duration
+        note.starttime + note.duration,
       );
       state.notes = state.notes.filter((n) => n.id !== note.id);
     },
@@ -66,13 +66,13 @@ export default {
           "delete",
           88 - note.pitch,
           note.starttime,
-          note.starttime + note.duration
+          note.starttime + note.duration,
         );
         state.wasm_song.edit_pattern(
           "insert",
           88 - pitch,
           starttime,
-          starttime + note.duration
+          starttime + note.duration,
         );
         note.pitch = pitch;
         note.starttime = starttime;
@@ -96,13 +96,13 @@ export default {
           "delete",
           88 - note.pitch,
           note.starttime,
-          note.starttime + note.duration
+          note.starttime + note.duration,
         );
         state.wasm_song.edit_pattern(
           "insert",
           88 - note.pitch,
           note.starttime,
-          note.starttime + duration
+          note.starttime + duration,
         );
 
         note.duration = duration;

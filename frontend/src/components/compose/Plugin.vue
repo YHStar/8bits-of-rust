@@ -28,7 +28,6 @@
       <my-knob
         class="label"
         v-model="synths_params[synths_active_id].release"
-
         @update:modelValue="(val) => handleReleaseChange(val)"
       />
       <my-text v-bind:content="'/ms'" />

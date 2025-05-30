@@ -14,10 +14,10 @@ export function useDragDrop(commit) {
     drop: (index) => {
       commit("sortPattern", {
         index: draggingIndex.value,
-        newIndex: index
+        newIndex: index,
       });
       draggingIndex.value = -1;
-    }
+    },
   };
 
   return { ...handlers };

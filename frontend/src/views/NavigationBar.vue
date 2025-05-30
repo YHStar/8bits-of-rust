@@ -29,7 +29,8 @@ const router = useRouter();
 // 使用计算属性获取当前路由状态
 const currentRoute = computed(() => store.state.route.currentRoute);
 
-const navigateTo = (route) => {// 提交模块化的 mutation
+const navigateTo = (route) => {
+  // 提交模块化的 mutation
   store.commit("route/setCurrentRoute", route);
   router.push(route);
 };

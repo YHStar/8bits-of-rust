@@ -74,10 +74,10 @@ export default createStore({
       console.log("Initializing WASM instance...", state.route.currentRoute);
       console.log("Channel params:", state.channel.params); // Debug channel data
       console.log("Synth params:", state.synthesiser.params); // Debug synth data
-    
+
       const channelParams = state.channel.params;
       const synthParams = state.synthesiser.params;
-      
+
       console.log("init wasm song with channels", channelParams.length);
       console.log("synth params length", synthParams[0]); // Ensure matching lengths
       // const synthParams = state.synth.params;
@@ -122,7 +122,7 @@ export default createStore({
             "insert",
             88 - note.pitch,
             note.starttime,
-            note.starttime + note.duration
+            note.starttime + note.duration,
           );
         }
       }
@@ -136,7 +136,7 @@ export default createStore({
           display.channel,
           display.patternId,
           display.duration,
-          display.starttime
+          display.starttime,
         );
       }
       state.wasm_song.sort_display();
@@ -174,7 +174,7 @@ export default createStore({
         newDisplay.channel,
         newDisplay.patternId,
         newDisplay.duration,
-        newDisplay.starttime
+        newDisplay.starttime,
       );
       state.wasm_song.sort_display();
       // console.log("display pattern")
@@ -190,7 +190,7 @@ export default createStore({
         state.wasm_song.delete_display(
           display.channel,
           display.patternId,
-          display.starttime
+          display.starttime,
         );
       }
     },
@@ -201,13 +201,13 @@ export default createStore({
         state.wasm_song.delete_display(
           display.channel,
           display.patternId,
-          display.starttime
+          display.starttime,
         );
         state.wasm_song.push_display(
           channel,
           display.patternId,
           display.duration,
-          starttime
+          starttime,
         );
         state.wasm_song.sort_display();
 
@@ -224,7 +224,7 @@ export default createStore({
           display.channel,
           display.patternId,
           display.starttime,
-          duration
+          duration,
         );
       }
     },
@@ -235,7 +235,7 @@ export default createStore({
         "insert",
         88 - note.pitch,
         note.starttime,
-        note.starttime + note.duration
+        note.starttime + note.duration,
       );
       state.notes.push(note);
     },
@@ -244,7 +244,7 @@ export default createStore({
         "delete",
         88 - note.pitch,
         note.starttime,
-        note.starttime + note.duration
+        note.starttime + note.duration,
       );
       state.notes = state.notes.filter((n) => n.id !== note.id);
     },
@@ -255,13 +255,13 @@ export default createStore({
           "delete",
           88 - note.pitch,
           note.starttime,
-          note.starttime + note.duration
+          note.starttime + note.duration,
         );
         state.wasm_song.edit_pattern(
           "insert",
           88 - pitch,
           starttime,
-          starttime + note.duration
+          starttime + note.duration,
         );
         note.pitch = pitch;
         note.starttime = starttime;
@@ -285,13 +285,13 @@ export default createStore({
           "delete",
           88 - note.pitch,
           note.starttime,
-          note.starttime + note.duration
+          note.starttime + note.duration,
         );
         state.wasm_song.edit_pattern(
           "insert",
           88 - note.pitch,
           note.starttime,
-          note.starttime + duration
+          note.starttime + duration,
         );
 
         note.duration = duration;
@@ -336,7 +336,7 @@ export default createStore({
         pattern.scrollX,
         pattern.scrollY,
         pattern.scaleX,
-        pattern.scaleY
+        pattern.scaleY,
       );
     },
     deletePattern(state, id) {
@@ -432,11 +432,11 @@ export default createStore({
       const ZOOM_FACTOR = 0.1;
       state.pianoroll_scaleX = Math.max(
         0.1,
-        state.pianoroll_scaleX + deltaX * ZOOM_FACTOR
+        state.pianoroll_scaleX + deltaX * ZOOM_FACTOR,
       );
       state.pianoroll_scaleY = Math.max(
         0.1,
-        state.pianoroll_scaleY + deltaY * ZOOM_FACTOR
+        state.pianoroll_scaleY + deltaY * ZOOM_FACTOR,
       );
     },
 

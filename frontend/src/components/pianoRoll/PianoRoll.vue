@@ -23,7 +23,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { useScrollHandler } from './scrollState'; // 导入封装模块
+import { useScrollHandler } from "./scrollState"; // 导入封装模块
 
 import PianoKeys from "./PianoKeys.vue";
 import Score from "./Score.vue";
@@ -40,11 +40,11 @@ const n_bars = ref(16);
 const beats = computed(() => 16 + 1);
 
 const headerBarStyle = computed(() => ({
-  width: `${100 + 5 + 200 * n_bars.value}px`
+  width: `${100 + 5 + 200 * n_bars.value}px`,
 }));
 
 const getBeatStyle = (beat) => ({
-  left: `${80 - 3 + (beat - 1) * 200}px`
+  left: `${80 - 3 + (beat - 1) * 200}px`,
 });
 </script>
 

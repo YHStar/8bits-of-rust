@@ -44,11 +44,11 @@
 import { ref, computed } from "vue";
 import { useStore } from "vuex";
 import { useColorGenerator } from "@/components/common/ColorGenerator.js";
-import {useDragDrop} from "./dragDrop";
+import { useDragDrop } from "./dragDrop";
 
 const { getRandomColor } = useColorGenerator();
 const store = useStore();
-const {dragStart, allowDrop, drop} = useDragDrop(store.commit);
+const { dragStart, allowDrop, drop } = useDragDrop(store.commit);
 const patterns = computed(() => store.state.patterns);
 const activePattern = computed(() => store.state.activePattern);
 // 是否正在编辑
