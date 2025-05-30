@@ -2,14 +2,14 @@
 import { createStore } from "vuex";
 import createPersistedState from "vuex-persistedstate";
 import { SongWrapper, init_panic_hook } from "eight_bits_of_rust";
-import route from './modules/route';
-import pattern from './modules/pattern';
-import channel from './modules/channel';
-import synth from './modules/synth';
-import song from './modules/song';
-import display from './modules/display';
-import pianoroll from './modules/pianorolls';
-import exportModule from './modules/export';
+import route from "./modules/route";
+import pattern from "./modules/pattern";
+import channel from "./modules/channel";
+import synthesiser from "./modules/synthesiser";
+import song from "./modules/song";
+import display from "./modules/display";
+import pianoroll from "./modules/pianorolls";
+import exportsongs from "./modules/exportsongs";
 
 export default createStore({
   state: {
@@ -18,11 +18,11 @@ export default createStore({
     // pattern列表
     patterns: [],
     // 歌曲列表
-    songs: [],
+    // songs: [],
     // display列表
     displays: [],
 
-   // 当前路径
+    // 当前路径
     // currentRoute: "/",
     //被激活的页面
     // activeComposePage: "plugin",
@@ -38,13 +38,13 @@ export default createStore({
     //   { name: "noise", volume: 0.2, pan: 0 },
     // ],
     //synthesiser状态
-    synths_params: [
-      { preset: "square", n_poly: 1, be_modulated: true, attack : 0, decay : 0.1, sustain : 0.5, release : 0.1 },
-      { preset: "saw", n_poly: 1, be_modulated: true, attack : 0, decay : 0.1, sustain : 0.5, release : 0.1  },
-      { preset: "spike", n_poly: 1, be_modulated: true, attack : 0, decay : 0.1, sustain : 0.5, release : 0.1  },
-      { preset: "triangle", n_poly: 1, be_modulated: true, attack : 0, decay : 0.1, sustain : 0.5, release : 0.1 },
-      { preset: "noise", n_poly: 1, be_modulated: true, attack : 0, decay : 0.1, sustain : 0.5, release : 0.1  },
-    ],
+    // synths_params: [
+    //   { preset: "square", n_poly: 1, be_modulated: true, attack : 0, decay : 0.1, sustain : 0.5, release : 0.1 },
+    //   { preset: "saw", n_poly: 1, be_modulated: true, attack : 0, decay : 0.1, sustain : 0.5, release : 0.1  },
+    //   { preset: "spike", n_poly: 1, be_modulated: true, attack : 0, decay : 0.1, sustain : 0.5, release : 0.1  },
+    //   { preset: "triangle", n_poly: 1, be_modulated: true, attack : 0, decay : 0.1, sustain : 0.5, release : 0.1 },
+    //   { preset: "noise", n_poly: 1, be_modulated: true, attack : 0, decay : 0.1, sustain : 0.5, release : 0.1  },
+    // ],
     //piano roll状态
     pianoroll_scrollX: 0, // 横向滚动位置
     pianoroll_scrollY: 0, // 纵向滚动位置
@@ -55,8 +55,8 @@ export default createStore({
     selectedNotes: new Set(),
     separatorPosition: 300,
 
-    exportFormat: "",
-    songName: "",
+    // exportFormat: "",
+    // songName: "",
     estimated_space: 0,
 
     scrollX: 0,
@@ -66,29 +66,41 @@ export default createStore({
   },
   mutations: {
     // WASM相关
-    
+
     initWasmInstance(state) {
       // 初始化错误捕捉函数并初始化wasm实例
       init_panic_hook();
       state.wasm_song = SongWrapper.new("TMP");
       console.log("Initializing WASM instance...", state.route.currentRoute);
-      console.log("Initializing WASM instance...", state.channel.test);
-
-      // 先创建channel
+      console.log("Channel params:", state.channel.params); // Debug channel data
+      console.log("Synth params:", state.synthesiser.params); // Debug synth data
+    
       const channelParams = state.channel.params;
-      console.log("init wasm song with channels", channelParams[0].name);
+      const synthParams = state.synthesiser.params;
+      
+      console.log("init wasm song with channels", channelParams.length);
+      console.log("synth params length", synthParams[0]); // Ensure matching lengths
       // const synthParams = state.synth.params;
       // const patternState = state.pattern;
-
       for (var i = 0; i < channelParams.length; ++i) {
-        // console.log(i, channelParams[i].name, channelParams[i].volume, channelParams[i].pan);
+        // for (var i = 0; i < 2; ++i) {
+        // console.log("channelParams: ", i, channelParams[i].name, channelParams[i].volume, channelParams[i].pan);
+        // console.log("synthParams: ", synthParams[i].preset, synthParams[i].n_poly, synthParams[i].be_modulated);
         state.wasm_song.new_channel(
           channelParams[i].name,
+
           channelParams[i].volume,
           channelParams[i].pan,
-          state.synths_params[i].preset,
-          state.synths_params[i].n_poly,
-          state.synths_params[i].be_modulated,
+
+          synthParams[i].preset,
+          synthParams[i].n_poly,
+
+          synthParams[i].be_modulated,
+
+          synthParams[i].attack,
+          synthParams[i].decay,
+          synthParams[i].sustain,
+          synthParams[i].release,
         );
       }
 
@@ -110,7 +122,7 @@ export default createStore({
             "insert",
             88 - note.pitch,
             note.starttime,
-            note.starttime + note.duration,
+            note.starttime + note.duration
           );
         }
       }
@@ -124,7 +136,7 @@ export default createStore({
           display.channel,
           display.patternId,
           display.duration,
-          display.starttime,
+          display.starttime
         );
       }
       state.wasm_song.sort_display();
@@ -162,7 +174,7 @@ export default createStore({
         newDisplay.channel,
         newDisplay.patternId,
         newDisplay.duration,
-        newDisplay.starttime,
+        newDisplay.starttime
       );
       state.wasm_song.sort_display();
       // console.log("display pattern")
@@ -178,7 +190,7 @@ export default createStore({
         state.wasm_song.delete_display(
           display.channel,
           display.patternId,
-          display.starttime,
+          display.starttime
         );
       }
     },
@@ -189,13 +201,13 @@ export default createStore({
         state.wasm_song.delete_display(
           display.channel,
           display.patternId,
-          display.starttime,
+          display.starttime
         );
         state.wasm_song.push_display(
           channel,
           display.patternId,
           display.duration,
-          starttime,
+          starttime
         );
         state.wasm_song.sort_display();
 
@@ -212,7 +224,7 @@ export default createStore({
           display.channel,
           display.patternId,
           display.starttime,
-          duration,
+          duration
         );
       }
     },
@@ -223,7 +235,7 @@ export default createStore({
         "insert",
         88 - note.pitch,
         note.starttime,
-        note.starttime + note.duration,
+        note.starttime + note.duration
       );
       state.notes.push(note);
     },
@@ -232,7 +244,7 @@ export default createStore({
         "delete",
         88 - note.pitch,
         note.starttime,
-        note.starttime + note.duration,
+        note.starttime + note.duration
       );
       state.notes = state.notes.filter((n) => n.id !== note.id);
     },
@@ -243,13 +255,13 @@ export default createStore({
           "delete",
           88 - note.pitch,
           note.starttime,
-          note.starttime + note.duration,
+          note.starttime + note.duration
         );
         state.wasm_song.edit_pattern(
           "insert",
           88 - pitch,
           starttime,
-          starttime + note.duration,
+          starttime + note.duration
         );
         note.pitch = pitch;
         note.starttime = starttime;
@@ -273,13 +285,13 @@ export default createStore({
           "delete",
           88 - note.pitch,
           note.starttime,
-          note.starttime + note.duration,
+          note.starttime + note.duration
         );
         state.wasm_song.edit_pattern(
           "insert",
           88 - note.pitch,
           note.starttime,
-          note.starttime + duration,
+          note.starttime + duration
         );
 
         note.duration = duration;
@@ -297,7 +309,7 @@ export default createStore({
         pattern.scrollX = state.pianoroll_scrollX;
         pattern.scrollY = state.pianoroll_scrollY;
         pattern.scaleX = state.pianoroll_scaleX;
-        pattern.scaleY = state.pianoroll_scaleY;        
+        pattern.scaleY = state.pianoroll_scaleY;
       }
     },
     loadNotes(state) {
@@ -324,7 +336,7 @@ export default createStore({
         pattern.scrollX,
         pattern.scrollY,
         pattern.scaleX,
-        pattern.scaleY,
+        pattern.scaleY
       );
     },
     deletePattern(state, id) {
@@ -347,59 +359,59 @@ export default createStore({
     },
 
     // state.songs
-    addSong(state, song) {
-      state.songs.push(song);
-      // state.rust_songs.push(songWrapper.new(song))
-    },
-    deleteSong(state, index) {
-      state.songs.splice(index, 1);
-      // state.rust_songs.splice(index, 1)
-    },
-    setSongName(state, name) {
-      state.songName = name;
-    },
+    // addSong(state, song) {
+    //   state.songs.push(song);
+    //   // state.rust_songs.push(songWrapper.new(song))
+    // },
+    // deleteSong(state, index) {
+    //   state.songs.splice(index, 1);
+    //   // state.rust_songs.splice(index, 1)
+    // },
+    // setSongName(state, name) {
+    //   state.songName = name;
+    // },
 
-    //synthesizer状态相关
-    setAttack(state, { index, value }) {
-      state.synths_params[index].attack = value;
-      // console.log(
-      //   "setAttack index = ",
-      //   index,
-      //   " value = ",
-      //   state.synths_params[index].attack,
-      // );
-      state.wasm_song.set_synth_attack(index, value);
-    },
-    setDecay(state, { index, value }) {
-      state.synths_params[index].dscay = value;
-      // console.log(
-      //   "setDecay index = ",
-      //   index,
-      //   " value = ",
-      //   state.synths_params[index].decay,
-      // );
-      state.wasm_song.set_synth_decay(index, value);
-    },
-    setSustain(state, { index, value }) {
-      state.synths_params[index].sustain = value;
-      // console.log(
-      //   "setSustain index = ",
-      //   index,
-      //   " value = ",
-      //   state.synths_params[index].sustain,
-      // );
-      state.wasm_song.set_synth_sustain(index, value);
-    },
-    setRelease(state, { index, value }) {
-      state.synths_params[index].release = value;
-      // console.log(
-      //   "setRelease index = ",
-      //   index,
-      //   " value = ",
-      //   state.synths_params[index].release,
-      // );
-      state.wasm_song.set_synth_release(index, value);
-    },
+    // //synthesizer状态相关
+    // setAttack(state, { index, value }) {
+    //   state.synths_params[index].attack = value;
+    //   // console.log(
+    //   //   "setAttack index = ",
+    //   //   index,
+    //   //   " value = ",
+    //   //   state.synths_params[index].attack,
+    //   // );
+    //   state.wasm_song.set_synth_attack(index, value);
+    // },
+    // setDecay(state, { index, value }) {
+    //   state.synths_params[index].dscay = value;
+    //   // console.log(
+    //   //   "setDecay index = ",
+    //   //   index,
+    //   //   " value = ",
+    //   //   state.synths_params[index].decay,
+    //   // );
+    //   state.wasm_song.set_synth_decay(index, value);
+    // },
+    // setSustain(state, { index, value }) {
+    //   state.synths_params[index].sustain = value;
+    //   // console.log(
+    //   //   "setSustain index = ",
+    //   //   index,
+    //   //   " value = ",
+    //   //   state.synths_params[index].sustain,
+    //   // );
+    //   state.wasm_song.set_synth_sustain(index, value);
+    // },
+    // setRelease(state, { index, value }) {
+    //   state.synths_params[index].release = value;
+    //   // console.log(
+    //   //   "setRelease index = ",
+    //   //   index,
+    //   //   " value = ",
+    //   //   state.synths_params[index].release,
+    //   // );
+    //   state.wasm_song.set_synth_release(index, value);
+    // },
 
     // 钢琴窗相关状态
 
@@ -420,11 +432,11 @@ export default createStore({
       const ZOOM_FACTOR = 0.1;
       state.pianoroll_scaleX = Math.max(
         0.1,
-        state.pianoroll_scaleX + deltaX * ZOOM_FACTOR,
+        state.pianoroll_scaleX + deltaX * ZOOM_FACTOR
       );
       state.pianoroll_scaleY = Math.max(
         0.1,
-        state.pianoroll_scaleY + deltaY * ZOOM_FACTOR,
+        state.pianoroll_scaleY + deltaY * ZOOM_FACTOR
       );
     },
 
@@ -442,9 +454,9 @@ export default createStore({
     clearSelection(state) {
       state.selectedNotes.clear();
     },
-    setExportFormat(state, format) {
-      state.exportFormat = format;
-    },
+    // setExportFormat(state, format) {
+    //   state.exportFormat = format;
+    // },
   },
   getters: {
     getActivePattern: (state) =>
@@ -455,11 +467,11 @@ export default createStore({
     channel,
 
     // pattern,
-    // synth,
-    // song,
+    synthesiser,
+    song,
     // display,
     // pianoroll,
-    // export: exportModule
-},
+    exportsongs,
+  },
   plugins: [createPersistedState()],
 });
