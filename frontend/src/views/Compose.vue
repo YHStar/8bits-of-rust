@@ -4,22 +4,22 @@
     <div class="container">
       <my-button
         text="插件"
-        :active="$store.state.activeComposePage === 'plugin'"
+        :active="isComposePage('plugin')"
         @click="changeComposePage('plugin')"
       />
       <my-button
         text="混音台"
-        :active="$store.state.activeComposePage === 'mixer'"
+        :active="isComposePage('mixer')"
         @click="changeComposePage('mixer')"
       />
       <my-button
         text="编曲"
-        :active="$store.state.activeComposePage === 'arrangement'"
+        :active="isComposePage('arrangement')"
         @click="changeComposePage('arrangement')"
       />
       <my-button
         text="导出歌曲"
-        :active="$store.state.activeComposePage === 'export'"
+        :active="isComposePage('export')"
         @click="changeComposePage('export')"
       />
       <play-unit class="play-unit" />
@@ -48,11 +48,11 @@ import PlayUnit from "@/components/playUnit/PlayUnit.vue";
 const store = useStore();
 
 const isComposePage = computed(
-  () => (page) => store.state.activeComposePage === page,
+  () => (page) => store.state.route.activeComposePage === page,
 );
 
 const changeComposePage = (page) => {
-  store.commit("setActiveComposePage", page);
+  store.commit("route/setActiveComposePage", page);
 };
 </script>
 
