@@ -44,21 +44,21 @@ import { useStore } from "vuex";
 const store = useStore();
 
 const songName = computed({
-  get: () => store.state.songName,
-  set: (value) => store.commit("setSongName", value),
+  get: () => store.state.exportsongs.songName,
+  set: (value) => store.commit("exportsongs/setSongName", value),
 });
 
 const exportFormat = computed({
-  get: () => store.state.exportFormat,
-  set: (value) => store.commit("setExportFormat", value),
+  get: () => store.state.exportsongs.format,
+  set: (value) => store.commit("exportsongs/setFormat", value),
 });
 
 const exportBitWidth = computed({
-  get: () => store.state.exportBitWidth,
-  set: (value) => store.commit("setExportBitWidth", value),
+  get: () => store.state.exportsongs.bitWidth,
+  set: (value) => store.commit("exportsongs/setBitWidth", value),
 });
 
-const estimated_space = computed(() => store.state.estimated_space);
+const estimated_space = computed(() => store.state.exportsongs.estimated_space);
 </script>
 <style scoped>
 .container {
