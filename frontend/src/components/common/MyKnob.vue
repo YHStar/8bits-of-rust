@@ -11,7 +11,7 @@
   >
     <div class="round_right" :style="{ transform: `rotate(${ang}deg)` }"></div>
     <div class="round_num">
-      <my-text :content="String(parseInt(100 * modelValue))" />
+      <my-text :content="String(parseInt(ratio * modelValue))" />
     </div>
   </div>
 </template>
@@ -33,7 +33,7 @@ const props = defineProps({
   },
   maxVal: {
     type: Number,
-    default: 1000,
+    default: 1,
   },
   minAng: {
     type: Number,
@@ -43,6 +43,10 @@ const props = defineProps({
     type: Number,
     default: 175,
   },
+  ratio:{
+      type: Number,
+      default: 100,
+    },
 });
 
 const emit = defineEmits(["update:modelValue"]);
