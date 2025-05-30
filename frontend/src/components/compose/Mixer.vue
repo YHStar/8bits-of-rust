@@ -54,16 +54,16 @@ const store = useStore();
 // 状态映射
 const n_channels = computed(() => store.state.channels_params.length);
 const channels_params = computed({
-  get: () => store.state.channels_params,
-  set: (value) => store.commit("setchannelparams", value),
+  get: () => store.state.channel.params,
+  set: (value) => store.dispatch("channel/setChannelParams", value),
 });
 
 const handleVolumeChange = (index, value) => {
-  store.commit("updateVolume", { index, value });
+  store.dispatch("channel/updateVolume", { index, value });
 };
 
 const handlePanChange = (index, value) => {
-  store.commit("updatePan", { index, value });
+  store.dispatch("channel/updatePan", { index, value });
 };
 // const n_channels = ref(5)
 // const volumes = ref([80, 80, 80, 80, 80])
