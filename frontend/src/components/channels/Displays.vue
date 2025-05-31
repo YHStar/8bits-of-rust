@@ -1,4 +1,4 @@
-<!-- pattern��channel�е�չʾ״̬ -->
+<!-- pattern显示在channel中 -->
 <template>
   <div
     @mousedown.left="handleCanvasMouseLeftDown"
