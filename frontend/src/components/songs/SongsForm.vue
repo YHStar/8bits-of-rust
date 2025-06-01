@@ -8,28 +8,29 @@
         @click="addItem"
         text="添加歌曲"
         class="add-btn"
-        size="medium" />
+        size="medium"
+      />
     </div>
     <SongsList ref="songsListRef" />
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue"
-import SongsList from "./SongsList.vue"
+import { ref } from "vue";
+import SongsList from "./SongsList.vue";
 
-const songName = ref("")
-const songsListRef = ref(null)
+const songName = ref("");
+const songsListRef = ref(null);
 
 // 检查并提交歌曲名字
 const addItem = () => {
   if (songName.value.trim()) {
-    songsListRef.value.addItem(songName.value)
+    songsListRef.value.addItem(songName.value);
   } else {
-    songsListRef.value.addItem("untitled")
+    songsListRef.value.addItem("untitled");
   }
-  songName.value = ""
-}
+  songName.value = "";
+};
 </script>
 
 <style scoped>

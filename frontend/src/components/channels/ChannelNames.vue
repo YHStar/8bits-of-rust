@@ -5,7 +5,8 @@
       v-for="i in proxy.CHANNEL_RANGE"
       :key="i"
       class="key"
-      :style="{ top: (i - 1) * 50 + 'px' }">
+      :style="{ top: (i - 1) * 50 + 'px' }"
+    >
       <my-text
         :content="'通道' + i"
         :style="{
@@ -13,14 +14,15 @@
           justifyContent: 'center',
           alignItems: 'center',
           height: '50px',
-        }" />
+        }"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { getCurrentInstance } from "vue"
-const { proxy } = getCurrentInstance()
+import { getCurrentInstance } from "vue";
+const { proxy } = getCurrentInstance();
 </script>
 
 <style scoped>

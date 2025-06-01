@@ -60,12 +60,6 @@ pub struct ModulateParameters {
     // ========= fm调制参数 ========= //
     pub frequency: f32, 
     pub range: f32, 
-    // ========= 音量包络参数 ======== //
-    pub attack_time: f32, 
-    pub decay_time: f32,
-    pub sustain_level: f32,
-    pub release_time: f32,
-    pub envelope_state: Cell<EnvelopeState>,
 }
 
 pub type Score = MultiMap<Timebase, Midi>; // 乐谱类型

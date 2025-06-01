@@ -1,13 +1,14 @@
 <!-- 钢琴窗组件 -->
 <template>
   <div></div>
-  <div class="roll">
+  <div class="roll" ref="rollContainer" @scroll="handleScroll">
     <div class="header-bar" :style="headerBarStyle">
       <span
         v-for="beat in beats"
         :key="'h' + beat"
         :style="getBeatStyle(beat)"
-        class="c-label">
+        class="c-label"
+      >
         {{ beat - 1 }}
       </span>
     </div>
@@ -21,20 +22,30 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue"
-import PianoKeys from "./PianoKeys.vue"
-import Score from "./Score.vue"
+import { ref, computed } from "vue";
+import { useScrollHandler } from "./scrollState"; // 导入封装模块
 
-const n_bars = ref(16)
-const beats = computed(() => 16 + 1)
+import PianoKeys from "./PianoKeys.vue";
+import Score from "./Score.vue";
+
+const rollContainer = ref(null);
+const { setupLifecycle, setupStateWatcher } = useScrollHandler(rollContainer);
+
+// 初始化生命周期和状态监听
+setupLifecycle();
+setupStateWatcher();
+
+// 以下保持原有结构不变
+const n_bars = ref(16);
+const beats = computed(() => 16 + 1);
 
 const headerBarStyle = computed(() => ({
   width: `${100 + 5 + 200 * n_bars.value}px`,
-}))
+}));
 
 const getBeatStyle = (beat) => ({
   left: `${80 - 3 + (beat - 1) * 200}px`,
-})
+});
 </script>
 
 <style scoped>

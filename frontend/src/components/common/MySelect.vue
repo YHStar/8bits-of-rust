@@ -7,9 +7,10 @@
     </div>
     <div v-show="isOpen" class="dropdown-options">
       <div
-        v-for="(option, index) in options"
+        v-for="option in options"
         class="option"
-        @click.stop="selectOption(option)">
+        @click.stop="selectOption(option)"
+      >
         <my-text :content="option.label" size="medium" />
       </div>
     </div>
@@ -17,10 +18,11 @@
 </template>
 
 <script>
-export default { name: "MySelect" }
+export default { name: "MySelect" };
 </script>
+
 <script setup>
-import { ref, watch } from "vue"
+import { ref, watch } from "vue";
 
 const props = defineProps({
   options: {
@@ -29,36 +31,81 @@ const props = defineProps({
     validator: (value) =>
       value.every((opt) => "value" in opt && "label" in opt),
   },
-  value: {
+  modelValue: {
     type: [String, Number],
     default: "",
   },
-})
+});
 
-const emit = defineEmits(["input"])
+const emit = defineEmits(["update:modelValue"]);
 
-const isOpen = ref(false)
-const selectedLabel = ref("")
+const isOpen = ref(false);
+const selectedLabel = ref("请选择……");
 
 watch(
-  () => props.value,
+  () => props.modelValue,
   (newVal) => {
-    const selected = props.options.find((opt) => opt.value === newVal)
-    selectedLabel.value = selected ? selected.label : ""
+    const selected = props.options.find((opt) => opt.value === newVal);
+    selectedLabel.value = selected ? selected.label : "";
   },
   { immediate: true },
-)
+);
 
 const toggleDropdown = () => {
-  isOpen.value = !isOpen.value
-}
+  isOpen.value = !isOpen.value;
+};
 
 const selectOption = (option) => {
-  emit("input", option.value)
-  selectedLabel.value = option.label
-  isOpen.value = false
-}
+  // 添加防御性检查 - 确保 option 和 option.value 存在
+  if (option && option.value !== undefined && option.value !== null) {
+    emit("update:modelValue", option.value);
+    selectedLabel.value = option.label || props.options[0]?.label || "请选择...";
+  } else {
+    console.error("Invalid option selected:", option);
+  }
+  isOpen.value = false;
+};
 </script>
+<!-- <script setup>
+import { ref, watch } from "vue";
+
+const props = defineProps({
+  options: {
+    type: Array,
+    required: true,
+    validator: (value) =>
+      value.every((opt) => "value" in opt && "label" in opt),
+  },
+  modelValue: { 
+    type: [String, Number],
+    default: "",
+  },
+});
+
+const emit = defineEmits(["update:modelValue"]);
+
+const isOpen = ref(false);
+const selectedLabel = ref("请选择");
+
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    const selected = props.options.find((opt) => opt.value === newVal);
+    selectedLabel.value = selected ? selected.label : "";
+  },
+  { immediate: true },
+);
+
+const toggleDropdown = () => {
+  isOpen.value = !isOpen.value;
+};
+
+const selectOption = (option) => {
+  emit("update:modelValue", option.value);
+  selectedLabel.value = option.label;
+  isOpen.value = false;
+};
+</script> -->
 
 <style scoped>
 .pixel-select {
@@ -102,4 +149,3 @@ const selectOption = (option) => {
   padding: 8px;
 }
 </style>
-

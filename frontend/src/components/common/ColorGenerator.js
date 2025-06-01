@@ -1,5 +1,5 @@
 // 颜色生成器
-import { reactive } from "vue"
+import { reactive } from "vue";
 
 export function useColorGenerator() {
   const COMMON_COLORS = reactive({
@@ -29,7 +29,7 @@ export function useColorGenerator() {
       "#f5f5dc", //浅米色
       "#D3C0B2", // 浅卡其灰
     ],
-  })
+  });
 
   const methods = {
     /**
@@ -41,8 +41,8 @@ export function useColorGenerator() {
         ...COMMON_COLORS.warm,
         ...COMMON_COLORS.cool,
         ...COMMON_COLORS.neutral,
-      ]
-      return allColors[Math.floor(Math.random() * allColors.length)]
+      ];
+      return allColors[Math.floor(Math.random() * allColors.length)];
     },
     /**
      * 按色系获取随机颜色
@@ -50,11 +50,11 @@ export function useColorGenerator() {
      * @returns {Object} hex
      */
     getRandomByTone(toneType) {
-      const colors = COMMON_COLORS[toneType] || []
+      const colors = COMMON_COLORS[toneType] || [];
       return (
         colors[Math.floor(Math.random() * colors.length)] ||
         this.getRandomColor()
-      )
+      );
     },
 
     /**
@@ -62,25 +62,25 @@ export function useColorGenerator() {
      * @returns {Array} 包含协调颜色的数组
      */
     getGradientGroup() {
-      const baseColor = this.getRandomColor()
+      const baseColor = this.getRandomColor();
       return [
         baseColor,
         this._findComplementary(baseColor),
         this._findAnalogous(baseColor),
-      ].filter(Boolean)
+      ].filter(Boolean);
     },
 
     // 私有方法：寻找补色
     _findComplementary(base) {
       // 色相环补色算法（略）
-      return COMMON_COLORS.cool.find((c) => c.hex !== base.hex)
+      return COMMON_COLORS.cool.find((c) => c.hex !== base.hex);
     },
 
     // 私有方法：寻找类似色
     _findAnalogous(base) {
       // 类似色选择算法（略）
-      return COMMON_COLORS.warm.find((c) => c.hex !== base.hex)
+      return COMMON_COLORS.warm.find((c) => c.hex !== base.hex);
     },
-  }
-  return { ...methods, COMMON_COLORS }
+  };
+  return { ...methods, COMMON_COLORS };
 }

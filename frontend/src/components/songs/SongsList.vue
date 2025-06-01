@@ -1,4 +1,3 @@
-
 <!-- 歌曲列表逻辑 -->
 <template>
   <div class="main-container">
@@ -26,39 +25,39 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue"
-import { useStore } from "vuex"
-import { getCurrentInstance } from "vue"
-const { proxy } = getCurrentInstance()
+import { ref, computed, onMounted } from "vue";
+import { useStore } from "vuex";
+import { getCurrentInstance } from "vue";
+const { proxy } = getCurrentInstance();
 
-const store = useStore()
-const songs = computed(() => store.state.songs)
+const store = useStore();
+const songs = computed(() => store.state.song.songs);
 // 获取间格式化的时间
 const getCurrentTime = () =>
-  new Date().toISOString().slice(0, 16).replace("T", " ")
+  new Date().toISOString().slice(0, 16).replace("T", " ");
 
 // 检查歌曲数量上限并添加歌曲
 const addItem = (name) => {
-  console.log("add", songs.value.length)
+  console.log("add", songs.length);
   if (songs.value.length >= proxy.MAX_SONG_NUM) {
-    alert("歌曲数量达到上限！")
+    alert("歌曲数量达到上限！");
   } else {
-    store.commit("addSong", {
+    store.commit("song/addSong", {
       name: name,
       date: getCurrentTime(),
-    })
+    });
   }
-}
+};
 
 // 删除歌曲
 const deleteItem = (index) => {
   if (confirm("确定删除这首歌曲吗？")) {
-    store.commit("deleteSong", index)
+    store.commit("song/deleteSong", index);
   }
-}
+};
 
 defineExpose({
   addItem,
   deleteItem,
-})
+});
 </script>

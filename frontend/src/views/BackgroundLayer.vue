@@ -18,7 +18,6 @@
   z-index: -1;
 }
 
-
 .background-layer1 {
   position: fixed;
   top: 0;
@@ -29,8 +28,7 @@
   z-index: -1;
   background-size: cover;
   background-repeat: no-repeat;
-  background-attachment:fixed;
-
+  background-attachment: fixed;
 }
 
 .container {

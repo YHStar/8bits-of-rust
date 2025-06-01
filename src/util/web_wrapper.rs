@@ -19,7 +19,8 @@ pub struct SongWrapper {
 impl SongWrapper {
     pub fn new(name: &str) -> Self {
         SongWrapper {
-            song: Song::new(name),
+            song: Song::new(name, 
+                0),
             active_pattern_index: UNEXIST_PATTERN_INDEX,
         }
     } // fn new
@@ -36,11 +37,17 @@ impl SongWrapper {
         pan: f32,
 
         preset: &str,
+
         n_poly: usize,
         be_modulated: bool,
+
+        attack: f32,
+        decay: f32,
+        sustain: f32,
+        release: f32,
     ) {
-        log!(name);
-        self.song.new_channel(name, preset, volume, n_poly, pan, be_modulated);
+        log!(name, preset);
+        self.song.new_channel(name, preset, volume, n_poly, pan, be_modulated, attack, decay, sustain, release);
     } // fn new_channel
 
 
@@ -48,16 +55,36 @@ impl SongWrapper {
         self.song.clear();
     }
 
-    pub fn set_channel_preset(&mut self, index: usize, new_preset: &str){
-        self.song.set_channel_preset(index, new_preset);
+    pub fn set_synth_preset(&mut self, value: &str){
+        self.song.set_synth_preset(value);
     }
 
-    pub fn set_channel_volume(&mut self, index: usize, new_volume: f32){
-        self.song.set_channel_volume(index, new_volume);
+    pub fn set_channel_volume(&mut self, index: usize, value: f32){
+        self.song.set_channel_volume(index, value);
     }
 
-    pub fn set_channel_pan(&mut self, index: usize, new_pan: f32){
-        self.song.set_channel_pan(index, new_pan);
+    pub fn set_channel_pan(&mut self, index: usize, value: f32){
+        self.song.set_channel_pan(index, value);
+    }
+
+    pub fn set_synth_attack(&mut self, value: f32){
+        self.song.set_synth_attack(value);
+    }
+
+    pub fn set_synth_decay(&mut self, value: f32){
+        self.song.set_synth_decay(value);
+    }
+
+    pub fn set_synth_sustain(&mut self, value: f32){
+        self.song.set_synth_sustain(value);
+    }
+
+    pub fn set_synth_release(&mut self, value: f32){
+        self.song.set_synth_release(value);
+    }
+
+    pub fn set_active_synth_id(&mut self, value: usize){
+        self.song.set_active_synth_id(value);
     }
 
     pub fn clear_pattern_notes(&mut self) {
@@ -108,7 +135,7 @@ impl SongWrapper {
         log!("edit pattern!");
         if self.active_pattern_index != UNEXIST_PATTERN_INDEX {
             self.song.edit_pattern(self.active_pattern_index, mode, note_idx, start_time, end_time);
-            self.pattern_content_log();
+            // self.pattern_content_log();
         }
     }
 
@@ -176,6 +203,7 @@ impl SongWrapper {
         buffer.copy_to_channel(&float_right_samples, 1)?;
 
         let source = AudioBufferSourceNode::new(&audio_ctx)?;
+        source.set_loop(true);
         source.set_buffer(Some(&buffer));
         source.connect_with_audio_node(&audio_ctx.destination())?;
         source.set_loop(false);

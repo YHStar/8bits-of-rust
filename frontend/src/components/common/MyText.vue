@@ -6,10 +6,10 @@
 <script>
 export default {
   name: "MyText",
-}
+};
 </script>
 <script setup>
-import { computed } from "vue"
+import { computed } from "vue";
 
 const props = defineProps({
   content: String,
@@ -18,9 +18,9 @@ const props = defineProps({
     default: "medium",
     validator: (v) => ["small", "medium", "large"].includes(v),
   },
-})
+});
 
-const sizeClass = computed(() => `text-${props.size}`)
+const sizeClass = computed(() => `text-${props.size}`);
 </script>
 
 <style>

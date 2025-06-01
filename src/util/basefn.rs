@@ -313,7 +313,11 @@ pub fn mixer(song: &Song) -> (Vec<f32>, Vec<f32>) {
                                     &channels[channel_idx].preset,
                                     channels[channel_idx].n_poly,
                                     channels[channel_idx].be_modulated,
-                                //这里应该添加音量包络的参数     
+                                    channels[channel_idx].attack,
+                                    channels[channel_idx].decay,
+                                    channels[channel_idx].sustain,
+                                    channels[channel_idx].release,
+                                    //这里应该添加音量包络的参数     
                                 ),
                             );
                         }

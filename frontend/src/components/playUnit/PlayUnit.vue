@@ -2,21 +2,24 @@
 <template>
   <div class="play-unit">
     <div class="container1">
-      <my-button size="small" :active="playStatus === 'playing'" @click="play">
+      <my-button
+        size="small"
+        :active="playStatus === 'playing'"
+        @click="play_or_pause"
+      >
         <template #icon>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M4 2L14 8L4 14V2Z" />
+            <!-- 播放图标（暂停状态时显示） -->
+            <path v-if="playStatus === 'paused'" d="M4 2L14 8L4 14V2Z" />
+            <!-- 暂停图标（播放状态时显示） -->
+            <g v-if="playStatus === 'playing'">
+              <rect x="4" y="2" width="4" height="12" rx="1" />
+              <rect x="10" y="2" width="4" height="12" rx="1" />
+            </g>
           </svg>
         </template>
       </my-button>
-      <my-button size="small" :active="playStatus === 'paused'" @click="pause">
-        <template #icon>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-            <rect x="4" y="2" width="4" height="12" rx="1" />
-            <rect x="10" y="2" width="4" height="12" rx="1" />
-          </svg>
-        </template>
-      </my-button>
+
       <my-button size="small" @click="reset">
         <template #icon>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -30,7 +33,8 @@
         :min="10"
         :max="500"
         label="BPM"
-        @change="updateInterval" />
+        @change="updateInterval"
+      />
       <my-text class="bpm-value" content="bpm" />
     </div>
 
@@ -48,26 +52,32 @@
 </template>
 
 <script setup>
-import { ref } from "vue"
-import { useStore } from "vuex"
+import { ref } from "vue";
+import { useStore } from "vuex";
 
-const playStatus = ref("stopped")
-const progress = ref(0)
-const store = useStore()
+const playStatus = ref("paused");
+const progress = ref(0);
+const store = useStore();
 
-const play = () => {
-  playStatus.value = "playing"
-  store.commit("play")
-}
-
-const pause = () => {
-  playStatus.value = "paused"
-}
+const play_or_pause = () => {
+  // 播放/暂停按钮逻辑
+  if (playStatus.value == "paused") {
+    playStatus.value = "playing";
+    store.commit("play");
+  } else if (playStatus.value == "playing") {
+    playStatus.value = "paused";
+    store.commit("pause");
+  } else {
+    console.log("unknown status!");
+  }
+};
 
 const reset = () => {
-  playStatus.value = "stopped"
-  progress.value = 0
-}
+  //重播按钮逻辑
+  store.commit("reset");
+  playStatus.value = "paused";
+  progress.value = 0;
+};
 </script>
 
 <style scoped>
@@ -111,4 +121,3 @@ const reset = () => {
   gap: 8px;
 }
 </style>
-

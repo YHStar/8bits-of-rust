@@ -21,14 +21,20 @@ pub struct Song {
     pub channels: Vec<Channel>,
     pub patterns: Vec<Pattern>,
     pub name: String,
+    pub active_synth_id: usize, // 当前激活的合成器索引
 } // struct Song
 
 impl Song {
-    pub fn new(name: &str) -> Self {
+    pub fn new(
+        name: &str, 
+        active_synth_id: usize,
+    ) -> Self 
+    {
         Self {
             channels: Vec::new(),
             patterns: Vec::new(),
             name: name.to_string(),
+            active_synth_id: active_synth_id,
         }
     }
 
@@ -37,34 +43,68 @@ impl Song {
         &mut self,
         name: &str,
         preset: &str,
+        
         volume: f32,
         n_poly: usize,
         pan: f32,
+        
         be_modulated: bool,
+
+        attack: f32,
+        decay: f32,
+        sustain: f32,
+        release: f32,
     ) {
-        self.channels.push(Channel {
-            name: name.to_string(),
-            preset: preset.to_string(),
-            volume: volume,
-            n_poly: n_poly,
-            pan: pan,
-            be_modulated: be_modulated,
-            display: Vec::new(),
-        });
+        self.channels.push(
+            Channel{
+                name: name.to_string(),
+                preset: preset.to_string(),
+                volume: volume,
+                n_poly: n_poly,
+                pan: pan,
+                be_modulated: be_modulated,
+
+                attack: attack,
+                decay: decay,
+                sustain: sustain,
+                release: release,
+
+                display: Vec::new(),
+            }
+        );
     } // new channel
 
-    pub fn set_channel_preset(&mut self, index: usize, new_preset: &str){
-        self.channels[index].set_preset(index, new_preset);
+    pub fn set_synth_preset(&mut self, value: &str){
+        self.channels[self.active_synth_id].set_preset(value);
     }
 
-    pub fn set_channel_volume(&mut self, index: usize, new_volume: f32){
-        self.channels[index].set_volume(index, new_volume);
+    pub fn set_channel_volume(&mut self, index: usize, value: f32){
+        self.channels[index].set_volume(value);
     }
 
-    pub fn set_channel_pan(&mut self, index: usize, new_pan: f32){
-        self.channels[index].set_pan(index, new_pan);
+    pub fn set_channel_pan(&mut self, index: usize, value: f32){
+        self.channels[index].set_pan(value);
     }
 
+    pub fn set_synth_attack(&mut self, value: f32){
+        self.channels[self.active_synth_id].set_attack(value);
+    }
+
+    pub fn set_synth_decay(&mut self, value: f32){
+        self.channels[self.active_synth_id].set_decay(value);
+    }
+
+    pub fn set_synth_sustain(&mut self, value: f32){
+        self.channels[self.active_synth_id].set_sustain(value);
+    }
+
+    pub fn set_synth_release(&mut self, value: f32){
+        self.channels[self.active_synth_id].set_release(value);
+    }
+
+    pub fn set_active_synth_id(&mut self, value: usize) {
+        self.active_synth_id = value;
+    }
     // 创建新pattern
     pub fn new_pattern(
         &mut self,

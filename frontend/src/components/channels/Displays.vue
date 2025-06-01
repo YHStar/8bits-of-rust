@@ -1,10 +1,11 @@
-<!-- patternÔÚchannelÖÐµÄÕ¹Ê¾×´Ì¬ -->
+<!-- patternåœ¨channelä¸­çš„æ˜¾ç¤ºçŠ¶æ€ -->
 <template>
   <div
     @mousedown.left="handleCanvasMouseLeftDown"
     @mouseup="handleCanvasMouseUp"
     @mousemove="handleCanvasMouseMove"
-    @contextmenu.prevent>
+    @contextmenu.prevent
+  >
     <div v-for="display in displays">
       <div
         class="display"
@@ -17,7 +18,8 @@
           )
         "
         @click.right="deleteDisplay(display.id)"
-        @mousedown.left="startMoveDisplay(display, $event)"></div>
+        @mousedown.left="startMoveDisplay(display, $event)"
+      ></div>
       <div
         class="display-resize-handle"
         :style="
@@ -27,25 +29,26 @@
             display.duration,
           )
         "
-        @mousedown.left="startResizeDisplay(display, $event)"></div>
+        @mousedown.left="startResizeDisplay(display, $event)"
+      ></div>
     </div>
     <my-grid :n_rows="5" :h_rows="50" ref="gridEl" />
   </div>
 </template>
 <script setup>
-import { ref, computed } from "vue"
-import { useStore, mapState } from "vuex"
+import { ref, computed } from "vue";
+import { useStore, mapState } from "vuex";
 
-const store = useStore()
-const displays = computed(() => store.state.displays)
-const pattern = computed(() => store.getters.getActivePattern)
-const activePattern = computed(() => store.state.activePattern)
+const store = useStore();
+const displays = computed(() => store.state.displays);
+const pattern = computed(() => store.getters.getActivePattern);
+const activePattern = computed(() => store.state.activePattern);
 
-const moveX = ref(0)
-const moveY = ref(0)
-const resizeX = ref(0)
-const tmpDuration = ref(2)
-const gridEl = ref(null)
+const moveX = ref(0);
+const moveY = ref(0);
+const resizeX = ref(0);
+const tmpDuration = ref(2);
+const gridEl = ref(null);
 
 const patternStyle = (row, col, duration, color) => ({
   left: `${col * 25}px`,
@@ -53,52 +56,51 @@ const patternStyle = (row, col, duration, color) => ({
   width: `${duration * 25 - 1}px`,
   height: `${50 - 2}px`,
   backgroundColor: color,
-})
+});
 
 const resizeHandleStyle = (row, starttime, duration) => ({
   left: `${(starttime + duration) * 25 - 5}px`,
   top: `${row * 50 + 1}px`,
   width: `5px`,
   height: `${50 - 2}px`,
-})
+});
 
-let dragState = null
-const selectedpatterns = ref(new Set())
-const selectionBox = ref({ x1: 0, y1: 0, x2: 0, y2: 0 })
+let dragState = null;
+const selectedpatterns = ref(new Set());
+const selectionBox = ref({ x1: 0, y1: 0, x2: 0, y2: 0 });
 
 const handleCanvasMouseLeftDown = (e) => {
-  e.preventDefault()
-  if (e.ctrlKey || e.metaKey) return
+  e.preventDefault();
+  if (e.ctrlKey || e.metaKey) return;
 
   if (e.target.classList.contains("grid")) {
-    // Ìí¼Ódisplay
-    addDisplay(e)
+    // æ·»åŠ display
+    addDisplay(e);
   }
-}
-
+};
 
 const handleCanvasMouseMove = (e) => {
-  if (!dragState) return
-  // ÍÏ×§displayÎ²²¿  
+  if (!dragState) return;
+  // æ”¹å˜displayæŒç»­æ—¶é—´
   if (dragState.type === "resize") {
-    resizeDisplay(e)
-    return
+    resizeDisplay(e);
+    return;
   }
-  // Å²¶¯display  
+  // æ‹–æ‹½display
   if (dragState.type === "move") {
-    moveDisplay(e)
-    return
+    moveDisplay(e);
+    return;
   }
-}
+};
 
 const handleCanvasMouseUp = () => {
-  dragState = null
-}
+  dragState = null;
+};
 
 const addDisplay = (e) => {
-  const rect = e.target.getBoundingClientRect()
-  const x = e.clientX - rect.left
-  const y = e.clientY - rect.top
+  const rect = e.target.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
   // console.log("add display:", store.state.activePattern)
   if (activePattern.value > 0) {
     const newDisplay = {
@@ -108,17 +110,17 @@ const addDisplay = (e) => {
       duration: tmpDuration.value,
       channel: Math.floor(y / 50),
       color: pattern.value.color,
-    }
-    store.commit("addDisplay", newDisplay)
+    };
+    store.commit("addDisplay", newDisplay);
   }
-}
+};
 
 const deleteDisplay = (id) => {
-  store.commit("deleteDisplay", { id })
-}
-// ¸´ÓÃpianorollÖÐstartMoveNote
+  store.commit("deleteDisplay", { id });
+};
+// ç±»ä¼¼pianorollçš„startMoveNote
 const startMoveDisplay = (display, e) => {
-  const gridRect = gridEl.value.$el.getBoundingClientRect()
+  const gridRect = gridEl.value.$el.getBoundingClientRect();
 
   dragState = {
     type: "move",
@@ -126,62 +128,62 @@ const startMoveDisplay = (display, e) => {
     startX: Math.floor((e.clientX - gridRect.left) / 25),
     startY: Math.floor((e.clientY - gridRect.top) / 50),
     originalPos: { ...display },
-  }
-}
-// ¸´ÓÃpianorollÖÐstartResizeNote
+  };
+};
+// ç±»ä¼¼pianorollçš„startResizeNote
 const startResizeDisplay = (display, e) => {
-  e.stopPropagation()
-  const gridRect = gridEl.value.$el.getBoundingClientRect()
+  e.stopPropagation();
+  const gridRect = gridEl.value.$el.getBoundingClientRect();
   dragState = {
     type: "resize",
     displayId: display.id,
     startX: Math.floor((e.clientX - gridRect.left) / 25),
     originalPos: { ...display },
-  }
-}
-// ¸´ÓÃpianorollÖÐMoveNote
+  };
+};
+// ç±»ä¼¼pianorollçš„MoveNote
 const moveDisplay = (e) => {
-  const gridRect = gridEl.value.$el.getBoundingClientRect()
-  const x = Math.floor((e.clientX - gridRect.left) / 25)
-  const y = Math.floor((e.clientY - gridRect.top) / 50)
+  const gridRect = gridEl.value.$el.getBoundingClientRect();
+  const x = Math.floor((e.clientX - gridRect.left) / 25);
+  const y = Math.floor((e.clientY - gridRect.top) / 50);
 
-  if (x === moveX.value && y === moveY.value) return
-  moveX.value = x
-  moveY.value = y
+  if (x === moveX.value && y === moveY.value) return;
+  moveX.value = x;
+  moveY.value = y;
 
-  const dx = x - dragState.startX
-  const dy = y - dragState.startY
+  const dx = x - dragState.startX;
+  const dy = y - dragState.startY;
 
-  let newStarttime = dragState.originalPos.starttime + dx
-  let newChannel = dragState.originalPos.channel + dy
+  let newStarttime = dragState.originalPos.starttime + dx;
+  let newChannel = dragState.originalPos.channel + dy;
 
-  newStarttime = Math.max(0, newStarttime)
-  newChannel = Math.max(0, Math.min(4, newChannel))
+  newStarttime = Math.max(0, newStarttime);
+  newChannel = Math.max(0, Math.min(4, newChannel));
 
   store.commit("updateDisplayPosition", {
     id: dragState.displayId,
     starttime: newStarttime,
     channel: newChannel,
-  })
-}
-// ¸´ÓÃpianorollÖÐresizeNote
+  });
+};
+// ç±»ä¼¼pianorollçš„resizeNote
 const resizeDisplay = (e) => {
-  const gridRect = gridEl.value.$el.getBoundingClientRect()
-  const x = Math.floor((e.clientX - gridRect.left) / 25)
-  if (x === resizeX.value) return
-  resizeX.value = x
+  const gridRect = gridEl.value.$el.getBoundingClientRect();
+  const x = Math.floor((e.clientX - gridRect.left) / 25);
+  if (x === resizeX.value) return;
+  resizeX.value = x;
   // console.log("update")
-  const dx = x - dragState.startX
+  const dx = x - dragState.startX;
 
-  let newDuration = dragState.originalPos.duration + dx
-  newDuration = Math.max(1, newDuration)
-  tmpDuration.value = newDuration
+  let newDuration = dragState.originalPos.duration + dx;
+  newDuration = Math.max(1, newDuration);
+  tmpDuration.value = newDuration;
 
   store.commit("updateDisplayDuration", {
     id: dragState.displayId,
     duration: newDuration,
-  })
-}
+  });
+};
 </script>
 
 <style scoped>
@@ -199,4 +201,3 @@ const resizeDisplay = (e) => {
   z-index: 10;
 }
 </style>
-

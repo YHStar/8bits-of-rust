@@ -7,18 +7,19 @@
     @mousemove="handleMouseMove"
     @mouseup="handleMouseUp"
     @mouseleave="handleMouseUp"
-    @dblclick="handleDoubleClick">
+    @dblclick="handleDoubleClick"
+  >
     <div class="round_right" :style="{ transform: `rotate(${ang}deg)` }"></div>
     <div class="round_num">
-      <my-text :content="String(parseInt(100 * modelValue))" />
+      <my-text :content="String(parseInt(ratio * modelValue))" />
     </div>
   </div>
 </template>
 <script>
-export default { name: "MyKnob" }
+export default { name: "MyKnob" };
 </script>
 <script setup>
-import { ref, computed, watch, onMounted } from "vue"
+import { ref, computed, watch, onMounted } from "vue";
 
 const props = defineProps({
   modelValue: {
@@ -32,7 +33,7 @@ const props = defineProps({
   },
   maxVal: {
     type: Number,
-    default: 1000,
+    default: 1,
   },
   minAng: {
     type: Number,
@@ -42,90 +43,94 @@ const props = defineProps({
     type: Number,
     default: 175,
   },
-})
+  ratio: {
+    type: Number,
+    default: 100,
+  },
+});
 
-const emit = defineEmits(["update:modelValue"])
+const emit = defineEmits(["update:modelValue"]);
 
-const ang = ref(0)
-const angleRange = computed(() => props.maxAng - props.minAng)
-const valueRange = computed(() => props.maxVal - props.minVal)
+const ang = ref(0);
+const angleRange = computed(() => props.maxAng - props.minAng);
+const valueRange = computed(() => props.maxVal - props.minVal);
 
 const initializeAngle = () => {
   ang.value =
     props.minAng +
-    ((props.modelValue - props.minVal) / valueRange.value) * angleRange.value
+    ((props.modelValue - props.minVal) / valueRange.value) * angleRange.value;
   // console.log(props.minVal, props.maxVal, props.minAng, props.maxAng, props.modelValue)
-}
+};
 
-onMounted(initializeAngle)
+onMounted(initializeAngle);
 
 watch(
   () => props.modelValue,
   (newVal) => {
-    const clampedValue = Math.max(props.minVal, Math.min(props.maxVal, newVal))
+    const clampedValue = Math.max(props.minVal, Math.min(props.maxVal, newVal));
 
     if (clampedValue !== newVal) {
-      emit("update:modelValue", clampedValue)
-      return
+      emit("update:modelValue", clampedValue);
+      return;
     }
-    initializeAngle()
+    initializeAngle();
   },
-)
+);
 
 // 鼠标事件处理
-const isDragging = ref(false)
-const startX = ref(0)
-const startValue = ref(0)
+const isDragging = ref(false);
+const startX = ref(0);
+const startValue = ref(0);
 
 const handleMouseDown = (event) => {
-  isDragging.value = true
-  startX.value = event.clientX
-  startValue.value = props.modelValue
-  document.body.style.userSelect = "none"
-}
+  isDragging.value = true;
+  startX.value = event.clientX;
+  startValue.value = props.modelValue;
+  document.body.style.userSelect = "none";
+};
 
 const handleMouseMove = (event) => {
-  if (!isDragging.value) return
+  if (!isDragging.value) return;
 
-  const deltaX = event.clientX - startX.value
-  const sensitivity = (props.maxVal - props.minVal) / 30
-  const newVal = startValue.value + deltaX * sensitivity
-  const clampedValue = Math.max(props.minVal, Math.min(props.maxVal, newVal))
+  const deltaX = event.clientX - startX.value;
+  const sensitivity = (props.maxVal - props.minVal) / 30;
+  const newVal = startValue.value + deltaX * sensitivity;
+  const clampedValue = Math.max(props.minVal, Math.min(props.maxVal, newVal));
   // 将限制后的数值转换为对应角度
   ang.value =
     props.minAng +
-    ((clampedValue - props.minVal) / valueRange.value) * angleRange.value
+    ((clampedValue - props.minVal) / valueRange.value) * angleRange.value;
 
-  emit("update:modelValue", clampedValue)
-}
+  emit("update:modelValue", clampedValue);
+};
 
 const handleMouseUp = () => {
-  isDragging.value = false
-  document.body.style.userSelect = ""
-}
+  isDragging.value = false;
+  document.body.style.userSelect = "";
+};
 
 // 滚轮事件处理
 const handleWheel = (event) => {
-  event.preventDefault()
-  const delta = Math.sign(event.deltaY) * 5
-  const newAngle = ang.value - delta
+  event.preventDefault();
+  const delta = Math.sign(event.deltaY) * 5;
+  const newAngle = ang.value - delta;
   if (newAngle < props.minAng) {
-    ang.value = props.minAng
+    ang.value = props.minAng;
   } else if (newAngle > props.maxAng) {
-    ang.value = props.maxAng
+    ang.value = props.maxAng;
   } else {
-    ang.value = newAngle
+    ang.value = newAngle;
   }
   const newValue =
     props.minVal +
-    ((ang.value - props.minAng) / angleRange.value) * valueRange.value
-  emit("update:modelValue", newValue)
-}
+    ((ang.value - props.minAng) / angleRange.value) * valueRange.value;
+  emit("update:modelValue", newValue);
+};
 
 const handleDoubleClick = () => {
-  const defaultValue = 0
-  emit("update:modelValue", defaultValue)
-}
+  const defaultValue = 0;
+  emit("update:modelValue", defaultValue);
+};
 </script>
 
 <style scoped>
