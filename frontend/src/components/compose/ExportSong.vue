@@ -45,17 +45,23 @@ const store = useStore();
 
 const songName = computed({
   get: () => store.state.exportsongs.songName,
-  set: (value) => store.commit("exportsongs/setSongName", value),
+  set: (value) => store.dispatch("exportsongs/setSongName", value),
 });
 
 const exportFormat = computed({
-  get: () => store.state.exportsongs.format,
-  set: (value) => store.commit("exportsongs/setFormat", value),
+  get: () => {
+    // console.log("GET format:", store.state.exportsongs.format);
+    return store.state.exportsongs.format;
+  },
+  set: (value) => {
+    // console.log("SET format to:", value);
+    store.dispatch("exportsongs/setFormat", value);
+  }
 });
 
 const exportBitWidth = computed({
   get: () => store.state.exportsongs.bitWidth,
-  set: (value) => store.commit("exportsongs/setBitWidth", value),
+  set: (value) => store.dispatch("exportsongs/setBitWidth", value),
 });
 
 const estimated_space = computed(() => store.state.exportsongs.estimated_space);

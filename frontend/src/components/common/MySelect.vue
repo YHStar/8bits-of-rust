@@ -2,12 +2,12 @@
 <template>
   <div class="pixel-select" @click="toggleDropdown">
     <div class="selected-option">
-      <my-text :content="selectedLabel || '请选择...'" size="medium" />
+      <my-text :content="selectedLabel || '请选择……'" size="medium" />
       <div class="dropdown-arrow">▼</div>
     </div>
     <div v-show="isOpen" class="dropdown-options">
       <div
-        v-for="(option, index) in options"
+        v-for="(option) in options"
         class="option"
         @click.stop="selectOption(option)"
       >
@@ -30,19 +30,19 @@ const props = defineProps({
     validator: (value) =>
       value.every((opt) => "value" in opt && "label" in opt),
   },
-  value: {
+  modelValue: { 
     type: [String, Number],
     default: "",
   },
 });
 
-const emit = defineEmits(["input"]);
+const emit = defineEmits(["update:modelValue"]);
 
 const isOpen = ref(false);
-const selectedLabel = ref("");
+const selectedLabel = ref(props.options[0].label);
 
 watch(
-  () => props.value,
+  () => props.modelValue,
   (newVal) => {
     const selected = props.options.find((opt) => opt.value === newVal);
     selectedLabel.value = selected ? selected.label : "";
@@ -55,7 +55,7 @@ const toggleDropdown = () => {
 };
 
 const selectOption = (option) => {
-  emit("input", option.value);
+  emit("update:modelValue", option.value);
   selectedLabel.value = option.label;
   isOpen.value = false;
 };
