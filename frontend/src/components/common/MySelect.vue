@@ -2,7 +2,7 @@
 <template>
   <div class="pixel-select" @click="toggleDropdown">
     <div class="selected-option">
-      <my-text :content="selectedLabel || '请选择……'" size="medium" />
+      <my-text :content="selectedLabel || '请选择...'" size="medium" />
       <div class="dropdown-arrow">▼</div>
     </div>
     <div v-show="isOpen" class="dropdown-options">
@@ -59,7 +59,7 @@ const selectOption = (option) => {
   // 添加防御性检查 - 确保 option 和 option.value 存在
   if (option && option.value !== undefined && option.value !== null) {
     emit("update:modelValue", option.value);
-    selectedLabel.value = option.label || props.options[0]?.label || "请选择……";
+    selectedLabel.value = option.label || props.options[0]?.label || "请选择...";
   } else {
     console.error("Invalid option selected:", option);
   }
