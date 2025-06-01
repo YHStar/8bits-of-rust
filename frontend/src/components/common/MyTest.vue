@@ -1,4 +1,4 @@
-<!-- ���ڲ��� -->
+<!-- 测试组件 -->
 <template>
   <div
     @dblclick="rename(true, $event)"
