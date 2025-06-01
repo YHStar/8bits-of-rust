@@ -1,4 +1,4 @@
-<!-- pattern显示在channel中 -->
+<!-- pattern在channel中的显示状态 -->
 <template>
   <div
     @mousedown.left="handleCanvasMouseLeftDown"
@@ -74,19 +74,19 @@ const handleCanvasMouseLeftDown = (e) => {
   if (e.ctrlKey || e.metaKey) return;
 
   if (e.target.classList.contains("grid")) {
-    // ����display
+    // 添加display
     addDisplay(e);
   }
 };
 
 const handleCanvasMouseMove = (e) => {
   if (!dragState) return;
-  // ��קdisplayβ��
+  // 改变display持续时间
   if (dragState.type === "resize") {
     resizeDisplay(e);
     return;
   }
-  // Ų��display
+  // 拖拽display
   if (dragState.type === "move") {
     moveDisplay(e);
     return;
@@ -118,7 +118,7 @@ const addDisplay = (e) => {
 const deleteDisplay = (id) => {
   store.commit("deleteDisplay", { id });
 };
-// ����pianoroll��startMoveNote
+// 类似pianoroll的startMoveNote
 const startMoveDisplay = (display, e) => {
   const gridRect = gridEl.value.$el.getBoundingClientRect();
 
@@ -130,7 +130,7 @@ const startMoveDisplay = (display, e) => {
     originalPos: { ...display },
   };
 };
-// ����pianoroll��startResizeNote
+// 类似pianoroll的startResizeNote
 const startResizeDisplay = (display, e) => {
   e.stopPropagation();
   const gridRect = gridEl.value.$el.getBoundingClientRect();
@@ -141,7 +141,7 @@ const startResizeDisplay = (display, e) => {
     originalPos: { ...display },
   };
 };
-// ����pianoroll��MoveNote
+// 类似pianoroll的MoveNote
 const moveDisplay = (e) => {
   const gridRect = gridEl.value.$el.getBoundingClientRect();
   const x = Math.floor((e.clientX - gridRect.left) / 25);
@@ -166,7 +166,7 @@ const moveDisplay = (e) => {
     channel: newChannel,
   });
 };
-// ����pianoroll��resizeNote
+// 类似pianoroll的resizeNote
 const resizeDisplay = (e) => {
   const gridRect = gridEl.value.$el.getBoundingClientRect();
   const x = Math.floor((e.clientX - gridRect.left) / 25);
