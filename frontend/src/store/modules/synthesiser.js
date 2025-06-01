@@ -52,21 +52,25 @@ export default {
     ],
   }),
   mutations: {
-    // 更新当前的和合成器ID
-    updateRelease(state, { value }) {
+    // 设置当前的和合成器ID
+    setActiveId(state, value) {
       state.active_id = value;
     },
-    // 更新合成器ADSR参数
-    updateAttack(state, { value }) {
+    // 设置合成器预设
+    setPreset(state, value) {
+      state.preset = value;
+    },
+    // 设置合成器ADSR参数
+    setAttack(state, value) {
       state.params[state.active_id].attack = value;
     },
-    updateDecay(state, { value }) {
-      state.params[state.active_id].dscay = value;
+    setDecay(state, value) {
+      state.params[state.active_id].decay = value;
     },
-    updateSustain(state, { value }) {
+    setSustain(state, value) {
       state.params[state.active_id].sustain = value;
     },
-    updateRelease(state, { value }) {
+    setRelease(state, value) {
       state.params[state.active_id].release = value;
     },
   },
@@ -75,21 +79,21 @@ export default {
   },
   actions: {
     // 更新合成器的临时ID
-    updateActiveId({ commit, rootState }, { value }) {
-      console.log("Action updateActiveId: value = ", value);
-      commit("updateActiveId", { value });
+    setActiveId({ commit, rootState }, value) {
+      console.log("Action setActiveId: value = ", value);
+      commit("setActiveId", value);
 
       // 访问根状态中的 wasm_song
       if (rootState.wasm_song) {
-        rootState.wasm_song.set_synth_activeid(value);
+        rootState.wasm_song.set_active_synth_id(value);
       } else {
         console.warn("WASM song instance not available");
       }
     },
     // 在WASM中更新attack
-    updateAttack({ commit, rootState }, { value }) {
-      console.log("Action updateAttack :value = ", value);
-      commit("updateAttack", { value });
+    setAttack({ commit, rootState }, value) {
+      console.log("Action setAttack :value = ", value);
+      commit("setAttack", value);
       // 访问根状态中的 wasm_song
       if (rootState.wasm_song) {
         rootState.wasm_song.set_synth_attack(value);
@@ -98,9 +102,9 @@ export default {
       }
     },
     // 在WASM中更新decay
-    updateDecay({ commit, rootState }, { value }) {
-      console.log("Action updateDecay : value = ", value);
-      commit("updateDecay", { value });
+    setDecay({ commit, rootState }, value) {
+      console.log("Action setDecay : value = ", value);
+      commit("setDecay", value);
       // 访问根状态中的 wasm_song
       if (rootState.wasm_song) {
         rootState.wasm_song.set_synth_decay(value);
@@ -109,9 +113,9 @@ export default {
       }
     },
     // 在WASM中更新sustain
-    updateSustain({ commit, rootState }, { value }) {
-      console.log("Action updateSustain : value = ", value);
-      commit("updateSustain", { value });
+    setSustain({ commit, rootState }, value) {
+      console.log("Action setSustain : value = ", value);
+      commit("setSustain", value);
 
       // 访问根状态中的 wasm_song
       if (rootState.wasm_song) {
@@ -121,13 +125,24 @@ export default {
       }
     },
     // 在WASM中更新release
-    updateRelease({ commit, rootState }, { value }) {
-      console.log("Action updateRelease : value = ", value);
-      commit("updateRelease", { value });
+    setRelease({ commit, rootState }, value) {
+      console.log("Action setRelease : value = ", value);
+      commit("setRelease", value);
 
       // 访问根状态中的 wasm_song
       if (rootState.wasm_song) {
         rootState.wasm_song.set_synth_release(value);
+      } else {
+        console.warn("WASM song instance not available");
+      }
+    },
+    setPreset({ commit, rootState }, value) {
+      console.log("Action setPreset : value = ", value);
+      commit("setPreset", value);
+
+      // 访问根状态中的 wasm_song
+      if (rootState.wasm_song) {
+        rootState.wasm_song.set_synth_preset(value);
       } else {
         console.warn("WASM song instance not available");
       }
