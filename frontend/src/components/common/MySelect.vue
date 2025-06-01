@@ -7,7 +7,7 @@
     </div>
     <div v-show="isOpen" class="dropdown-options">
       <div
-        v-for="(option) in options"
+        v-for="option in options"
         class="option"
         @click.stop="selectOption(option)"
       >
@@ -37,7 +37,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(["update:modelValue"]);
 
 const isOpen = ref(false);
 const selectedLabel = ref("请选择……");
@@ -58,7 +58,7 @@ const toggleDropdown = () => {
 const selectOption = (option) => {
   // 添加防御性检查 - 确保 option 和 option.value 存在
   if (option && option.value !== undefined && option.value !== null) {
-    emit('update:modelValue', option.value);
+    emit("update:modelValue", option.value);
     selectedLabel.value = option.label || props.options[0]?.label || "请选择……";
   } else {
     console.error("Invalid option selected:", option);

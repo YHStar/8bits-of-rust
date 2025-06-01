@@ -38,6 +38,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useStore } from "vuex";
+
 import Plugin from "@/components/compose/Plugin.vue";
 import Mixer from "@/components/compose/Mixer.vue";
 import Arrangement from "@/components/compose/Arrangement.vue";

@@ -37,17 +37,20 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import { computed } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
 
+// 歌曲名称
 const songName = computed({
   get: () => store.state.exportsongs.songName,
   set: (value) => store.dispatch("exportsongs/setSongName", value),
 });
 
+// 导出格式
 const exportFormat = computed({
   get: () => {
     // console.log("GET format:", store.state.exportsongs.format);
@@ -56,16 +59,19 @@ const exportFormat = computed({
   set: (value) => {
     // console.log("SET format to:", value);
     store.dispatch("exportsongs/setFormat", value);
-  }
+  },
 });
 
+// 导出位宽
 const exportBitWidth = computed({
   get: () => store.state.exportsongs.bitWidth,
   set: (value) => store.dispatch("exportsongs/setBitWidth", value),
 });
 
+// 预计占用空间
 const estimated_space = computed(() => store.state.exportsongs.estimated_space);
 </script>
+
 <style scoped>
 .container {
   display: flex;
