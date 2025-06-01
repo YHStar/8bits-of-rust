@@ -13,12 +13,12 @@ export default {
   }),
   mutations: {
     // 更新通道音量
-    updateVolume(state, { index, value }) {
+    setVolume(state, { index, value }) {
       state.params[index].volume = value;
       // state.wasm_song.set_channel_volume(index, value);
     },
     //更新通道声相
-    updatePan(state, { index, value }) {
+    setPan(state, { index, value }) {
       state.params[index].pan = value;
       // state.wasm_song.set_channel_pan(index, value);
     },
@@ -40,10 +40,10 @@ export default {
   },
   actions: {
     // 更新通道音量（包含 WASM 操作）
-    updateVolume({ commit, rootState }, { index, value }) {
-      console.log("Action updateVolume index = ", index, " value = ", value);
+    setVolume({ commit, rootState }, { index, value }) {
+      console.log("Action setVolume index = ", index, " value = ", value);
       // 访问根状态中的 wasm_song
-      commit("updateVolume", { index, value });
+      commit("setVolume", { index, value });
       if (rootState.wasm_song) {
         rootState.wasm_song.set_channel_volume(index, value);
       } else {
@@ -51,9 +51,9 @@ export default {
       }
     },
     // 更新通道声相（包含 WASM 操作）
-    updatePan({ commit, rootState }, { index, value }) {
-      console.log("Action updatePan index = ", index, " value = ", value);
-      commit("updatePan", { index, value });
+    setPan({ commit, rootState }, { index, value }) {
+      console.log("Action setPan index = ", index, " value = ", value);
+      commit("setPan", { index, value });
       // 访问根状态中的 wasm_song
       if (rootState.wasm_song) {
         rootState.wasm_song.set_channel_pan(index, value);

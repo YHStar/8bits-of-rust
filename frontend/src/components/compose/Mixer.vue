@@ -59,11 +59,11 @@ const channels_params = computed({
 });
 
 const handleVolumeChange = (index, value) => {
-  store.dispatch("channel/updateVolume", { index, value });
+  store.dispatch("channel/setVolume", { index, value });
 };
 
 const handlePanChange = (index, value) => {
-  store.dispatch("channel/updatePan", { index, value });
+  store.dispatch("channel/setPan", { index, value });
 };
 // const n_channels = ref(5)
 // const volumes = ref([80, 80, 80, 80, 80])
