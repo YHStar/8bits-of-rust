@@ -72,6 +72,7 @@ const handleBpmChange = (newBpm) => {
   }
   newBpm = Math.max(0.1, Math.min(newBpm, 1)); // 这里确保bpm范围是50-500
   console.log("BPM changed to:", newBpm * 500);
+  store.commit("setBpm", newBpm);// 后端更改Bpm
   bpm.value = newBpm;
 };
 
@@ -79,17 +80,17 @@ const handleBpmChange = (newBpm) => {
 const playOrPause = () => {
   if (!isPlaying.value) {
     startClock();
-    store.commit("play");
+    store.commit("play");// 后端播放歌曲
   } else {
     pauseClock();
-    store.commit("pause");
+    store.commit("pause");// 后端暂停播放歌曲
   }
 };
 
 // 重置按钮逻辑
 const reset = () => {
   resetClock();
-  store.commit("reset");
+  store.commit("reset");// 后端暂停并重置歌曲
 };
 </script>
 
