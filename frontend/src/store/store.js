@@ -7,6 +7,7 @@ import pattern from "./modules/pattern";
 import channel from "./modules/channel";
 import synthesiser from "./modules/synthesiser";
 import song from "./modules/song";
+import playunit from "./modules/playunit";
 import display from "./modules/display";
 import pianoroll from "./modules/pianorolls";
 import exportsongs from "./modules/exportsongs";
@@ -465,13 +466,14 @@ export default createStore({
   modules: {
     route,
     channel,
-
     // pattern,
     synthesiser,
     song,
+    playunit,
     // display,
     // pianoroll,
     exportsongs,
+    
   },
   plugins: [createPersistedState()],
 });

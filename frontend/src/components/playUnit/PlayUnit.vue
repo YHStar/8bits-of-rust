@@ -72,7 +72,7 @@ const handleBpmChange = (newBpm) => {
   }
   newBpm = Math.max(0.1, Math.min(newBpm, 1)); // 这里确保bpm范围是50-500
   console.log("BPM changed to:", newBpm * 500);
-  store.commit("setBpm", newBpm);// 后端更改Bpm
+  store.dispatch("playunit/setBpm", newBpm);// 后端更改Bpm
   bpm.value = newBpm;
 };
 
