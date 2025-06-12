@@ -89,20 +89,16 @@ const dynamicStyle = computed(() => (props.color ? props.color : ""));
   font-size: 36px;
 }
 
-.my-button.active:not(.disabled) {
-  background-color: var(--dynamic-bg, var(--global-highlight)) !important;
-  /* background-color: var(--dynamic-bg, var(--global-primary)) !important; */
-  border: 5px solid var(--global-highlight);
-}
+
 
 .my-button:not(.disabled) {
   background-color: var(--dynamic-bg, var(--global-primary)) !important;
 }
-/* 
-.my-button:not(.disabled) {
-  background-color: var(--global-primary) !important;
-  color: var(--global-highlight);
-} */
+.my-button.active:not(.disabled) {
+  background-color: var(--dynamic-bg, var(--global-highlight)) !important;
+  border: 5px solid var(--global-highlight);
+  transition: transform 0.25s;
+}
 .my-button.secondary:not(.disabled) {
   background-color: var(--global-secondary) !important;
 }
@@ -111,16 +107,15 @@ const dynamicStyle = computed(() => (props.color ? props.color : ""));
   color: var(--global-ghost);
   border: 1px solid var(--global-ghost);
 }
-.my-button:not(.disabled):hover {
-  transform: scale(1.08);
+/* 鼠标悬停字体放大 */
+.my-button:not(.disabled):hover .content-wrapper{
+  transform: scale(1.15);
   transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   z-index: 1;
 }
-.my-button:not(.disabled):hover {
-  background-color: var(--global-secondary);
-}
-.my-button:not(.disabled):active {
-  transform: scale(1.05);
+/* 选中时字体放大 */
+.my-button:not(.disabled):active .content-wrapper {
+  transform: scale(1.08);
 }
 
 .my-button.disabled {
