@@ -41,8 +41,8 @@ import { useStore, mapState } from "vuex";
 
 const store = useStore();
 const displays = computed(() => store.state.display.data);
-const pattern = computed(() => store.getters.getActivePattern);
-const activePattern = computed(() => store.state.activePattern);
+const pattern = computed(() => store.getters['pattern/active']);
+const activePattern = computed(() => store.state.pattern.activeId);
 
 const moveX = ref(0);
 const moveY = ref(0);
@@ -111,12 +111,12 @@ const addDisplay = (e) => {
       channel: Math.floor(y / 50),
       color: pattern.value.color,
     };
-    store.dispatch("display/addDisplay", newDisplay);
+    store.dispatch("display/add", newDisplay);
   }
 };
 
 const deleteDisplay = (id) => {
-  store.dispatch("display/deleteDisplay", id);
+  store.dispatch("display/delete", id);
 };
 // 类似pianoroll的startMoveNote
 const startMoveDisplay = (display, e) => {
@@ -160,7 +160,7 @@ const moveDisplay = (e) => {
   newStarttime = Math.max(0, newStarttime);
   newChannel = Math.max(0, Math.min(4, newChannel));
 
-  store.dispatch("display/updateDisplayPosition", {
+  store.dispatch("display/updatePosition", {
     id: dragState.displayId,
     starttime: newStarttime,
     channel: newChannel,
@@ -179,7 +179,7 @@ const resizeDisplay = (e) => {
   newDuration = Math.max(1, newDuration);
   tmpDuration.value = newDuration;
 
-  store.dispatch("display/updateDisplayDuration", {
+  store.dispatch("display/updateDuration", {
     id: dragState.displayId,
     duration: newDuration,
   });

@@ -21,7 +21,7 @@
       >
         <my-button
           :text="pattern.name"
-          :active="activePattern === pattern.id"
+          :active="activePatternId === pattern.id"
           :color="pattern.color"
           @click.left="handleLeftClick(pattern.id, $event)"
           @click.right="deletePattern(pattern.id)"
@@ -49,8 +49,8 @@ import { useDragDrop } from "./dragDrop";
 const { getRandomColor } = useColorGenerator();
 const store = useStore();
 const { dragStart, allowDrop, drop } = useDragDrop(store.commit);
-const patterns = computed(() => store.state.patterns);
-const activePattern = computed(() => store.state.activePattern);
+const patterns = computed(() => store.state.pattern.data);
+const activePatternId = computed(() => store.state.pattern.activeId);
 // 是否正在编辑
 const isEdit = ref(-1);
 const patternName = ref("");
@@ -59,7 +59,7 @@ const newPatternName = ref("");
 // 更新选中的pattern和钢琴窗中的音符
 const handleLeftClick = (id, e) => {
   store.commit("saveNotes");
-  store.commit("setActivePattern", id);
+  store.dispatch("pattern/setActive", id);
   store.commit("loadNotes");
 };
 
@@ -81,7 +81,7 @@ const addPattern = () => {
   };
   patternName.value = "";
   // console.log("New color:", newPattern.color);
-  store.commit("addPattern", newPattern);
+  store.dispatch("pattern/add", newPattern);
   // console.log("Added pattern:", newPattern);
 };
 
@@ -90,12 +90,12 @@ const deletePattern = (id) => {
   if (isEdit.value === id) {
     isEdit.value = -1;
   } else if (confirm("确认删除乐段?")) {
-    if (id === activePattern.value) {
+    if (id === activePatternId.value) {
       console.log("need reset active pattern");
-      store.commit("setActivePattern", 0);
+      store.dispatch("pattern/setActive", 0);
       store.commit("emptyNotes");
     }
-    store.commit("deletePattern", id);
+    store.dispatch("pattern/delete", id);
   }
 };
 
@@ -106,7 +106,7 @@ const editPattern = (id) => {
 };
 const renamePattern = (id) => {
   console.log("enter");
-  store.commit("renamePattern", {
+  store.dispatch("pattern/rename", {
     id: id,
     name: newPatternName.value,
   });
