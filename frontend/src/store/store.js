@@ -21,7 +21,7 @@ export default createStore({
     // 歌曲列表
     // songs: [],
     // display列表
-    displays: [],
+    // displays: [],
 
     // 当前路径
     // currentRoute: "/",
@@ -131,8 +131,8 @@ export default createStore({
       state.wasm_song.set_active_pattern(state.activePattern);
 
       // 初始化所有display
-      for (var i = 0; i < state.displays.length; ++i) {
-        var display = state.displays[i];
+      for (var i = 0; i < state.display.data.length; ++i) {
+        var display = state.display.data[i]
         state.wasm_song.push_display(
           display.channel,
           display.patternId,
@@ -169,66 +169,66 @@ export default createStore({
     },
 
     // state.displays
-    addDisplay(state, newDisplay) {
-      state.displays.push(newDisplay);
-      state.wasm_song.push_display(
-        newDisplay.channel,
-        newDisplay.patternId,
-        newDisplay.duration,
-        newDisplay.starttime,
-      );
-      state.wasm_song.sort_display();
-      // console.log("display pattern")
-      // for (var i = 0; i < state.displays.length; ++i){
-      //   console.log(state.displays[i]);
-      // }
-    },
-    deleteDisplay(state, { id }) {
-      const display = state.displays.find((p) => p.id === id);
-      if (display) {
-        const index = state.displays.findIndex((p) => p.id === id);
-        state.displays.splice(index, 1);
-        state.wasm_song.delete_display(
-          display.channel,
-          display.patternId,
-          display.starttime,
-        );
-      }
-    },
-    updateDisplayPosition(state, { id, starttime, channel }) {
-      const display = state.displays.find((d) => d.id === id);
-      if (display) {
-        // 对wasm，直接先删除再插入
-        state.wasm_song.delete_display(
-          display.channel,
-          display.patternId,
-          display.starttime,
-        );
-        state.wasm_song.push_display(
-          channel,
-          display.patternId,
-          display.duration,
-          starttime,
-        );
-        state.wasm_song.sort_display();
+    // addDisplay(state, newDisplay) {
+    //   state.display.data.push(newDisplay);
+    //   state.wasm_song.push_display(
+    //     newDisplay.channel,
+    //     newDisplay.patternId,
+    //     newDisplay.duration,
+    //     newDisplay.starttime,
+    //   );
+    //   state.wasm_song.sort_display();
+    //   // console.log("display pattern")
+    //   // for (var i = 0; i < state.displays.length; ++i){
+    //   //   console.log(state.displays[i]);
+    //   // }
+    // },
+    // deleteDisplay(state, { id }) {
+    //   const display = state.display.data.find((p) => p.id === id);
+    //   if (display) {
+    //     const index = state.display.data.findIndex((p) => p.id === id);
+    //     state.display.data.splice(index, 1);
+    //     state.wasm_song.delete_display(
+    //       display.channel,
+    //       display.patternId,
+    //       display.starttime,
+    //     );
+    //   }
+    // },
+    // updateDisplayPosition(state, { id, starttime, channel }) {
+    //   const display = state.display.data.find((d) => d.id === id);
+    //   if (display) {
+    //     // 对wasm，直接先删除再插入
+    //     state.wasm_song.delete_display(
+    //       display.channel,
+    //       display.patternId,
+    //       display.starttime,
+    //     );
+    //     state.wasm_song.push_display(
+    //       channel,
+    //       display.patternId,
+    //       display.duration,
+    //       starttime,
+    //     );
+    //     state.wasm_song.sort_display();
 
-        display.starttime = starttime;
-        display.channel = channel;
-      }
-    },
-    updateDisplayDuration(state, { id, duration }) {
-      const display = state.displays.find((d) => d.id === id);
-      if (display) {
-        display.duration = duration;
-        // 对wasm，直接先删除再插入
-        state.wasm_song.update_display_duration(
-          display.channel,
-          display.patternId,
-          display.starttime,
-          duration,
-        );
-      }
-    },
+    //     display.starttime = starttime;
+    //     display.channel = channel;
+    //   }
+    // },
+    // updateDisplayDuration(state, { id, duration }) {
+    //   const display = state.display.data.find((d) => d.id === id);
+    //   if (display) {
+    //     display.duration = duration;
+    //     // 对wasm，直接先删除再插入
+    //     state.wasm_song.update_display_duration(
+    //       display.channel,
+    //       display.patternId,
+    //       display.starttime,
+    //       duration,
+    //     );
+    //   }
+    // },
 
     // state.notes
     addNote(state, note) {
@@ -342,7 +342,7 @@ export default createStore({
     },
     deletePattern(state, id) {
       state.patterns = state.patterns.filter((n) => n.id !== id);
-      state.displays = state.displays.filter((n) => n.patternId !== id); // 删除pattern也会删除对应的所有display
+      state.displays = state.display.data.filter((n) => n.patternId !== id); // 删除pattern也会删除对应的所有display
       state.notes = [];
       state.wasm_song.delete_pattern(id);
       state.wasm_song.filter_display_without_pattern_id(id);
@@ -470,7 +470,7 @@ export default createStore({
     synthesiser,
     song,
     playunit,
-    // display,
+    display,
     // pianoroll,
     exportsongs,
     
