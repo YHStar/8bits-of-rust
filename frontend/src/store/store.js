@@ -317,5 +317,16 @@ export default createStore({
     exportsongs,
     
   },
+  modules: {
+    route,
+    channel,
+
+    // pattern,
+    synthesiser,
+    song,
+    // display,
+    // pianoroll,
+    exportsongs,
+  },
   plugins: [createPersistedState()],
 });
