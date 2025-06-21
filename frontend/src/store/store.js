@@ -106,6 +106,7 @@ export default createStore({
       }
 
       // 把正在编辑的pattern保存
+      console.log(state.pattern);
       var pattern = state.pattern.data.find((p) => p.id === state.pattern.activeId);
       if (pattern) {
         // console.log("save notes to old pattern", pattern.notes, state.notes)
@@ -316,17 +317,6 @@ export default createStore({
     // pianoroll,
     exportsongs,
     
-  },
-  modules: {
-    route,
-    channel,
-
-    // pattern,
-    synthesiser,
-    song,
-    // display,
-    // pianoroll,
-    exportsongs,
   },
   plugins: [createPersistedState()],
 });

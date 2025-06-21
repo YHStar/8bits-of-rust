@@ -203,10 +203,10 @@ impl SongWrapper {
         buffer.copy_to_channel(&float_right_samples, 1)?;
 
         let source = AudioBufferSourceNode::new(&audio_ctx)?;
-        source.set_loop(true);
+        // source.set_loop(true);
         source.set_buffer(Some(&buffer));
         source.connect_with_audio_node(&audio_ctx.destination())?;
-        // source.set_loop(false);
+        source.set_loop(false); // 循环播放该音频
         source.start()?;
 
         Ok(())
