@@ -1,19 +1,197 @@
-export default {
-  namespaced: true,
-  state: () => ({
-    patterns: [],
-    activePattern: 0,
-    notes: [],
+// store/modules/pattern.js
+const state = {
+  activeId: 0,
+  data: [],
+  // 当前显示在钢琴窗中的音符（属于当前活动的 pattern）
+  currentNotes: [],
+  // 钢琴窗滚动和缩放状态
+  scrollX: 0,
+  scrollY: 0,
+  scaleX: 1.0,
+  scaleY: 1.0,
+};
+
+const mutations = {
+  // 设置活动 pattern
+  setActive(state, id) {
+    state.activeId = id;
+  },
+
+  // 添加 pattern
+  add(state, pattern) {
+    state.data.push(pattern);
+  },
+
+  // 删除 pattern
+  delete(state, id) {
+    console.log("deletePattern id=", id)
+    // 删除 pattern
+    state.data = state.data.filter((n) => n.id !== id);
+
+    // 清空当前音符
+    if (state.activeId === id) {
+      state.currentNotes = [];
+    }
+  },
+
+  // 重命名 pattern
+  rename(state, { id, name }) {
+    const pattern = state.data.find((p) => p.id === id);
+    if (pattern) {
+      pattern.name = name;
+    }
+  },
+
+  // 排序 pattern
+  sort(state, { index, newIndex }) {
+    const draggedItem = state.data.splice(index, 1)[0];
+    state.data.splice(newIndex, 0, draggedItem);
+  },
+
+  // 音符操作
+  addNote(state, note) {
+    state.currentNotes.push(note);
+    this.rootState.wasm_song?.edit_pattern(
+      "insert",
+      88 - note.pitch,
+      note.starttime,
+      note.starttime + note.duration
+    );
+  },
+
+  deleteNote(state, note) {
+    state.currentNotes = state.currentNotes.filter((n) => n.id !== note.id);
+    this.rootState.wasm_song?.edit_pattern(
+      "delete",
+      88 - note.pitch,
+      note.starttime,
+      note.starttime + note.duration
+    );
+  },
+
+  updateNotePosition(state, { id, starttime, pitch }) {
+    const note = state.currentNotes.find((n) => n.id === id);
+    if (note) {
+      this.rootState.wasm_song?.edit_pattern(
+        "delete",
+        88 - note.pitch,
+        note.starttime,
+        note.starttime + note.duration
+      );
+
+      this.rootState.wasm_song?.edit_pattern(
+        "insert",
+        88 - pitch,
+        starttime,
+        starttime + note.duration
+      );
+
+      note.pitch = pitch;
+      note.starttime = starttime;
+    }
+  },
+
+  updateNoteDuration(state, { id, duration }) {
+    const note = state.currentNotes.find((n) => n.id === id);
+    if (note) {
+      this.rootState.wasm_song?.edit_pattern(
+        "delete",
+        88 - note.pitch,
+        note.starttime,
+        note.starttime + note.duration
+      );
+
+      this.rootState.wasm_song?.edit_pattern(
+        "insert",
+        88 - note.pitch,
+        note.starttime,
+        note.starttime + duration
+      );
+
+      note.duration = duration;
+    }
+  },
+
+  // 清空音符
+  emptyNotes(state) {
+    state.currentNotes = [];
+  },
+
+  // 保存当前音符到活动 pattern
+  saveCurrentNotesToActivePattern(state) {
+    const pattern = state.data.find((p) => p.id === state.activeId);
+    if (pattern) {
+      pattern.notes = [...state.currentNotes];
+      pattern.scrollX = state.scrollX;
+      pattern.scrollY = state.scrollY;
+      pattern.scaleX = state.scaleX;
+      pattern.scaleY = state.scaleY;
+    }
+  },
+
+  // 从活动 pattern 加载音符
+  loadNotesFromActivePattern(state) {
+    const pattern = state.data.find((p) => p.id === state.activeId);
+    if (pattern) {
+      state.currentNotes = [...pattern.notes];
+      state.scrollX = pattern.scrollX || 0;
+      state.scrollY = pattern.scrollY || 0;
+      state.scaleX = pattern.scaleX || 1.0;
+      state.scaleY = pattern.scaleY || 1.0;
+    }
+  },
+
+  // 钢琴窗滚动状态
+  setPianoScroll(state, { x, y }) {
+    state.scrollX = Math.max(0, x);
+    state.scrollY = Math.max(0, y);
+  },
+
+  // 设置缩放比例
+  setScale(state, { scaleX, scaleY }) {
+    state.scaleX = Math.max(0.1, scaleX);
+    state.scaleY = Math.max(0.1, scaleY);
+  },
+
+  // 增量缩放
+  zoomScale(state, { deltaX, deltaY }) {
+    const ZOOM_FACTOR = 0.1;
+    state.scaleX = Math.max(0.1, state.scaleX + deltaX * ZOOM_FACTOR);
+    state.scaleY = Math.max(0.1, state.scaleY + deltaY * ZOOM_FACTOR);
+  },
+};
+
+const getters = {
+  // 获取活动 pattern
+  active: (state) =>
+    state.data.find((p) => p.id === state.activeId),
+
+  // 获取当前音符
+  currentNotes: (state) => state.currentNotes,
+
+  // 获取钢琴窗设置
+  pianoRollSettings: (state) => ({
+    scrollX: state.scrollX,
+    scrollY: state.scrollY,
+    scaleX: state.scaleX,
+    scaleY: state.scaleY,
   }),
-  mutations: {
-    // state.patterns
-    setActivePattern(state, id) {
-      state.activePattern = id;
-      state.wasm_song.set_active_pattern(id);
-    },
-    addPattern: (state, pattern) => {
-      state.patterns.push(pattern);
-      state.wasm_song.new_pattern(
+
+  // 获取所有 pattern
+  allPatterns: (state) => state.data,
+};
+
+const actions = {
+  setActive({ commit, rootState }, id) {
+    if (rootState.wasm_song) {
+      rootState.wasm_song.set_active_pattern(id);
+    }
+    commit("setActive", id);
+  },
+  add: ({ commit, rootState }, pattern) => {
+    commit("add", pattern);
+    if (rootState.wasm_song) {
+      rootState.wasm_song.new_pattern(
         pattern.name,
         pattern.id,
         pattern.scrollX,
@@ -21,125 +199,40 @@ export default {
         pattern.scaleX,
         pattern.scaleY,
       );
-    },
-    deletePattern(state, id) {
-      state.patterns = state.patterns.filter((n) => n.id !== id);
-      state.displays = state.displays.filter((n) => n.patternId !== id); // 删除pattern也会删除对应的所有display
-      state.notes = [];
-      state.wasm_song.delete_pattern(id);
-      state.wasm_song.filter_display_without_pattern_id(id);
-    },
-    renamePattern(state, { id, name }) {
-      // console.log("renamepattern", name)
-      const pattern = state.patterns.find((p) => p.id === id);
-      if (pattern) pattern.name = name;
-      state.wasm_song.rename_pattern(id, name);
-    },
-    sortPattern(state, { index, newIndex }) {
-      const draggedItem = state.patterns.splice(index, 1)[0]; // 移除被拖拽的元素
-      state.patterns.splice(newIndex, 0, draggedItem);
-      state.wasm_song.sort_display();
-    },
-
-    addNote(state, note) {
-      state.wasm_song.edit_pattern(
-        "insert",
-        88 - note.pitch,
-        note.starttime,
-        note.starttime + note.duration,
-      );
-      state.notes.push(note);
-    },
-    deleteNote(state, note) {
-      state.wasm_song.edit_pattern(
-        "delete",
-        88 - note.pitch,
-        note.starttime,
-        note.starttime + note.duration,
-      );
-      state.notes = state.notes.filter((n) => n.id !== note.id);
-    },
-    updateNotePosition(state, { id, starttime, pitch }) {
-      const note = state.notes.find((n) => n.id === id);
-      if (note) {
-        state.wasm_song.edit_pattern(
-          "delete",
-          88 - note.pitch,
-          note.starttime,
-          note.starttime + note.duration,
-        );
-        state.wasm_song.edit_pattern(
-          "insert",
-          88 - pitch,
-          starttime,
-          starttime + note.duration,
-        );
-        note.pitch = pitch;
-        note.starttime = starttime;
-      }
-      //wasm播放这个音符
-      // state.wasm_song.play_single_note(note.pitch, note.starttime, note.duration)
-    },
-    // 更新音符持续时间：
-    // 直接删除旧的音符，插入更新后的音符
-    updateNoteDuration(state, { id, duration }) {
-      const note = state.notes.find((n) => n.id === id);
-      if (note) {
-        // if (duration < note.duration) {
-        //   state.wasm_song.edit_pattern("delete", 88 - note.pitch, note.starttime, note.starttime + note.duration)
-        // }
-        // else if (duration > note.duration) {
-        //   state.wasm_song.edit_pattern("insert", 88 - note.pitch, note.starttime, note.starttime + note.duration)
-        // }
-        // note.duration = duration
-        state.wasm_song.edit_pattern(
-          "delete",
-          88 - note.pitch,
-          note.starttime,
-          note.starttime + note.duration,
-        );
-        state.wasm_song.edit_pattern(
-          "insert",
-          88 - note.pitch,
-          note.starttime,
-          note.starttime + duration,
-        );
-
-        note.duration = duration;
-      }
-    },
-    emptyNotes(state) {
-      state.notes = [];
-    },
-    // 切换选中的pattern时,将note复制回旧pattern,从新pattern中复制note
-    saveNotes(state) {
-      const pattern = state.patterns.find((p) => p.id === state.activePattern);
-      if (pattern) {
-        // console.log("save notes to old pattern", pattern.notes, state.notes)
-        pattern.notes = state.notes;
-        pattern.scrollX = state.pianoroll_scrollX;
-        pattern.scrollY = state.pianoroll_scrollY;
-        pattern.scaleX = state.pianoroll_scaleX;
-        pattern.scaleY = state.pianoroll_scaleY;
-      }
-    },
-    loadNotes(state) {
-      const pattern = state.patterns.find((p) => p.id === state.activePattern);
-      if (pattern) {
-        state.notes = pattern.notes;
-        // console.log("load notes from new pattern", pattern.notes, state.notes)
-      }
-      state.pianoroll_scrollX = pattern.scrollX;
-      state.pianoroll_scrollY = pattern.scrollY;
-      state.pianoroll_scaleX = pattern.scaleX;
-      state.pianoroll_scaleY = pattern.scaleY;
-      // for (var i = 0; i < state.notes.length; ++i) {
-      // console.log(state.notes[i].id)
-      // }
-    },
+    }
   },
-  getters: {
-    getActivePattern: (state) =>
-      state.patterns.find((p) => p.id === state.activePattern),
+  rename({ commit, rootState }, { id, name }) {
+    const pattern = rootState.pattern.data.find((p) => p.id === id);
+    if (pattern) {
+      console.log("renamepattern", name)
+      rootState.wasm_song.rename_pattern(id, name);
+      commit("rename", {id, name});
+    }
   },
+  delete({ commit, rootState }, id) {
+    const pattern = rootState.pattern.data.find((p) => p.id === id);
+    if (pattern) {
+      commit("display/deleteByPattern", id, {root:true});
+      commit("delete", id);
+      rootState.notes = [];
+      if(rootState.wasm_song){
+        rootState.wasm_song.delete_pattern(id);
+        rootState.wasm_song.filter_display_without_pattern_id(id);    
+      }
+    }   
+  },
+  sort({ commit, rootState }, { index, newIndex }) {
+    commit("sort", {index, newIndex})
+    // const draggedItem = state.pattern.data.splice(index, 1)[0]; // 移除被拖拽的元素
+    // state.pattern.data.splice(newIndex, 0, draggedItem);
+    state.wasm_song.sort_display();
+  },
+};
+export default {
+  namespaced: true,
+  state,
+  mutations,
+  getters,
+  actions,
+  // Actions 可以在需要时添加
 };

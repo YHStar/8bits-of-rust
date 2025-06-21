@@ -7,6 +7,7 @@ import pattern from "./modules/pattern";
 import channel from "./modules/channel";
 import synthesiser from "./modules/synthesiser";
 import song from "./modules/song";
+import playunit from "./modules/playunit";
 import display from "./modules/display";
 import pianoroll from "./modules/pianorolls";
 import exportsongs from "./modules/exportsongs";
@@ -20,14 +21,14 @@ export default createStore({
     // 歌曲列表
     // songs: [],
     // display列表
-    displays: [],
+    // displays: [],
 
     // 当前路径
     // currentRoute: "/",
     //被激活的页面
     // activeComposePage: "plugin",
     // 激活中的pattern的id
-    activePattern: 0,
+    // activePattern: 0,
 
     //mixer状态
     // channels_params: [
@@ -105,14 +106,15 @@ export default createStore({
       }
 
       // 把正在编辑的pattern保存
-      var pattern = state.patterns.find((p) => p.id === state.activePattern);
+      var pattern = state.pattern.data.find((p) => p.id === state.pattern.activeId);
       if (pattern) {
         // console.log("save notes to old pattern", pattern.notes, state.notes)
         pattern.notes = state.notes;
       }
+      // state.pattern.data = Array.from(state.patterns)
       //初始化所有pattern
-      for (var i = 0; i < state.patterns.length; ++i) {
-        var pattern = state.patterns[i];
+      for (var i = 0; i < state.pattern.data.length; ++i) {
+        var pattern = state.pattern.data[i];
         console.log(pattern.name, pattern.id);
         state.wasm_song.new_pattern(pattern.name, pattern.id);
         state.wasm_song.set_active_pattern(pattern.id);
@@ -127,11 +129,11 @@ export default createStore({
         }
       }
       //初始化active pattern
-      state.wasm_song.set_active_pattern(state.activePattern);
+      state.wasm_song.set_active_pattern(state.pattern.activeId);
 
       // 初始化所有display
-      for (var i = 0; i < state.displays.length; ++i) {
-        var display = state.displays[i];
+      for (var i = 0; i < state.display.data.length; ++i) {
+        var display = state.display.data[i]
         state.wasm_song.push_display(
           display.channel,
           display.patternId,
@@ -161,73 +163,7 @@ export default createStore({
       //wasm重置函数
     },
 
-    // 页面状态相关
-    setActivePattern(state, id) {
-      state.activePattern = id;
-      state.wasm_song.set_active_pattern(id);
-    },
 
-    // state.displays
-    addDisplay(state, newDisplay) {
-      state.displays.push(newDisplay);
-      state.wasm_song.push_display(
-        newDisplay.channel,
-        newDisplay.patternId,
-        newDisplay.duration,
-        newDisplay.starttime,
-      );
-      state.wasm_song.sort_display();
-      // console.log("display pattern")
-      // for (var i = 0; i < state.displays.length; ++i){
-      //   console.log(state.displays[i]);
-      // }
-    },
-    deleteDisplay(state, { id }) {
-      const display = state.displays.find((p) => p.id === id);
-      if (display) {
-        const index = state.displays.findIndex((p) => p.id === id);
-        state.displays.splice(index, 1);
-        state.wasm_song.delete_display(
-          display.channel,
-          display.patternId,
-          display.starttime,
-        );
-      }
-    },
-    updateDisplayPosition(state, { id, starttime, channel }) {
-      const display = state.displays.find((d) => d.id === id);
-      if (display) {
-        // 对wasm，直接先删除再插入
-        state.wasm_song.delete_display(
-          display.channel,
-          display.patternId,
-          display.starttime,
-        );
-        state.wasm_song.push_display(
-          channel,
-          display.patternId,
-          display.duration,
-          starttime,
-        );
-        state.wasm_song.sort_display();
-
-        display.starttime = starttime;
-        display.channel = channel;
-      }
-    },
-    updateDisplayDuration(state, { id, duration }) {
-      const display = state.displays.find((d) => d.id === id);
-      if (display) {
-        display.duration = duration;
-        // 对wasm，直接先删除再插入
-        state.wasm_song.update_display_duration(
-          display.channel,
-          display.patternId,
-          display.starttime,
-          duration,
-        );
-      }
-    },
 
     // state.notes
     addNote(state, note) {
@@ -302,7 +238,7 @@ export default createStore({
     },
     // 切换选中的pattern时,将note复制回旧pattern,从新pattern中复制note
     saveNotes(state) {
-      const pattern = state.patterns.find((p) => p.id === state.activePattern);
+      const pattern = state.pattern.data.find((p) => p.id === state.pattern.activeId);
       if (pattern) {
         // console.log("save notes to old pattern", pattern.notes, state.notes)
         pattern.notes = state.notes;
@@ -313,7 +249,7 @@ export default createStore({
       }
     },
     loadNotes(state) {
-      const pattern = state.patterns.find((p) => p.id === state.activePattern);
+      const pattern = state.pattern.data.find((p) => p.id === state.pattern.activeId);
       if (pattern) {
         state.notes = pattern.notes;
         // console.log("load notes from new pattern", pattern.notes, state.notes)
@@ -326,92 +262,6 @@ export default createStore({
       // console.log(state.notes[i].id)
       // }
     },
-
-    // state.patterns
-    addPattern: (state, pattern) => {
-      state.patterns.push(pattern);
-      state.wasm_song.new_pattern(
-        pattern.name,
-        pattern.id,
-        pattern.scrollX,
-        pattern.scrollY,
-        pattern.scaleX,
-        pattern.scaleY,
-      );
-    },
-    deletePattern(state, id) {
-      state.patterns = state.patterns.filter((n) => n.id !== id);
-      state.displays = state.displays.filter((n) => n.patternId !== id); // 删除pattern也会删除对应的所有display
-      state.notes = [];
-      state.wasm_song.delete_pattern(id);
-      state.wasm_song.filter_display_without_pattern_id(id);
-    },
-    renamePattern(state, { id, name }) {
-      // console.log("renamepattern", name)
-      const pattern = state.patterns.find((p) => p.id === id);
-      if (pattern) pattern.name = name;
-      state.wasm_song.rename_pattern(id, name);
-    },
-    sortPattern(state, { index, newIndex }) {
-      const draggedItem = state.patterns.splice(index, 1)[0]; // 移除被拖拽的元素
-      state.patterns.splice(newIndex, 0, draggedItem);
-      state.wasm_song.sort_display();
-    },
-
-    // state.songs
-    // addSong(state, song) {
-    //   state.songs.push(song);
-    //   // state.rust_songs.push(songWrapper.new(song))
-    // },
-    // deleteSong(state, index) {
-    //   state.songs.splice(index, 1);
-    //   // state.rust_songs.splice(index, 1)
-    // },
-    // setSongName(state, name) {
-    //   state.songName = name;
-    // },
-
-    // //synthesizer状态相关
-    // setAttack(state, { index, value }) {
-    //   state.synths_params[index].attack = value;
-    //   // console.log(
-    //   //   "setAttack index = ",
-    //   //   index,
-    //   //   " value = ",
-    //   //   state.synths_params[index].attack,
-    //   // );
-    //   state.wasm_song.set_synth_attack(index, value);
-    // },
-    // setDecay(state, { index, value }) {
-    //   state.synths_params[index].dscay = value;
-    //   // console.log(
-    //   //   "setDecay index = ",
-    //   //   index,
-    //   //   " value = ",
-    //   //   state.synths_params[index].decay,
-    //   // );
-    //   state.wasm_song.set_synth_decay(index, value);
-    // },
-    // setSustain(state, { index, value }) {
-    //   state.synths_params[index].sustain = value;
-    //   // console.log(
-    //   //   "setSustain index = ",
-    //   //   index,
-    //   //   " value = ",
-    //   //   state.synths_params[index].sustain,
-    //   // );
-    //   state.wasm_song.set_synth_sustain(index, value);
-    // },
-    // setRelease(state, { index, value }) {
-    //   state.synths_params[index].release = value;
-    //   // console.log(
-    //   //   "setRelease index = ",
-    //   //   index,
-    //   //   " value = ",
-    //   //   state.synths_params[index].release,
-    //   // );
-    //   state.wasm_song.set_synth_release(index, value);
-    // },
 
     // 钢琴窗相关状态
 
@@ -454,13 +304,18 @@ export default createStore({
     clearSelection(state) {
       state.selectedNotes.clear();
     },
-    // setExportFormat(state, format) {
-    //   state.exportFormat = format;
-    // },
   },
-  getters: {
-    getActivePattern: (state) =>
-      state.patterns.find((p) => p.id === state.activePattern),
+  modules: {
+    route,
+    channel,
+    pattern,
+    synthesiser,
+    song,
+    playunit,
+    display,
+    // pianoroll,
+    exportsongs,
+    
   },
   modules: {
     route,

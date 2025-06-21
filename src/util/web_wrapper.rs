@@ -206,7 +206,7 @@ impl SongWrapper {
         source.set_loop(true);
         source.set_buffer(Some(&buffer));
         source.connect_with_audio_node(&audio_ctx.destination())?;
-        source.set_loop(false);
+        // source.set_loop(false);
         source.start()?;
 
         Ok(())

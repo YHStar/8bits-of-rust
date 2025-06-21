@@ -41,5 +41,15 @@ export default {
       }
       commit("setSongName", value);
     },
+    exportSong({ rootState }) {
+      console.log("Export Song");
+      if (rootState.wasm_song) {
+        // rootState.wasm_song.exportSong(
+        //   rootState.exportsongs.songName || "untitled", 
+        //   rootState.exportsongs.bitWidth, 
+        //   rootState.exportsongs.format, 
+        // );
+      }
+    },    
   },
 };

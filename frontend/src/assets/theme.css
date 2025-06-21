@@ -19,7 +19,7 @@
   --global-background: rgba(255, 202, 28, 0.25);
   /* --global-background: #eee */
   --global-border: #5f5f5f;
-  --global-grid: #aaa;
+  --global-grid: #999;
   --global-disabled: #555;
   --global-highlight: #ffffff;
   --global-ghost: #bbb;
@@ -27,6 +27,7 @@
   --global-text-shadow: #b4b4b4b7;
   --global-label-text: #ccc; 
   --global-headbar: #444;
+  --global-bar: #bbb;
   --global-handler: rgb(255, 153, 0);
 }
 

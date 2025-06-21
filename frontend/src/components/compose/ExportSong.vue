@@ -33,7 +33,7 @@
       />
     </div>
     <div class="export-button">
-      <my-button size="large" text="导出" />
+      <my-button size="large" text="导出" @click="store.dispatch('exportsongs/exportSong')" />
     </div>
   </div>
 </template>
@@ -46,7 +46,7 @@ const store = useStore();
 
 // 歌曲名称
 const songName = computed({
-  get: () => store.state.exportsongs.songName,
+  get: () => store.state.exportsongs.songName || "untitled",
   set: (value) => store.dispatch("exportsongs/setSongName", value),
 });
 

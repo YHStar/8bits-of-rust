@@ -1,18 +1,13 @@
-<!-- 播放单元 -->
 <template>
   <div class="play-unit">
     <div class="container1">
-      <my-button
-        size="small"
-        :active="playStatus === 'playing'"
-        @click="play_or_pause"
-      >
+      <my-button size="small" :active="isPlaying" @click="playOrPause">
         <template #icon>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
             <!-- 播放图标（暂停状态时显示） -->
-            <path v-if="playStatus === 'paused'" d="M4 2L14 8L4 14V2Z" />
+            <path v-if="!isPlaying" d="M4 2L14 8L4 14V2Z" />
             <!-- 暂停图标（播放状态时显示） -->
-            <g v-if="playStatus === 'playing'">
+            <g v-if="isPlaying">
               <rect x="4" y="2" width="4" height="12" rx="1" />
               <rect x="10" y="2" width="4" height="12" rx="1" />
             </g>
@@ -29,11 +24,12 @@
       </my-button>
 
       <my-knob
-        v-model="bpm"
-        :min="10"
-        :max="500"
+        :model-value="bpm"
+        :min="0.1"
+        :max="1"
+        :ratio="500"
         label="BPM"
-        @change="updateInterval"
+        @update:model-value="handleBpmChange"
       />
       <my-text class="bpm-value" content="bpm" />
     </div>
@@ -52,35 +48,54 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { useClock } from "./useClock";
 import { useStore } from "vuex";
 
-const playStatus = ref("paused");
-const progress = ref(0);
 const store = useStore();
 
-const play_or_pause = () => {
-  // 播放/暂停按钮逻辑
-  if (playStatus.value == "paused") {
-    playStatus.value = "playing";
-    store.commit("play");
-  } else if (playStatus.value == "playing") {
-    playStatus.value = "paused";
-    store.commit("pause");
+// 使用时钟功能并直接解构响应式变量
+const {
+  bpm,
+  isPlaying,
+  progress,
+  measureCount,
+  formattedTime,
+  startClock,
+  pauseClock,
+  resetClock,
+} = useClock();
+
+// 处理 BPM 变更
+const handleBpmChange = (newBpm) => {
+  if (newBpm < 0.1 || newBpm > 1) {
+    console.warn("BPM must be between 50 and 500");
+  }
+  newBpm = Math.max(0.1, Math.min(newBpm, 1)); // 这里确保bpm范围是50-500
+  console.log("BPM changed to:", newBpm * 500);
+  store.dispatch("playunit/setBpm", newBpm);// 后端更改Bpm
+  bpm.value = newBpm;
+};
+
+// 播放/暂停按钮逻辑
+const playOrPause = () => {
+  if (!isPlaying.value) {
+    startClock();
+    store.commit("play");// 后端播放歌曲
   } else {
-    console.log("unknown status!");
+    pauseClock();
+    store.commit("pause");// 后端暂停播放歌曲
   }
 };
 
+// 重置按钮逻辑
 const reset = () => {
-  //重播按钮逻辑
-  store.commit("reset");
-  playStatus.value = "paused";
-  progress.value = 0;
+  resetClock();
+  store.commit("reset");// 后端暂停并重置歌曲
 };
 </script>
 
 <style scoped>
+/* 保留原有样式不变 */
 .play-unit {
   margin-top: -10px;
   padding: 4px;
@@ -103,7 +118,7 @@ const reset = () => {
 .progress-bar {
   height: 100%;
   background: var(--global-highlight);
-  transition: width 0.3s ease;
+  transition: width 0.1s ease;
 }
 .timer-display {
   display: flex;

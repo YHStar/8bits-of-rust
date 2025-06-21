@@ -12,7 +12,7 @@ export function useDragDrop(commit) {
       e.preventDefault();
     },
     drop: (index) => {
-      commit("sortPattern", {
+      commit("pattern/sort", {
         index: draggingIndex.value,
         newIndex: index,
       });
