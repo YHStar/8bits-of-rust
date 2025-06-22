@@ -6,6 +6,7 @@
         <my-text content="导出格式：" size="large" />
         <my-select
           v-model="exportFormat"
+          setDefault="true"
           :options="[
             { label: '.mp3', value: 'mp3' },
             { label: '.wav', value: 'wav' },
@@ -16,6 +17,7 @@
         <my-text content="导出位宽：" size="large" />
         <my-select
           v-model="exportBitWidth"
+          setDefault="true"
           :options="[
             { label: '8bit', value: '8bit' },
             { label: '16bit', value: '16bit' },

@@ -22,7 +22,7 @@ export default { name: "MySelect" };
 </script>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 
 const props = defineProps({
   options: {
@@ -34,6 +34,10 @@ const props = defineProps({
   modelValue: {
     type: [String, Number],
     default: "",
+  },
+  setDefault: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -51,6 +55,14 @@ watch(
   { immediate: true },
 );
 
+onMounted(() => {
+  if (props.setDefault && props.options.length > 0) {
+    const firstOption = props.options[0];
+    emit("update:modelValue", firstOption.value);
+    selectedLabel.value = firstOption.label;
+  }
+});
+
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value;
 };
@@ -66,46 +78,6 @@ const selectOption = (option) => {
   isOpen.value = false;
 };
 </script>
-<!-- <script setup>
-import { ref, watch } from "vue";
-
-const props = defineProps({
-  options: {
-    type: Array,
-    required: true,
-    validator: (value) =>
-      value.every((opt) => "value" in opt && "label" in opt),
-  },
-  modelValue: { 
-    type: [String, Number],
-    default: "",
-  },
-});
-
-const emit = defineEmits(["update:modelValue"]);
-
-const isOpen = ref(false);
-const selectedLabel = ref("请选择");
-
-watch(
-  () => props.modelValue,
-  (newVal) => {
-    const selected = props.options.find((opt) => opt.value === newVal);
-    selectedLabel.value = selected ? selected.label : "";
-  },
-  { immediate: true },
-);
-
-const toggleDropdown = () => {
-  isOpen.value = !isOpen.value;
-};
-
-const selectOption = (option) => {
-  emit("update:modelValue", option.value);
-  selectedLabel.value = option.label;
-  isOpen.value = false;
-};
-</script> -->
 
 <style scoped>
 .pixel-select {

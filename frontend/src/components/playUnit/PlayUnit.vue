@@ -42,7 +42,16 @@
       <div class="timer-display">
         <my-text class="time" :content="formattedTime" />
         <my-text class="measure" :content="measureCount + '  小节'" />
-      </div>
+
+      </div>        
+      <my-select
+        v-model="play_song_or_pattern"
+        setDefault="true"
+        :options="[
+          { label: 'song', value: 0 },
+          { label: 'pattern', value: 1 },
+        ]"
+      />
     </div>
   </div>
 </template>
@@ -50,6 +59,7 @@
 <script setup>
 import { useClock } from "./useClock";
 import { useStore } from "vuex";
+import { computed } from "vue";
 
 const store = useStore();
 
@@ -86,6 +96,12 @@ const playOrPause = () => {
     store.commit("pause");// 后端暂停播放歌曲
   }
 };
+
+// 播放歌曲还是乐段？
+const play_song_or_pattern = computed({
+  get: () => store.state.playunit.play_song_or_pattern,
+  set: (value) => store.dispatch("playunit/setPlaySongOrPattern", value),
+});
 
 // 重置按钮逻辑
 const reset = () => {
