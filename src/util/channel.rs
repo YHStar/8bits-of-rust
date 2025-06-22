@@ -4,7 +4,7 @@ use super::pattern::display;
 use crate::Score;
 use crate::util::pattern::display::Display;
 
-// 通道（由于一个通道对饮一个乐器/音色，这个结构体相当于储存了合成器参数）
+// 通道（由于一个通道对应一个乐器/音色，这个结构体相当于储存了合成器参数）
 pub struct Channel {
     pub name: String,// 通道名称
     // score: Score,

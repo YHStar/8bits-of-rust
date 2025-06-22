@@ -13,7 +13,9 @@ multimap = "0.10.0"
 winapi = { version = "0.3", features = ["winuser"] }
 wasm-bindgen = "0.2.100"
 console_error_panic_hook = "0.1.7"
-web-sys = { version = "0.3", features = ["AudioContext", "AudioBuffer", "AudioBufferSourceNode"] }
+web-sys = { version = "0.3", features = ["AudioContext", "AudioBuffer", "AudioBufferSourceNode",'Blob',
+  'BlobPropertyBag','Url','HtmlAnchorElement','Document','Window','Element','HtmlElement'] }
+js-sys = "0.3"
 log = "0.4"      # 官方日志接口
 gloo-console = "0.3.0"   # 日志实现，支持文件输出和级别控制
 
