@@ -5,6 +5,7 @@
       <my-text v-bind:content="'轨道编号: '" size="large" />
       <my-select
         v-model="synths_active_id"
+        setDefault="true"
         :options="[
           { label: '1', value: 0 },
           { label: '2', value: 1 },
@@ -18,6 +19,7 @@
       <my-text v-bind:content="'波形预设: '" size="large" />
       <my-select
         v-model="synths_params[synths_active_id].preset"
+        setDefault="true"
         :options="[
           { label: 'square', value: 'square' },
           { label: 'saw', value: 'saw' },
