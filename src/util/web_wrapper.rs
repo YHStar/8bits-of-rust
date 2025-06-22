@@ -1,8 +1,7 @@
-use super::{pattern::display::Display, song::Song};
-use super::pattern::pattern::Pattern;
-use crate::Note;
-use crate::{mixer, generate_wav, load_wav};
-use super::parameter::baseconst::{ UNEXIST_PATTERN_INDEX, SAMPLE_RATE };
+use super::song::Song;
+use crate::util::parameter::baseconst::BPM;
+use crate::mixer;
+use super::parameter::baseconst::{ UNEXIST_PATTERN_INDEX, SAMPLE_RATE};
 use super::basetype::{PatternID, Timebase};
 extern crate wasm_bindgen;
 use wasm_bindgen::prelude::*;
@@ -10,7 +9,7 @@ use web_sys::{AudioContext, AudioBuffer, AudioBufferSourceNode};
 use gloo_console::log;
 use std::io::Cursor;
 use wasm_bindgen::JsValue;
-use web_sys::{Blob, BlobPropertyBag, Url, HtmlElement, HtmlAnchorElement};
+use web_sys::{Blob, BlobPropertyBag, Url, HtmlAnchorElement};
 use hound::{WavSpec, SampleFormat, WavWriter};
 use js_sys;
 
@@ -18,6 +17,15 @@ use js_sys;
 pub struct SongWrapper {
     song: Song,
     active_pattern_index: usize,
+
+    audio_ctx: AudioContext,
+    audio_buffer: Option<AudioBuffer>,
+    source_node: Option<AudioBufferSourceNode>,
+    start_time: f64,
+    paused_time: f64,
+    is_playing: bool,
+    is_paused: bool,
+    duration: f64, // 音频持续时间
 }
 
 #[wasm_bindgen]
@@ -27,6 +35,14 @@ impl SongWrapper {
             song: Song::new(name, 
                 0),
             active_pattern_index: UNEXIST_PATTERN_INDEX,
+            audio_ctx: AudioContext::new().expect("Failed to create AudioContext"),
+            audio_buffer: None,
+            source_node: None,
+            start_time: 0.0,
+            paused_time: 0.0,
+            is_playing: false,
+            is_paused: false,
+            duration: 16.0 * 60.0 / BPM as f64, // 默认持续时间为64个时基的长度
         }
     } // fn new
 
@@ -179,13 +195,12 @@ impl SongWrapper {
         self.song.push_display(channel_index, pattern_id, duration, start_time);
     }
 
-    // 播放当前工程中的音频
-    pub fn play(&self) -> Result<(), JsValue> {
-        log!("need play song!");
-        // 从歌曲文件渲染采样
-        // TODO：设置音频缓冲区，实时渲染音频并且播放
+    // 从song生成采样加载到成员变量audio_buffer
+    fn load(&mut self) -> Result<(), JsValue> {
+        // 调用 `mixer` 函数获取左右声道的音频样本
         let (left_sample, right_sample) = mixer(&self.song);
         
+        // 将左声道音频样本从 i8 转换为 Float32
         // 转换 i8 到 Float32
         let float_left_samples: Vec<f32> = left_sample
         .iter()
@@ -197,25 +212,103 @@ impl SongWrapper {
         .map(|&x| x as f32 / 128.0)
         .collect();
 
-        // 创建 AudioContext
-        let audio_ctx = AudioContext::new()?;
-
         // 创建 AudioBuffer
-        let buffer = audio_ctx
+        self.audio_buffer = self.audio_ctx
         .create_buffer(2, left_sample.len() as u32, SAMPLE_RATE as f32)
-        .expect("Failed to create audio buffer");
-        buffer.copy_to_channel(&float_left_samples, 0)?;
-        buffer.copy_to_channel(&float_right_samples, 1)?;
-
-        let source = AudioBufferSourceNode::new(&audio_ctx)?;
-        source.set_loop(true); // 循环播放该音频
-        source.set_buffer(Some(&buffer));
-        source.connect_with_audio_node(&audio_ctx.destination())?;
-        // source.set_loop(false); 
-        source.start()?;
+        .ok();
+        if let Some(buffer) = &self.audio_buffer {
+            buffer.copy_to_channel(&float_left_samples, 0)?;
+            buffer.copy_to_channel(&float_right_samples, 1)?;
+        }
 
         Ok(())
-    }
+    } // fn load
+
+    // 播放当前工程中的音频
+    pub fn play(&mut self) -> Result<(), JsValue> {
+        if self.is_playing {
+            return Ok(());
+        }
+
+        log!("need play song!");
+        // 从歌曲文件渲染采样
+
+        // 创建 AudioBufferSourceNode
+        let source = AudioBufferSourceNode::new(&self.audio_ctx)?;
+        source.set_loop(true); // 循环播放该音频
+        // source.set_loop(false); 
+        self.load();
+        source.set_buffer(Some(&self.audio_buffer.as_ref().unwrap()));
+        source.connect_with_audio_node(&self.audio_ctx.destination())?;
+        let start_offset = if self.is_paused {
+            self.paused_time
+        } else {
+            0.0
+        };
+        source.start_with_when_and_grain_offset(
+            self.audio_ctx.current_time(),
+            start_offset,
+        )?;
+        
+        self.start_time = self.audio_ctx.current_time() - start_offset;
+        self.source_node = Some(source);
+        self.is_playing = true;
+        self.is_paused = false;
+
+        Ok(())
+    } 
+
+    pub fn pause(&mut self) -> Result<(), JsValue> {
+        if !self.is_playing {
+            return Ok(());
+        }
+
+        if let Some(source) = &self.source_node {
+            #[allow(deprecated)]
+            source.stop()?;
+            self.paused_time = (self.audio_ctx.current_time() - self.start_time) % self.duration;
+            self.is_playing = false;
+            self.is_paused = true;
+        }
+
+        Ok(())
+    } // fn pause
+
+    // 重置音频
+    pub fn reset(&mut self) -> Result<(), JsValue> {
+        if let Some(source) = &self.source_node {
+            #[allow(deprecated)]
+            source.stop()?;
+            self.start_time = 0.0;
+            self.paused_time = 0.0;
+            self.is_playing = false;
+            self.is_paused = false;
+        }
+
+        Ok(())
+    } // fn reset
+
+    // 重新加载并播放
+    // 暴露给前端，在需要时（pattern or display modified）被调用
+    pub fn reload_and_play(&mut self) -> Result<(), JsValue> {
+        if let Some(source) = &self.source_node {
+            #[allow(deprecated)]
+            source.stop()?;
+        }
+        let reload_time = (self.audio_ctx.current_time() - self.start_time) % self.duration;
+        let source = AudioBufferSourceNode::new(&self.audio_ctx)?;
+        source.set_loop(true); // 循环播放该音频
+        self.load()?;
+        source.set_buffer(Some(&self.audio_buffer.as_ref().unwrap()));
+        source.connect_with_audio_node(&self.audio_ctx.destination())?;
+        source.start_with_when_and_grain_offset(
+            self.audio_ctx.current_time(),
+            reload_time
+        )?;
+        self.source_node = Some(source);
+
+        Ok(())
+    } // fn reload_and_play
 
     pub fn export_song(&self, song_name: String, bit_width: String, format: String) -> Result<(), JsValue>
     {
@@ -238,15 +331,6 @@ impl SongWrapper {
         .map(|&x| x as f32 / 128.0)
         .collect();
 
-        // 2. 使用 hound 定义 WAV 规格
-        // 您的样本是 i8，对应 hound 的 8-bit PCM 格式
-        let spec = WavSpec {
-            channels: 2,
-            sample_rate: SAMPLE_RATE,
-            bits_per_sample: 8,
-            sample_format: SampleFormat::Int,
-        };
-
         // 3. 将 WAV 数据写入内存缓冲区
         let mut cursor = Cursor::new(Vec::new());
 
@@ -268,8 +352,8 @@ impl SongWrapper {
                     // hound 的 i8 样本范围是全范围的，这里使用 127.0
                     let left_i8 = (left_sample[i] * 127.0) as i8;
                     let right_i8 = (right_sample[i] * 127.0) as i8;
-                    writer.write_sample(left_i8).map_err(|e| JsValue::from_str("Failed to write left sample"))?;
-                    writer.write_sample(right_i8).map_err(|e| JsValue::from_str("Failed to write right sample"))?;
+                    writer.write_sample(left_i8).map_err(|_| JsValue::from_str("Failed to write left sample"))?;
+                    writer.write_sample(right_i8).map_err(|_| JsValue::from_str("Failed to write right sample"))?;
                 }
             }
             "16bit" => {
@@ -287,8 +371,8 @@ impl SongWrapper {
                     // 将 f32 ([-1.0, 1.0]) 转换为 i16 ([-32768, 32767])
                     let left_i16 = (left_sample[i] * 32767.0) as i16;
                     let right_i16 = (right_sample[i] * 32767.0) as i16;
-                    writer.write_sample(left_i16).map_err(|e| JsValue::from_str("Failed to write left sample"))?;
-                    writer.write_sample(right_i16).map_err(|e| JsValue::from_str("Failed to write right sample"))?;
+                    writer.write_sample(left_i16).map_err(|_| JsValue::from_str("Failed to write left sample"))?;
+                    writer.write_sample(right_i16).map_err(|_| JsValue::from_str("Failed to write right sample"))?;
                 }
             }
             "24bit" => {
@@ -308,8 +392,8 @@ impl SongWrapper {
                     const MAX_24BIT: f32 = 8388607.0; // 2^23 - 1
                     let left_i24 = (left_sample[i] * MAX_24BIT) as i32;
                     let right_i24 = (right_sample[i] * MAX_24BIT) as i32;
-                    writer.write_sample(left_i24).map_err(|e| JsValue::from_str("Failed to write left sample"))?;
-                    writer.write_sample(right_i24).map_err(|e| JsValue::from_str("Failed to write right sample"))?;
+                    writer.write_sample(left_i24).map_err(|_| JsValue::from_str("Failed to write left sample"))?;
+                    writer.write_sample(right_i24).map_err(|_| JsValue::from_str("Failed to write right sample"))?;
                 }
             }
             "32bit" => {
@@ -326,8 +410,8 @@ impl SongWrapper {
                 
                 for i in 0..left_sample.len() {
                     // 直接写入 f32 样本
-                    writer.write_sample(left_sample[i]).map_err(|e| JsValue::from_str("Failed to write left sample"))?;
-                    writer.write_sample(right_sample[i]).map_err(|e| JsValue::from_str("Failed to write right sample"))?;
+                    writer.write_sample(left_sample[i]).map_err(|_| JsValue::from_str("Failed to write left sample"))?;
+                    writer.write_sample(right_sample[i]).map_err(|_| JsValue::from_str("Failed to write right sample"))?;
                 }
             }
             // 默认或不支持的格式
@@ -346,7 +430,7 @@ impl SongWrapper {
 
         let uint8_array = js_sys::Uint8Array::from(buffer.as_slice());
         
-        let mut blob_options = BlobPropertyBag::new();
+        let blob_options = BlobPropertyBag::new();
         blob_options.set_type("audio/wav");
         
         let blob = Blob::new_with_u8_array_sequence_and_options(
@@ -410,14 +494,6 @@ impl SongWrapper {
         log!("Raw PCM data generated. Length: {}", interleaved_pcm.len());
         interleaved_pcm
     }
-
-    // pub fn save_to_file(&self, file_path: &str) {
-    //     self.song.save_to_file(file_path);
-    // }
-
-    // pub fn read_from_file(&mut self, file_path: &str) {
-    //     self.song.read_from_file(file_path).unwrap();
-    // }
 } // impl SongWrapper
 
 /*
