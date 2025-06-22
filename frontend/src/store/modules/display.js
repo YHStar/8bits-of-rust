@@ -84,10 +84,12 @@ const actions = {
         starttime
       );
       rootState.wasm_song.sort_display();
+      rootState.wasm_song.reload_and_play();
     }
   },
   updateDuration({ commit, rootState }, { id, duration }) {
     const display = rootState.display.data.find(d => d.id === id);
+    console.log("updateDisplayDuration id=", id);
     if (display) {
       commit('updateDuration', { id, duration });
       rootState.wasm_song.update_display_duration(
@@ -96,6 +98,7 @@ const actions = {
         display.starttime,
         duration
       );
+      rootState.wasm_song.reload_and_play();
     }
   }
 };
