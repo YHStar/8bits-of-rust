@@ -137,7 +137,7 @@ impl SongWrapper {
         start_time: Timebase,
         end_time: Timebase,
     ) {
-        log!("edit pattern!");
+        log!("edit pattern!{}",note_idx);
         if self.active_pattern_index != UNEXIST_PATTERN_INDEX {
             self.song.edit_pattern(self.active_pattern_index, mode, note_idx, start_time, end_time);
             // self.pattern_content_log();
