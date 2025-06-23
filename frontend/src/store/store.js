@@ -155,18 +155,12 @@ export default createStore({
     // },
     pause(state) {
       // 暂停
-      // console.log("pause")
-      //wasm暂停函数
+      state.wasm_song.pause();
     },
     reset(state) {
       // 重置
-      // console.log("reset")
-      //wasm重置函数
+      state.wasm_song.reset();
     },
-
-
-
-    // state.notes
     addNote(state, note) {
       state.wasm_song.edit_pattern(
         "insert",
@@ -174,6 +168,7 @@ export default createStore({
         note.starttime,
         note.starttime + note.duration,
       );
+      state.wasm_song.reload_and_play();
       state.notes.push(note);
     },
     deleteNote(state, note) {
@@ -183,6 +178,7 @@ export default createStore({
         note.starttime,
         note.starttime + note.duration,
       );
+      state.wasm_song.reload_and_play();
       state.notes = state.notes.filter((n) => n.id !== note.id);
     },
     updateNotePosition(state, { id, starttime, pitch }) {
@@ -200,6 +196,7 @@ export default createStore({
           starttime,
           starttime + note.duration,
         );
+        state.wasm_song.reload_and_play();
         note.pitch = pitch;
         note.starttime = starttime;
       }
@@ -211,13 +208,6 @@ export default createStore({
     updateNoteDuration(state, { id, duration }) {
       const note = state.notes.find((n) => n.id === id);
       if (note) {
-        // if (duration < note.duration) {
-        //   state.wasm_song.edit_pattern("delete", 88 - note.pitch, note.starttime, note.starttime + note.duration)
-        // }
-        // else if (duration > note.duration) {
-        //   state.wasm_song.edit_pattern("insert", 88 - note.pitch, note.starttime, note.starttime + note.duration)
-        // }
-        // note.duration = duration
         state.wasm_song.edit_pattern(
           "delete",
           88 - note.pitch,
@@ -230,7 +220,7 @@ export default createStore({
           note.starttime,
           note.starttime + duration,
         );
-
+        state.wasm_song.reload_and_play();
         note.duration = duration;
       }
     },
