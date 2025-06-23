@@ -52,7 +52,7 @@ import { useStore } from "vuex";
 const store = useStore();
 
 // 状态映射
-const n_channels = computed(() => store.state.channels_params.length);
+const n_channels = computed(() => store.state.channel.params.length);
 const channels_params = computed({
   get: () => store.state.channel.params,
   set: (value) => store.dispatch("channel/setChannelParams", value),

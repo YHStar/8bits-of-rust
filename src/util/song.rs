@@ -1,5 +1,8 @@
 use rodio::cpal::Sample;
 
+use crate::util::basetype::create_debug_sine_wave_sample;
+use crate::util::basetype::SampleBank;
+use crate::util::basetype::SingleSample;
 use crate::Channel;
 use crate::Pattern;
 use crate::Score;
@@ -8,6 +11,9 @@ use std::io::Read;
 use std::io::Write;
 use std::string;
 use std::vec;
+use std::sync::Arc;
+use std::f32::consts::PI;
+
 
 use super::basefn::mixer;
 use super::basetype::Level;
@@ -22,6 +28,7 @@ pub struct Song {
     pub patterns: Vec<Pattern>,
     pub name: String,
     pub active_synth_id: usize, // 当前激活的合成器索引
+    pub sample_bank: SampleBank, //用于存储采样数据
 } // struct Song
 
 impl Song {
@@ -30,11 +37,17 @@ impl Song {
         active_synth_id: usize,
     ) -> Self 
     {
+        let sample = create_debug_sine_wave_sample(10.0, 2000.0);
+        let sample2 = create_debug_sine_wave_sample(10.0, 1000.0);
+        let mut sample_bank = SampleBank::new();
+        sample_bank.insert(88, sample);
+        sample_bank.insert(87, sample2);
         Self {
             channels: Vec::new(),
             patterns: Vec::new(),
             name: name.to_string(),
             active_synth_id: active_synth_id,
+            sample_bank: sample_bank, //本质是一个HashMap
         }
     }
 
