@@ -10,6 +10,7 @@ use std::thread;
 use std::time::Duration;
 
 use crate::util::channel;
+use crate::util::basetype::ActiveSample;
 use crate::Channel;
 use crate::Level;
 use crate::Midi;
@@ -259,6 +260,7 @@ pub fn mixer(song: &Song) -> (Vec<f32>, Vec<f32>) {
     // let mut left_sample:Vec<f32> = Vec::new();
     // let mut right_sample:Vec<f32> = Vec::new();
     let mut synth_parameters: HashMap<usize, SynthParameters> = HashMap::new();
+    let mut active_samples: Vec<ActiveSample> = Vec::new();                         //用于存储当前活跃度的Sample
 
 
     let mut song_tbase: Timebase = 0;
@@ -302,26 +304,39 @@ pub fn mixer(song: &Song) -> (Vec<f32>, Vec<f32>) {
                 if let Some(midis) = current_pattern.get_vec(song_tbase - dis.start_time) {
                     for midi in midis {
                         // log!("test_midi type: ", midi.typ, "pitch: ",FREQ_DATA[midi.note as usize] * 2.0);
+                        log!("test_midi note:{}",midi.note);
                         if midi.typ == START!() as NoteType {
-                            // 若midi信号的类型是START，就设置合成器相关参数,并且加入到synth_parameters中
-                            synth_parameters.insert(
-                                channel_idx * 128 + midi.note as usize,
-                                SynthParameters::new(
-                                    FREQ_DATA[midi.note as usize] * 2.0,
-                                    channels[channel_idx].volume,
-                                    channels[channel_idx].pan,
-                                    &channels[channel_idx].preset,
-                                    channels[channel_idx].n_poly,
-                                    channels[channel_idx].be_modulated,
-                                    channels[channel_idx].attack,
-                                    channels[channel_idx].decay,
-                                    channels[channel_idx].sustain,
-                                    channels[channel_idx].release,
-                                    //这里应该添加音量包络的参数     
-                                ),
-                            );
+                            // 分别处理采样和合成
+                            if let Some(sample_to_play) = song.sample_bank.get(&midi.note)
+                            {
+                                log!("Triggering sample for note: {}", midi.note);
+                                active_samples.push(ActiveSample::new(
+                                sample_to_play.clone(), // clone()在这里只复制Arc指针，开销很小
+                                channels[channel_idx].volume,
+                                channels[channel_idx].pan));
+                            }
+                            else {
+                                // 若midi信号的类型是START，就设置合成器相关参数,并且加入到synth_parameters中
+                                synth_parameters.insert(
+                                    channel_idx * 128 + midi.note as usize,
+                                    SynthParameters::new(
+                                        FREQ_DATA[midi.note as usize] * 2.0,
+                                        channels[channel_idx].volume,
+                                        channels[channel_idx].pan,
+                                        &channels[channel_idx].preset,
+                                        channels[channel_idx].n_poly,
+                                        channels[channel_idx].be_modulated,
+                                        channels[channel_idx].attack,
+                                        channels[channel_idx].decay,
+                                        channels[channel_idx].sustain,
+                                        channels[channel_idx].release,
+                                        //这里应该添加音量包络的参数     
+                                    ),
+                                );
+                            }  
                         }
                         if midi.typ == END!() as NoteType {
+                            // 由于采样一般是 one-shot 的，所以一般忽略它们的End信号
                             log!("End Signal");
                             // 若midi信号的类型是END，则遍历synth_parameters，找到对应的midi信号，状态设置为Release
                             for (note_idx,param) in synth_parameters.iter_mut() {
@@ -364,6 +379,31 @@ pub fn mixer(song: &Song) -> (Vec<f32>, Vec<f32>) {
                 _right_sample[_i as usize] += res * right_gain;
             }
         }
+
+        //  NEW: 处理并混合正在播放的采样
+        active_samples.retain(|s| s.is_active); // 移除已经播放完毕的采样
+        for sample_instance in active_samples.iter_mut() {
+            let angle = (sample_instance.pan + 1.0) * std::f32::consts::FRAC_PI_4;
+            let left_gain = angle.cos();    // 应用音量
+            let right_gain = angle.sin();   // 应用音量
+            
+            let sample_data = &sample_instance.sample.data;
+            let sample_len = sample_data.len();
+
+            for i in 0..full_samples as usize {
+                if sample_instance.current_index < sample_len {
+                    let sample_value = sample_data[sample_instance.current_index];
+                    _left_sample[i] += sample_value * left_gain;
+                    _right_sample[i] += sample_value * right_gain;
+                    sample_instance.current_index += 1;
+                } else {
+                    // 采样播放完毕
+                    sample_instance.is_active = false;
+                    break; // 提前退出内部循环，因为这个采样在这个时基内已经没有声音了
+                }
+            }
+        }
+
         left_sample.push(_left_sample);
         right_sample.push(_right_sample);
         clock += full_samples;
