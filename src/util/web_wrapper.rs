@@ -305,6 +305,11 @@ impl SongWrapper {
             self.audio_ctx.current_time(),
             reload_time
         )?;
+        if self.is_paused {
+            #[allow(deprecated)]
+            source.stop()?; 
+        }
+        
         self.source_node = Some(source);
 
         Ok(())
